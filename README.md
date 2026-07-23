@@ -191,8 +191,23 @@ Khai báo Secrets tương ứng ở GitHub (Settings → Secrets and variables �
 
 ## Deploy (Vercel)
 
-App này **chưa nối Vercel** — link `.vercel` của app cũ đã được gỡ để tránh deploy
-đè lên project `vrs-data-catalog`. Khi muốn lên production: tạo **project Vercel
-mới**, nối GitHub repo của app này, rồi khai báo lại `DATABASE_URL`, `APP_PASSWORD`,
-`AUTH_SECRET` trong **Vercel → Settings → Environment Variables** (dùng đúng
-`DATABASE_URL` của app cũ nếu muốn chung một database).
+Mã nguồn: <https://github.com/phongvt6/vrs-data-dashboard> (private).
+
+App **chưa nối Vercel** — cố ý, để không deploy đè lên project `vrs-data-catalog`
+đang chạy. Nối lần đầu:
+
+1. Vercel → **Add New → Project** → Import `phongvt6/vrs-data-dashboard`
+2. **Environment Variables** — thêm 3 biến (lấy giá trị trong `.env.local`):
+
+   | Biến | Ghi chú |
+   | --- | --- |
+   | `DATABASE_URL` | chuỗi Session pooler của Supabase `vrs` |
+   | `APP_PASSWORD` | mật khẩu chung để đăng nhập |
+   | `AUTH_SECRET` | chuỗi random ký cookie phiên |
+
+3. **Deploy**
+
+> ⚠️ **Đừng khai `AUTH_DISABLED` trên Vercel.** Biến đó chỉ để chạy máy local;
+> có nó là mở toang cả `/admin` cho bất kỳ ai có link.
+
+Nối xong thì **push `main` là tự deploy**, không phải làm gì thêm.
