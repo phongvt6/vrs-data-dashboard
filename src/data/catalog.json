@@ -1,0 +1,127 @@
+{
+  "datasets": [
+    {
+      "id": "doanh_thu_loi_nhuan",
+      "ten": "Doanh thu & Lợi nhuận",
+      "nguon": "BigQuery",
+      "duong_dan": "project.dataset.DT-LN-HH-NEW",
+      "chu_so_huu": "Team Data",
+      "tan_suat": "Hàng tháng",
+      "phan_loai_bao_mat": "Nội bộ - Nhạy cảm",
+      "trang_thai": "production",
+      "so_dong": 150000,
+      "mo_ta": "Dữ liệu giao dịch doanh thu và lãi gộp theo SKU, cửa hàng, điểm trạm, ngành và tháng.",
+      "columns": [
+        { "ten": "SKU", "kieu": "STRING", "khoa": "PK", "mo_ta": "Mã hàng hóa" },
+        { "ten": "ten_hang_hoa", "kieu": "STRING", "khoa": "", "mo_ta": "Tên hàng hóa" },
+        { "ten": "don_vi", "kieu": "STRING", "khoa": "", "mo_ta": "Đơn vị tính" },
+        { "ten": "ten_cua_hang", "kieu": "STRING", "khoa": "", "mo_ta": "Tên cửa hàng" },
+        { "ten": "diem_kd", "kieu": "STRING", "khoa": "", "mo_ta": "Điểm kinh doanh" },
+        { "ten": "diem_tram", "kieu": "STRING", "khoa": "FK", "mo_ta": "Điểm trạm (V52-SA1/SA2, V23-RA1/RA2)" },
+        { "ten": "tram", "kieu": "STRING", "khoa": "FK", "mo_ta": "Trạm (V52/V23)" },
+        { "ten": "nganh", "kieu": "STRING", "khoa": "", "mo_ta": "Ngành (Kiosk/Siêu thị/Nhà hàng/Souvenir)" },
+        { "ten": "nam_thang", "kieu": "STRING", "khoa": "", "mo_ta": "Định dạng 2023/01" },
+        { "ten": "nam", "kieu": "INT64", "khoa": "", "mo_ta": "Năm" },
+        { "ten": "thang", "kieu": "INT64", "khoa": "", "mo_ta": "Tháng" },
+        { "ten": "nhom_hh_L3", "kieu": "STRING", "khoa": "FK", "mo_ta": "Nhóm hàng hóa cấp 3" },
+        { "ten": "nhom_hh_L2", "kieu": "STRING", "khoa": "", "mo_ta": "Nhóm hàng hóa cấp 2" },
+        { "ten": "nhom_hh_L1", "kieu": "STRING", "khoa": "", "mo_ta": "Nhóm hàng hóa cấp 1" },
+        { "ten": "so_luong", "kieu": "NUMERIC", "khoa": "", "mo_ta": "Số lượng bán" },
+        { "ten": "gia_von", "kieu": "NUMERIC", "khoa": "", "mo_ta": "Giá vốn đơn vị" },
+        { "ten": "tien_von", "kieu": "NUMERIC", "khoa": "", "mo_ta": "Tiền vốn" },
+        { "ten": "doanh_thu", "kieu": "NUMERIC", "khoa": "", "mo_ta": "Doanh thu" },
+        { "ten": "lai_gop", "kieu": "NUMERIC", "khoa": "", "mo_ta": "Lãi gộp" },
+        { "ten": "gia_ban", "kieu": "NUMERIC", "khoa": "", "mo_ta": "Giá bán" }
+      ]
+    },
+    {
+      "id": "danh_muc_nhom_hh",
+      "ten": "Danh mục nhóm hàng hóa",
+      "nguon": "BigQuery",
+      "duong_dan": "project.dataset.DM-NHOM-HH",
+      "chu_so_huu": "Team Data",
+      "tan_suat": "Ít thay đổi",
+      "phan_loai_bao_mat": "Nội bộ",
+      "trang_thai": "production",
+      "so_dong": 54,
+      "mo_ta": "Cây phân cấp nhóm hàng hóa: 2 nhóm L1 → 17 nhóm L2 → 54 nhóm L3.",
+      "columns": [
+        { "ten": "nhom_hh_L1_ma", "kieu": "STRING", "khoa": "", "mo_ta": "Mã nhóm L1" },
+        { "ten": "nhom_hh_L1_ten", "kieu": "STRING", "khoa": "", "mo_ta": "Tên nhóm L1 (SP Kinh doanh, Đồ tiêu hao)" },
+        { "ten": "nhom_hh_L2_ma", "kieu": "STRING", "khoa": "", "mo_ta": "Mã nhóm L2" },
+        { "ten": "nhom_hh_L2_ten", "kieu": "STRING", "khoa": "", "mo_ta": "Tên nhóm L2" },
+        { "ten": "nhom_hh_L3_ma", "kieu": "STRING", "khoa": "PK", "mo_ta": "Mã nhóm L3" },
+        { "ten": "nhom_hh_L3_ten", "kieu": "STRING", "khoa": "", "mo_ta": "Tên nhóm L3" },
+        { "ten": "ghi_chu", "kieu": "STRING", "khoa": "", "mo_ta": "Ghi chú" }
+      ]
+    },
+    {
+      "id": "luong_xe",
+      "ten": "Lưu lượng xe",
+      "nguon": "Google Sheets",
+      "duong_dan": "Sheet: Tổng hợp lưu lượng xe (theo giờ)",
+      "chu_so_huu": "Team Data",
+      "tan_suat": "Hàng ngày",
+      "phan_loai_bao_mat": "Nội bộ",
+      "trang_thai": "prototype",
+      "so_dong": 17568,
+      "mo_ta": "Lưu lượng xe theo giờ từ camera, tổng hợp từ dữ liệu chi tiết per-second qua Apps Script. Camera 3 (exit) làm proxy cho xe đã vào.",
+      "columns": [
+        { "ten": "diem_tram", "kieu": "STRING", "khoa": "FK", "mo_ta": "Điểm trạm" },
+        { "ten": "ngay", "kieu": "DATE", "khoa": "", "mo_ta": "Ngày (yyyy-MM-dd)" },
+        { "ten": "khung_gio", "kieu": "STRING", "khoa": "", "mo_ta": "Khung giờ trong ngày" },
+        { "ten": "loai_xe", "kieu": "STRING", "khoa": "", "mo_ta": "Loại xe (Ô tô, ...)" },
+        { "ten": "xe_vao", "kieu": "INT64", "khoa": "", "mo_ta": "Số xe vào trạm" },
+        { "ten": "xe_ko_vao", "kieu": "INT64", "khoa": "", "mo_ta": "Số xe không vào" },
+        { "ten": "ty_le_vao_tram", "kieu": "STRING", "khoa": "", "mo_ta": "Tỷ lệ vào trạm (%)" }
+      ]
+    },
+    {
+      "id": "tong_hop",
+      "ten": "TONG_HOP (Doanh thu/đơn vị diện tích)",
+      "nguon": "Google Sheets",
+      "duong_dan": "Sheet: TONG_HOP",
+      "chu_so_huu": "Team Data",
+      "tan_suat": "Hàng tháng",
+      "phan_loai_bao_mat": "Nội bộ",
+      "trang_thai": "prototype",
+      "so_dong": 165,
+      "mo_ta": "Tab tổng hợp dùng SUMIFS + VLOOKUP tính doanh thu trên đơn vị diện tích, feed vào Looker Studio dashboard doanh thu/traffic.",
+      "columns": [
+        { "ten": "diem_kd", "kieu": "STRING", "khoa": "PK", "mo_ta": "Điểm kinh doanh" },
+        { "ten": "diem_tram", "kieu": "STRING", "khoa": "FK", "mo_ta": "Điểm trạm" },
+        { "ten": "nganh", "kieu": "STRING", "khoa": "", "mo_ta": "Ngành" },
+        { "ten": "phan_loai_kd", "kieu": "STRING", "khoa": "", "mo_ta": "Phân loại KD (Tự doanh/HTKT/Cho thuê/DV khác)" },
+        { "ten": "quy_mo", "kieu": "NUMERIC", "khoa": "", "mo_ta": "Quy mô (m² hoặc m dài)" },
+        { "ten": "doanh_thu", "kieu": "NUMERIC", "khoa": "", "mo_ta": "Doanh thu (từ SUMIFS)" },
+        { "ten": "dt_per_don_vi", "kieu": "NUMERIC", "khoa": "", "mo_ta": "Doanh thu / quy mô" }
+      ]
+    },
+    {
+      "id": "pl_data",
+      "ten": "P&L (Cây chi phí)",
+      "nguon": "Google Sheets",
+      "duong_dan": "Sheet: P&L Data",
+      "chu_so_huu": "Team Data",
+      "tan_suat": "Hàng tháng",
+      "phan_loai_bao_mat": "Nội bộ - Nhạy cảm",
+      "trang_thai": "prototype",
+      "so_dong": 0,
+      "mo_ta": "Dữ liệu tài chính P&L với cây chi phí 4 nhóm L1: Doanh thu / CP Giá vốn / CP Bán hàng / CP Quản lý. Feed vào Looker Studio P&L dashboard.",
+      "columns": [
+        { "ten": "bo_phan", "kieu": "STRING", "khoa": "FK", "mo_ta": "Bộ phận / điểm bán (đang được populate)" },
+        { "ten": "diem_tram", "kieu": "STRING", "khoa": "FK", "mo_ta": "Điểm trạm" },
+        { "ten": "tai_khoan", "kieu": "STRING", "khoa": "", "mo_ta": "Số tài khoản (6427x/6428x = CP Quản lý)" },
+        { "ten": "nhom_cp_L1", "kieu": "STRING", "khoa": "", "mo_ta": "Nhóm chi phí L1" },
+        { "ten": "nhom_cp_L3", "kieu": "STRING", "khoa": "", "mo_ta": "Nhóm chi phí L3" },
+        { "ten": "so_tien", "kieu": "NUMERIC", "khoa": "", "mo_ta": "Số tiền" }
+      ]
+    }
+  ],
+  "relationships": [
+    { "id": "r1", "from": "doanh_thu_loi_nhuan", "to": "danh_muc_nhom_hh", "loai": "JOIN key", "mo_ta": "nhom_hh_L3 ↔ nhom_hh_L3_ma" },
+    { "id": "r2", "from": "doanh_thu_loi_nhuan", "to": "tong_hop", "loai": "feeds-into", "mo_ta": "SUMIFS theo diem_kd tính doanh_thu" },
+    { "id": "r3", "from": "tong_hop", "to": "luong_xe", "loai": "JOIN key", "mo_ta": "diem_tram — phân tích DT vs lưu lượng" },
+    { "id": "r4", "from": "pl_data", "to": "tong_hop", "loai": "JOIN key", "mo_ta": "diem_tram / bo_phan — ghép chi phí với doanh thu" }
+  ]
+}

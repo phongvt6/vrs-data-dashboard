@@ -1,0 +1,1000 @@
+[
+  {
+    "id": "1",
+    "dataset_id": "pl_data",
+    "at": "2026-07-12T04:47:31.346Z",
+    "so_dong": "0",
+    "columns": [
+      {
+        "ten": "bo_phan",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "diem_tram",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "tai_khoan",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "nhom_cp_L1",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "nhom_cp_L3",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "so_tien",
+        "kieu": "NUMERIC"
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "dataset_id": "tong_hop",
+    "at": "2026-07-12T04:47:31.346Z",
+    "so_dong": "165",
+    "columns": [
+      {
+        "ten": "diem_kd",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "diem_tram",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "nganh",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "phan_loai_kd",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "quy_mo",
+        "kieu": "NUMERIC"
+      },
+      {
+        "ten": "doanh_thu",
+        "kieu": "NUMERIC"
+      },
+      {
+        "ten": "dt_per_don_vi",
+        "kieu": "NUMERIC"
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "dataset_id": "luong_xe",
+    "at": "2026-07-12T04:47:31.346Z",
+    "so_dong": "17568",
+    "columns": [
+      {
+        "ten": "diem_tram",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "ngay",
+        "kieu": "DATE"
+      },
+      {
+        "ten": "khung_gio",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "loai_xe",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "xe_vao",
+        "kieu": "INT64"
+      },
+      {
+        "ten": "xe_ko_vao",
+        "kieu": "INT64"
+      },
+      {
+        "ten": "ty_le_vao_tram",
+        "kieu": "STRING"
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "dataset_id": "loai_luong",
+    "at": "2026-07-12T04:47:31.346Z",
+    "so_dong": "0",
+    "columns": []
+  },
+  {
+    "id": "5",
+    "dataset_id": "input_luong",
+    "at": "2026-07-12T04:47:31.346Z",
+    "so_dong": "0",
+    "columns": [
+      {
+        "ten": "Năm",
+        "kieu": ""
+      },
+      {
+        "ten": "Tháng",
+        "kieu": ""
+      },
+      {
+        "ten": "Kỳ lương",
+        "kieu": ""
+      },
+      {
+        "ten": "Mã NV",
+        "kieu": ""
+      },
+      {
+        "ten": "Mã ID",
+        "kieu": ""
+      },
+      {
+        "ten": "Họ và tên",
+        "kieu": ""
+      },
+      {
+        "ten": "Loại nhân viên",
+        "kieu": ""
+      },
+      {
+        "ten": "Chức danh",
+        "kieu": ""
+      },
+      {
+        "ten": "Bộ phận",
+        "kieu": ""
+      },
+      {
+        "ten": "Khối",
+        "kieu": ""
+      },
+      {
+        "ten": "Trạm",
+        "kieu": ""
+      },
+      {
+        "ten": "Quầy",
+        "kieu": ""
+      },
+      {
+        "ten": "Level",
+        "kieu": ""
+      },
+      {
+        "ten": "Lương CB",
+        "kieu": ""
+      },
+      {
+        "ten": "Tổng tiền công",
+        "kieu": ""
+      },
+      {
+        "ten": "Trợ cấp",
+        "kieu": ""
+      },
+      {
+        "ten": "Tăng ca",
+        "kieu": ""
+      },
+      {
+        "ten": "Quỹ lương BHXH",
+        "kieu": ""
+      },
+      {
+        "ten": "BH cty chi trả",
+        "kieu": ""
+      },
+      {
+        "ten": "CĐ công ty chi trả",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng doanh thu",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng KPI",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng nóng",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng sản phẩm",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng quý",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng lương T13",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng đồng hành,khích lệ",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng cuối năm",
+        "kieu": ""
+      },
+      {
+        "ten": "Đoàn phí NV chi trả",
+        "kieu": ""
+      },
+      {
+        "ten": "BHNV chi trả",
+        "kieu": ""
+      },
+      {
+        "ten": "Lương partime",
+        "kieu": ""
+      },
+      {
+        "ten": "Lương thuê ngoài",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng định biên",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng Setup Siêu thị ",
+        "kieu": ""
+      }
+    ]
+  },
+  {
+    "id": "6",
+    "dataset_id": "doanh_thu_loi_nhuan",
+    "at": "2026-07-12T04:47:31.346Z",
+    "so_dong": "150000",
+    "columns": [
+      {
+        "ten": "SKU",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "ten_hang_hoa",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "don_vi",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "ten_cua_hang",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "diem_kd",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "diem_tram",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "tram",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "nganh",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "nam_thang",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "nam",
+        "kieu": "INT64"
+      },
+      {
+        "ten": "thang",
+        "kieu": "INT64"
+      },
+      {
+        "ten": "nhom_hh_L3",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "nhom_hh_L2",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "nhom_hh_L1",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "so_luong",
+        "kieu": "NUMERIC"
+      },
+      {
+        "ten": "gia_von",
+        "kieu": "NUMERIC"
+      },
+      {
+        "ten": "tien_von",
+        "kieu": "NUMERIC"
+      },
+      {
+        "ten": "doanh_thu",
+        "kieu": "NUMERIC"
+      },
+      {
+        "ten": "lai_gop",
+        "kieu": "NUMERIC"
+      },
+      {
+        "ten": "gia_ban",
+        "kieu": "NUMERIC"
+      }
+    ]
+  },
+  {
+    "id": "7",
+    "dataset_id": "danh_muc_nhom_hh",
+    "at": "2026-07-12T04:47:31.346Z",
+    "so_dong": "54",
+    "columns": [
+      {
+        "ten": "nhom_hh_L1_ma",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "nhom_hh_L1_ten",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "nhom_hh_L2_ma",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "nhom_hh_L2_ten",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "nhom_hh_L3_ma",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "nhom_hh_L3_ten",
+        "kieu": "STRING"
+      },
+      {
+        "ten": "ghi_chu",
+        "kieu": "STRING"
+      }
+    ]
+  },
+  {
+    "id": "10",
+    "dataset_id": "input_luong",
+    "at": "2026-07-12T09:23:05.667Z",
+    "so_dong": "14223",
+    "columns": [
+      {
+        "ten": "Năm",
+        "kieu": ""
+      },
+      {
+        "ten": "Tháng",
+        "kieu": ""
+      },
+      {
+        "ten": "Kỳ lương",
+        "kieu": ""
+      },
+      {
+        "ten": "Mã NV",
+        "kieu": ""
+      },
+      {
+        "ten": "Mã ID",
+        "kieu": ""
+      },
+      {
+        "ten": "Họ và tên",
+        "kieu": ""
+      },
+      {
+        "ten": "Loại nhân viên",
+        "kieu": ""
+      },
+      {
+        "ten": "Chức danh",
+        "kieu": ""
+      },
+      {
+        "ten": "Bộ phận",
+        "kieu": ""
+      },
+      {
+        "ten": "Khối",
+        "kieu": ""
+      },
+      {
+        "ten": "Trạm",
+        "kieu": ""
+      },
+      {
+        "ten": "Quầy",
+        "kieu": ""
+      },
+      {
+        "ten": "Level",
+        "kieu": ""
+      },
+      {
+        "ten": "Lương CB",
+        "kieu": ""
+      },
+      {
+        "ten": "Tổng tiền công",
+        "kieu": ""
+      },
+      {
+        "ten": "Trợ cấp",
+        "kieu": ""
+      },
+      {
+        "ten": "Tăng ca",
+        "kieu": ""
+      },
+      {
+        "ten": "Quỹ lương BHXH",
+        "kieu": ""
+      },
+      {
+        "ten": "BH cty chi trả",
+        "kieu": ""
+      },
+      {
+        "ten": "CĐ công ty chi trả",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng doanh thu",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng KPI",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng nóng",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng sản phẩm",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng quý",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng lương T13",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng đồng hành,khích lệ",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng cuối năm",
+        "kieu": ""
+      },
+      {
+        "ten": "Đoàn phí NV chi trả",
+        "kieu": ""
+      },
+      {
+        "ten": "BHNV chi trả",
+        "kieu": ""
+      },
+      {
+        "ten": "Lương partime",
+        "kieu": ""
+      },
+      {
+        "ten": "Lương thuê ngoài",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng định biên",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng Setup Siêu thị ",
+        "kieu": ""
+      }
+    ]
+  },
+  {
+    "id": "11",
+    "dataset_id": "loai_luong",
+    "at": "2026-07-12T09:23:07.102Z",
+    "so_dong": "22",
+    "columns": []
+  },
+  {
+    "id": "12",
+    "dataset_id": "data_luong_xe_goc_that",
+    "at": "2026-07-12T10:08:03.820Z",
+    "so_dong": "1363",
+    "columns": [
+      {
+        "ten": "diem_tram",
+        "kieu": ""
+      },
+      {
+        "ten": "tram",
+        "kieu": ""
+      },
+      {
+        "ten": "ngay",
+        "kieu": ""
+      },
+      {
+        "ten": "khung_gio",
+        "kieu": ""
+      },
+      {
+        "ten": "loai_xe",
+        "kieu": ""
+      },
+      {
+        "ten": "xe_vao",
+        "kieu": ""
+      },
+      {
+        "ten": "xe_ko_vao",
+        "kieu": ""
+      },
+      {
+        "ten": "ty_le_vao_tram",
+        "kieu": ""
+      },
+      {
+        "ten": "sl_khach_tb",
+        "kieu": ""
+      },
+      {
+        "ten": "sl_khach_vao",
+        "kieu": ""
+      },
+      {
+        "ten": "sl_khach_ko_vao",
+        "kieu": ""
+      }
+    ]
+  },
+  {
+    "id": "13",
+    "dataset_id": "data_khung_gio",
+    "at": "2026-07-12T10:08:06.781Z",
+    "so_dong": "24",
+    "columns": [
+      {
+        "ten": "khung_gio",
+        "kieu": ""
+      },
+      {
+        "ten": "diem_tram",
+        "kieu": ""
+      },
+      {
+        "ten": "ca",
+        "kieu": ""
+      },
+      {
+        "ten": "mang_chinh",
+        "kieu": ""
+      },
+      {
+        "ten": "mang_phu",
+        "kieu": ""
+      },
+      {
+        "ten": "ngay_dem",
+        "kieu": ""
+      }
+    ]
+  },
+  {
+    "id": "14",
+    "dataset_id": "data_loai_xe",
+    "at": "2026-07-12T10:08:08.660Z",
+    "so_dong": "3",
+    "columns": [
+      {
+        "ten": "loai_xe",
+        "kieu": ""
+      },
+      {
+        "ten": "sl_khach_tb",
+        "kieu": ""
+      }
+    ]
+  },
+  {
+    "id": "15",
+    "dataset_id": "input_luong",
+    "at": "2026-07-13T14:23:06.350Z",
+    "so_dong": "14223",
+    "columns": [
+      {
+        "ten": "Năm",
+        "kieu": ""
+      },
+      {
+        "ten": "Tháng",
+        "kieu": ""
+      },
+      {
+        "ten": "Kỳ lương",
+        "kieu": ""
+      },
+      {
+        "ten": "Mã NV",
+        "kieu": ""
+      },
+      {
+        "ten": "Mã ID",
+        "kieu": ""
+      },
+      {
+        "ten": "Họ và tên",
+        "kieu": ""
+      },
+      {
+        "ten": "Loại nhân viên",
+        "kieu": ""
+      },
+      {
+        "ten": "Chức danh",
+        "kieu": ""
+      },
+      {
+        "ten": "Bộ phận",
+        "kieu": ""
+      },
+      {
+        "ten": "Khối",
+        "kieu": ""
+      },
+      {
+        "ten": "Trạm",
+        "kieu": ""
+      },
+      {
+        "ten": "Quầy",
+        "kieu": ""
+      },
+      {
+        "ten": "Level",
+        "kieu": ""
+      },
+      {
+        "ten": "Lương CB",
+        "kieu": ""
+      },
+      {
+        "ten": "Tổng tiền công",
+        "kieu": ""
+      },
+      {
+        "ten": "Trợ cấp",
+        "kieu": ""
+      },
+      {
+        "ten": "Tăng ca",
+        "kieu": ""
+      },
+      {
+        "ten": "Quỹ lương BHXH",
+        "kieu": ""
+      },
+      {
+        "ten": "BH cty chi trả",
+        "kieu": ""
+      },
+      {
+        "ten": "CĐ công ty chi trả",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng doanh thu",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng KPI",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng nóng",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng sản phẩm",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng quý",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng lương T13",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng đồng hành,khích lệ",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng cuối năm",
+        "kieu": ""
+      },
+      {
+        "ten": "Đoàn phí NV chi trả",
+        "kieu": ""
+      },
+      {
+        "ten": "BHNV chi trả",
+        "kieu": ""
+      },
+      {
+        "ten": "Lương partime",
+        "kieu": ""
+      },
+      {
+        "ten": "Lương thuê ngoài",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng định biên",
+        "kieu": ""
+      },
+      {
+        "ten": "Thưởng Setup Siêu thị",
+        "kieu": ""
+      }
+    ]
+  },
+  {
+    "id": "16",
+    "dataset_id": "data_doanh_thu",
+    "at": "2026-07-13T14:27:07.775Z",
+    "so_dong": "58017",
+    "columns": [
+      {
+        "ten": "nam",
+        "kieu": ""
+      },
+      {
+        "ten": "thang",
+        "kieu": ""
+      },
+      {
+        "ten": "nam_thang",
+        "kieu": ""
+      },
+      {
+        "ten": "ngay",
+        "kieu": ""
+      },
+      {
+        "ten": "ma_cua_hang",
+        "kieu": ""
+      },
+      {
+        "ten": "doanh_thu",
+        "kieu": ""
+      },
+      {
+        "ten": "ten_diem_kd",
+        "kieu": ""
+      },
+      {
+        "ten": "phan_loai_kd",
+        "kieu": ""
+      },
+      {
+        "ten": "nganh",
+        "kieu": ""
+      },
+      {
+        "ten": "tram",
+        "kieu": ""
+      },
+      {
+        "ten": "diem_tram",
+        "kieu": ""
+      },
+      {
+        "ten": "tuan_ISO",
+        "kieu": ""
+      },
+      {
+        "ten": "doi_tac",
+        "kieu": ""
+      }
+    ]
+  },
+  {
+    "id": "17",
+    "dataset_id": "ma",
+    "at": "2026-07-13T14:32:00.799Z",
+    "so_dong": "31",
+    "columns": [
+      {
+        "ten": "ma_hang",
+        "kieu": ""
+      },
+      {
+        "ten": "ten_hang_hoa",
+        "kieu": ""
+      },
+      {
+        "ten": "co_xe",
+        "kieu": ""
+      },
+      {
+        "ten": "loai_khach",
+        "kieu": ""
+      },
+      {
+        "ten": "loai_chi",
+        "kieu": ""
+      },
+      {
+        "ten": "phan_loai",
+        "kieu": ""
+      },
+      {
+        "ten": "don_gia",
+        "kieu": ""
+      },
+      {
+        "ten": "tinh_trang_ap_dung",
+        "kieu": ""
+      }
+    ]
+  },
+  {
+    "id": "18",
+    "dataset_id": "data_tlx",
+    "at": "2026-07-13T14:32:04.038Z",
+    "so_dong": "34278",
+    "columns": [
+      {
+        "ten": "nam",
+        "kieu": ""
+      },
+      {
+        "ten": "thang",
+        "kieu": ""
+      },
+      {
+        "ten": "ngay",
+        "kieu": ""
+      },
+      {
+        "ten": "tram",
+        "kieu": ""
+      },
+      {
+        "ten": "diem_tram",
+        "kieu": ""
+      },
+      {
+        "ten": "ma_hang",
+        "kieu": ""
+      },
+      {
+        "ten": "ten_hang",
+        "kieu": ""
+      },
+      {
+        "ten": "so_luong",
+        "kieu": ""
+      },
+      {
+        "ten": "gia_von",
+        "kieu": ""
+      },
+      {
+        "ten": "thanh_tien",
+        "kieu": ""
+      },
+      {
+        "ten": "loai_chi",
+        "kieu": ""
+      },
+      {
+        "ten": "loai_xe",
+        "kieu": ""
+      },
+      {
+        "ten": "phan_loai_xe_an",
+        "kieu": ""
+      },
+      {
+        "ten": "tuan_iso",
+        "kieu": ""
+      },
+      {
+        "ten": "nam_thang",
+        "kieu": ""
+      }
+    ]
+  },
+  {
+    "id": "19",
+    "dataset_id": "data_diem_kd",
+    "at": "2026-07-13T15:12:04.793Z",
+    "so_dong": "171",
+    "columns": [
+      {
+        "ten": "ma_cua_hang",
+        "kieu": ""
+      },
+      {
+        "ten": "ten_diem_kd",
+        "kieu": ""
+      },
+      {
+        "ten": "doi_tac",
+        "kieu": ""
+      },
+      {
+        "ten": "tinh_trang_hd",
+        "kieu": ""
+      },
+      {
+        "ten": "tram",
+        "kieu": ""
+      },
+      {
+        "ten": "diem_tram",
+        "kieu": ""
+      },
+      {
+        "ten": "nganh",
+        "kieu": ""
+      },
+      {
+        "ten": "loai_hinh_kd",
+        "kieu": ""
+      },
+      {
+        "ten": "phan_loai_kd",
+        "kieu": ""
+      },
+      {
+        "ten": "ghi_chu",
+        "kieu": ""
+      },
+      {
+        "ten": "dvt",
+        "kieu": ""
+      },
+      {
+        "ten": "quy_mo",
+        "kieu": ""
+      }
+    ]
+  }
+]

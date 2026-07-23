@@ -1,0 +1,37 @@
+{
+  "_help": "Khai báo nguồn để collector kéo schema. KHÔNG để secret ở đây — chỉ tên biến môi trường (env:...). Bật nguồn bằng cách đổi enabled=true. Secret đặt trong .env (chạy tay) hoặc GitHub Secrets (Action). Chạy: npm run collect",
+  "sources": [
+    {
+      "id": "supabase",
+      "type": "postgres",
+      "enabled": false,
+      "connEnv": "env:SUPABASE_DB_URL",
+      "schemas": ["public"],
+      "nguon": "Supabase"
+    },
+    {
+      "id": "bq_main",
+      "type": "bigquery",
+      "enabled": false,
+      "project": "env:BQ_PROJECT",
+      "dataset": "env:BQ_DATASET",
+      "nguon": "BigQuery"
+    },
+    {
+      "id": "airtable_ops",
+      "type": "airtable",
+      "enabled": false,
+      "baseEnv": "env:AIRTABLE_BASE",
+      "tokenEnv": "env:AIRTABLE_TOKEN",
+      "nguon": "Airtable"
+    },
+    {
+      "id": "kpi_sheet",
+      "type": "sheets",
+      "enabled": false,
+      "spreadsheetId": "env:SHEETS_ID_KPI",
+      "tabs": [],
+      "nguon": "Google Sheets"
+    }
+  ]
+}

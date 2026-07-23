@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #12212e;
+  --ink-soft: #3a4d5c;
+  --paper: #f3f5f4;
+  --panel: #ffffff;
+  --line: #d4dbdd;
+  --line-strong: #b3bec1;
+  --accent: #1f6f6b;
+  --accent-soft: #e3efee;
+  --bq: #4a6fa5;
+  --sheets: #2f8f5b;
+  --airtable: #c46a3d;
+  --warn: #b5732c;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+code, .mono {
+  font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+}
+
+a { color: inherit; text-decoration: none; }
+
+.source-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid;
+  /* Mặc định cho nguồn chưa có style riêng */
+  color: var(--ink-soft);
+  border-color: var(--line-strong);
+  background: var(--paper);
+}
+.source-BigQuery { color: var(--bq); border-color: var(--bq); background: #eef3f9; }
+.source-Google\.Sheets { color: var(--sheets); border-color: var(--sheets); background: #ecf6f0; }
+.source-Airtable { color: var(--airtable); border-color: var(--airtable); background: #f9efe9; }
+.source-Supabase { color: #7c5cbf; border-color: #7c5cbf; background: #f1edf9; }
+.source-Postgres { color: #546a7b; border-color: #546a7b; background: #eef1f3; }
+
+/* Pill công cụ dashboard — cùng hình dạng với .source-pill nhưng bảng màu riêng
+   để không nhầm "nguồn dữ liệu" với "công cụ dựng dashboard". */
+.tool-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px dashed;
+  color: var(--ink-soft);
+  border-color: var(--line-strong);
+  background: var(--paper);
+}
+.tool-Looker\.Studio { color: #3a7bd5; border-color: #3a7bd5; background: #eef3fb; }
+.tool-Power\.BI { color: #9a7c1d; border-color: #c9a227; background: #faf5e6; }
+.tool-Metabase { color: #4c8f8b; border-color: #4c8f8b; background: #edf5f4; }
+.tool-Tableau { color: #8a5cb8; border-color: #8a5cb8; background: #f4eefa; }
+.tool-Google\.Sheets { color: var(--sheets); border-color: var(--sheets); background: #ecf6f0; }
+.tool-Nội\.bộ { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 6px; }

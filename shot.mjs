@@ -1,0 +1,12 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: 1180, height: 900 } });
+await p.goto('http://localhost:3000', { waitUntil: 'networkidle' });
+await p.screenshot({ path: '/tmp/home.png' });
+await p.goto('http://localhost:3000/dataset/doanh_thu_loi_nhuan', { waitUntil: 'networkidle' });
+await p.screenshot({ path: '/tmp/dataset.png', fullPage: true });
+await p.goto('http://localhost:3000/lineage', { waitUntil: 'networkidle' });
+await p.waitForTimeout(1500);
+await p.screenshot({ path: '/tmp/lineage.png' });
+await b.close();
+console.log('ok');
