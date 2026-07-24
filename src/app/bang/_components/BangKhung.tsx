@@ -15,8 +15,11 @@ export default function BangKhung({
 }: {
   ten: string;
   mo_ta?: string;
-  /** Dữ liệu kéo về lúc nào — người xem phải biết mình đang nhìn số của khi nào. */
-  mocDuLieu?: string | null;
+  /**
+   * Dữ liệu kéo về lúc nào — người xem phải biết mình đang nhìn số của khi nào.
+   * Nhận ReactNode để truyền được component async, cho nó chảy về sau phần khung.
+   */
+  mocDuLieu?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
@@ -51,7 +54,7 @@ export default function BangKhung({
           </div>
           {mocDuLieu && (
             <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--ink-soft)", whiteSpace: "nowrap" }}>
-              Số liệu tính đến {mocDuLieu}
+              {mocDuLieu}
             </span>
           )}
         </div>
@@ -108,5 +111,18 @@ export function Luoi({ children }: { children: React.ReactNode }) {
     <div style={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: 12, marginBottom: 12 }}>
       {children}
     </div>
+  );
+}
+
+/** Ô giữ chỗ trong lúc chờ query — giữ đúng chiều cao để trang không nhảy. */
+export function OTrong({ w = 6, cao = 260 }: { w?: number; cao?: number }) {
+  return (
+    <div
+      style={{
+        gridColumn: `span ${w}`, minWidth: 0, height: cao,
+        background: "var(--panel)", border: "1px solid var(--line)",
+        borderRadius: 12, opacity: 0.55,
+      }}
+    />
   );
 }

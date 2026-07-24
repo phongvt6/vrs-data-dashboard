@@ -181,16 +181,10 @@ function sqlToRows(rows: Record<string, unknown>[], p: QueryParams): ChartRow[] 
 /* Chạy + cache                                                                */
 /* -------------------------------------------------------------------------- */
 
-type CacheItem = { rows: ChartRow[]; hetHan: number };
-// Cache trong RAM của tiến trình. Trên Vercel mỗi instance một cache riêng —
-// chấp nhận được vì đây chỉ để đỡ gọi Sheets API liên tục, không phải nguồn sự thật.
-const globalForCache = globalThis as unknown as { _vddChartCache?: Map<string, CacheItem> };
-const cache = (globalForCache._vddChartCache ??= new Map());
-
-export function xoaCache(chartId?: string) {
-  if (chartId) cache.delete(chartId);
-  else cache.clear();
-}
+// Cache của tầng này đã chuyển sang `duLieu()` trong src/lib/nguon.ts — nó dùng
+// cache DÙNG CHUNG của Next thay vì RAM từng instance (RAM khiến hai người mở
+// cùng lúc thấy số lệch nhau). Giữ `xoaCache` làm hàm rỗng cho nơi gọi cũ.
+export function xoaCache(_chartId?: string) {}
 
 export type KetQua = { rows: ChartRow[]; tuCache: boolean; loi?: string };
 
@@ -198,14 +192,8 @@ export type KetQua = { rows: ChartRow[]; tuCache: boolean; loi?: string };
  * Chạy truy vấn của một chart. Trả về mảng rỗng kèm `loi` khi hỏng — nơi gọi tự
  * quyết định hiện lỗi hay lùi về số liệu mẫu.
  */
-export async function chayChartQuery(q: ChartQuery, boQuaCache = false): Promise<KetQua> {
+export async function chayChartQuery(q: ChartQuery, _boQuaCache = false): Promise<KetQua> {
   if (!q.source_id) return { rows: [], tuCache: false, loi: "Chưa chọn nguồn dữ liệu." };
-
-  const nay = Date.now();
-  if (!boQuaCache) {
-    const c = cache.get(q.chart_id);
-    if (c && c.hetHan > nay) return { rows: c.rows, tuCache: true };
-  }
 
   try {
     const source = await getSourceFull(q.source_id);
@@ -220,7 +208,6 @@ export async function chayChartQuery(q: ChartQuery, boQuaCache = false): Promise
       rows = sqlToRows(await chaySql(source, q.sql), q.params ?? {});
     }
 
-    cache.set(q.chart_id, { rows, hetHan: nay + Math.max(0, q.cache_ttl_giay || 0) * 1000 });
     await ghiNhanChay(q.chart_id, `OK · ${rows.length} dòng`);
     return { rows, tuCache: false };
   } catch (e) {

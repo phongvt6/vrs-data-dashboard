@@ -1,13 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { logoutAction } from "@/app/login/actions";
 
 export default function SiteHeader({ authDisabled = false }: { authDisabled?: boolean }) {
-  const pathname = usePathname();
-  if (pathname === "/login") return null; // trang đăng nhập không cần header
-
   const linkStyle = { color: "var(--ink-soft)" as const };
 
   return (

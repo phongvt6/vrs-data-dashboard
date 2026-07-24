@@ -24,13 +24,11 @@ Sửa lại thiết kế: **không phải nguồn nào cũng copy về Postgres*
 | BigQuery | **query trực tiếp** | Đã là kho phân tích; copy vừa phí vừa làm số cũ đi |
 | Supabase / Postgres | query trực tiếp | Đã là Postgres |
 
-- [ ] Gộp thành một hàm query chung, tự chọn đường theo `catalog.sources.type`
-      — dashboard viết y như nhau, khác biệt giấu bên dưới
-- [ ] Đưa `doanh_thu_chi_tiet` vào danh mục dữ liệu (chạy `npm run collect`
-      sau khi thêm nguồn BigQuery)
-- [ ] **Bỏ cache RAM**, chuyển sang cache tầng CDN (`revalidate` của Next).
-      Cache RAM hiện tại có lỗi thật: trên Vercel mỗi instance một bản riêng,
-      hai người mở cùng lúc thấy số lệch nhau
+- [x] Gộp thành một hàm query chung (`duLieu()` trong `src/lib/nguon.ts`),
+      tự chọn đường theo `catalog.sources.type`
+- [x] Đưa `doanh_thu_chi_tiet` vào danh mục dữ liệu (2,67 triệu dòng)
+- [x] **Bỏ cache RAM**, chuyển sang `use cache` + `cacheLife` của Next 16.
+      Đo được: 3,46s → 0,07s khi cache ấm
 - [ ] Đặt lịch `npm run sync` bằng GitHub Actions (theo mẫu
       `.github/workflows/collect-schema.yml`). **Chưa chốt: mấy tiếng một lần?**
 
@@ -48,7 +46,7 @@ Mục tiêu: làm một cái cho chuẩn, sau cứ thế nhân bản.
   - [ ] **Phần diễn giải bằng câu chữ** (Điểm sáng / Cảnh báo / Kiến nghị) —
         thứ khiến sếp đọc được dashboard mà không cần ai giải thích.
         Bên kia sinh bằng JS theo luật, không gọi LLM
-  - [ ] Streaming: thẻ KPI hiện ngay trong khi chart nặng còn đang query
+  - [x] Streaming: bật `cacheComponents`, mỗi hàng một `<Suspense>` riêng
 - [ ] Rút thành khuôn để dashboard sau chỉ việc sửa query và nhãn
 - [ ] Viết lại dashboard doanh thu tự doanh trong app này để so trực tiếp
       với bản của nhân viên
