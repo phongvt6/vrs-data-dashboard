@@ -194,6 +194,9 @@
     .content{padding:12px}
   }
 </style>
+<!-- Kit token dùng chung (màu + định dạng số) — tự sinh từ src/chart/lib/theme.ts. -->
+<link rel="stylesheet" href="/_kit/theme.css">
+<script src="/_kit/palette.js"></script>
 </head>
 <body>
 <style>
@@ -605,10 +608,13 @@ const API = "";
 const esc = s => String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const vnd = n => Math.round(n||0).toLocaleString('vi-VN');
 const intVN = n => Math.round(n||0).toLocaleString('vi-VN');
-function cfmt(n){ const sg=n<0?'-':''; const a=Math.abs(Math.round(n||0));
-  if(a>=1e9){const v=a/1e9; return sg+(v%1===0?v.toFixed(0):v.toFixed(1))+'B';}
-  if(a>=1e6){const v=a/1e6; return sg+(v%1===0?v.toFixed(0):v.toFixed(1))+'M';}
-  if(a>=1e3){const v=a/1e3; return sg+(v%1===0?v.toFixed(0):v.toFixed(1))+'K';} return sg+a; }
+// Định dạng số dùng KIT.vnCompact (tỷ/tr/k kiểu VN) từ kit dùng chung, để mọi
+// dashboard đọc số giống nhau. Fallback nếu kit chưa nạp.
+function cfmt(n){ if(window.KIT) return KIT.vnCompact(n);
+  const sg=n<0?'-':''; const a=Math.abs(Math.round(n||0));
+  if(a>=1e9){const v=a/1e9; return sg+(v%1===0?v.toFixed(0):v.toFixed(1))+' tỷ';}
+  if(a>=1e6){const v=a/1e6; return sg+(v%1===0?v.toFixed(0):v.toFixed(1))+' tr';}
+  if(a>=1e3){const v=a/1e3; return sg+(v%1===0?v.toFixed(0):v.toFixed(1))+' k';} return sg+a; }
 const pct1 = v => (v*100).toLocaleString('vi-VN',{maximumFractionDigits:1})+'%';
 const pctSigned = v => (v>=0?'+':'')+ (v).toLocaleString('vi-VN',{maximumFractionDigits:1})+'%';
 function deltaObj(cur,prev){ if(!(prev>0)) return {text:'—',cls:'',p:null}; const p=(cur-prev)/prev*100; return {text:(p>=0?'▲ +':'▼ ')+p.toLocaleString('vi-VN',{maximumFractionDigits:1})+'%',cls:p>=0?'up':'down',p}; }
@@ -647,7 +653,9 @@ async function api(path,params){ const p=Object.assign({},params||{}); if(_fresh
 
 const state = { view:'dashboard', from:'', to:'', tram:'', diem:'', bp:'', store:'', group:'', comboDim:'tram', cmpBase:'prevM', periodType:'month', drillGroup:'', drillTab:'core', catGroup:'', catSearch:'', catTram:'', catDiem:'', catBp:'', catStore:'', catStoreSearch:'', catBase:'prevM', catPanelHidden:false };
 let META=null, OVR=null;
-const GCOL=['#6366f1','#22c55e','#f59e0b','#f43f5e','#a855f7','#06b6d4','#ec4899','#84cc16','#14b8a6','#8b5cf6'];
+// Bảng màu categorical lấy từ kit dùng chung (đã kiểm định mù màu, 8 slot) — cùng
+// bảng với dashboard khoán và các dashboard native. Fallback nếu kit chưa nạp.
+const GCOL = (window.KIT && KIT.series) || ['#2a78d6','#eb6834','#1baf7a','#eda100','#e87ba4','#008300','#4a3aa7','#e34948'];
 const TOPN_GRP=8, COL_KHAC='#94a3b8';   // MỌI biểu đồ nhóm hàng: chỉ hiện Top nhóm cao nhất, còn lại gộp "Nhóm khác"
 // Gộp danh sách nhóm (đã sắp giảm dần) thành Top-N + "Nhóm khác": trả mảng {name,v,color} cho donut/legend
 function collapseGroups(rows, valOf, nameOf){

@@ -91,6 +91,31 @@ Mọi loại chart cùng ăn một dạng dữ liệu `ChartRow[]` (`label` / `s
 `value` / `value2`) — đó là lý do giai đoạn 3 chỉ phải thay đúng nguồn của
 `rows`, không đụng vào bộ render.
 
+## Hệ thiết kế dùng chung cho MỌI dashboard
+
+Có hai kiểu dashboard trong `/bang/`, và một nguồn thiết kế chung cho cả hai:
+
+- **Native** (mẫu chuẩn để nhân rộng) — viết bằng React, dùng thẳng `src/chart/`:
+  `<ChartTile>` (ECharts), bảng màu `theme.ts`, engine diễn giải `dien-giai.ts`,
+  lưới `<BangKhung>/<Luoi>/<O>`. **`/bang/doanh-thu` là khuôn** — copy nó khi làm
+  dashboard mới. Một API chart, một bảng màu, một engine diễn giải.
+- **Port tĩnh** (khi đã có app polished sẵn, chỉ muốn nhét vào catalog) —
+  `public/<tên>/` + rewrite trong `next.config.ts` + một API route. Hiện có
+  `khoan` (từ Cloudflare Worker) và `tu-doanh` (từ app nhân viên).
+
+**`theme.ts` là nguồn sự thật DUY NHẤT về màu + định dạng số.** Native import
+thẳng. Port tĩnh không import TS được, nên `npm run kit` (chạy tự động ở
+`prebuild`) sinh `public/_kit/` từ `theme.ts`:
+
+| File sinh ra | Dùng cho |
+| --- | --- |
+| `_kit/theme.css` | biến CSS `--kit-series-1..8`, `--kit-pos/neg` (light + dark) |
+| `_kit/palette.js` | `window.KIT`: `series[]`, `colorFor(khoá)` (màu bám thực thể), `vnCompact/vnNumber/vnPercent` |
+
+Port chỉ cần nạp 2 file này rồi trỏ palette + formatter về `KIT` — đổi màu ở
+`theme.ts`, chạy lại `npm run kit`, **cả native lẫn port đổi theo**. Kit chỉ đồng
+bộ TOKEN (màu, định dạng số), không đụng layout riêng của từng app.
+
 ## Cài đặt lần đầu
 
 **1. Tạo bảng trong Supabase**

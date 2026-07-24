@@ -4,6 +4,25 @@ Cập nhật 2026-07-23. Xếp theo thứ tự nên làm.
 
 ---
 
+## 0b. Hệ thiết kế dùng chung — làm mẫu với 2 dashboard (xong bước 1)
+
+Chốt hướng: **mẫu để nhân rộng = native** (`/bang/doanh-thu`, dùng `src/chart/`
++ `dien-giai.ts`). 2 bản port giữ giao diện gốc nhưng **đồng bộ token** với hệ
+thiết kế app.
+
+- [x] Kit dùng chung `public/_kit/` sinh từ `theme.ts` (`npm run kit`, tự chạy ở
+      `prebuild`) — một nguồn sự thật về màu + định dạng số cho cả native lẫn port.
+- [x] Áp vào **khoán** + **tự doanh**: bảng màu categorical → palette mù-màu 8 slot
+      dùng chung; số → `KIT.vnCompact` (tỷ/tr/k). Verify cả hai render đúng.
+- [ ] **Nhân rộng:** dashboard mới xây native theo khuôn `/bang/doanh-thu`. Cân
+      nhắc dựng lại 2 port thành native để đồng bộ HẲN (không chỉ token) — khoán
+      đã có bản native trong git history.
+- [ ] Kit mới đồng bộ *token* (màu/số), chưa đụng *layout/chrome* (sidebar tối của
+      khoán vs sáng của tự doanh vẫn khác). Nếu muốn đồng bộ cả chrome → phải
+      thống nhất khung, gần như dựng lại native.
+
+---
+
 ## 0. Dashboard Thưởng khoán — vừa thêm (nhánh riêng, cần xác nhận)
 
 Port **nguyên xi** tool thưởng khoán (Cloudflare Worker `worker.js`) thành

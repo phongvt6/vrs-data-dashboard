@@ -1,0 +1,31 @@
+/* ⚙️ TỰ SINH từ src/chart/lib/theme.ts — chạy `node scripts/gen-kit.mjs`.
+   Đừng sửa tay. Bảng màu categorical đã kiểm định mù màu (light + dark). */
+:root {
+  --kit-series-1: #2a78d6;
+  --kit-series-2: #eb6834;
+  --kit-series-3: #1baf7a;
+  --kit-series-4: #eda100;
+  --kit-series-5: #e87ba4;
+  --kit-series-6: #008300;
+  --kit-series-7: #4a3aa7;
+  --kit-series-8: #e34948;
+  --kit-pos: #e34948;
+  --kit-neg: #2a78d6;
+  --kit-good: #0ca30c;
+  --kit-warning: #fab219;
+  --kit-critical: #d03b3b;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+  --kit-series-1: #3987e5;
+  --kit-series-2: #d95926;
+  --kit-series-3: #199e70;
+  --kit-series-4: #c98500;
+  --kit-series-5: #d55181;
+  --kit-series-6: #008300;
+  --kit-series-7: #9085e9;
+  --kit-series-8: #e66767;
+    --kit-pos: #e66767;
+    --kit-neg: #3987e5;
+  }
+}
