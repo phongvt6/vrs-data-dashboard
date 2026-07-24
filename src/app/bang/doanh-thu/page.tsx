@@ -7,7 +7,7 @@
 //   4. Tách mỗi hàng thành component async riêng, bọc <Suspense> — hàng nào
 //      query xong trước thì hiện trước, khối nhẹ không phải chờ khối nặng.
 //
-// Xem /bang/tu-doanh cho bản đọc thẳng BigQuery.
+// Xem /bang/doanh-thu-tu-doanh cho bản đọc thẳng BigQuery.
 
 import { Suspense } from "react";
 import ChartTile from "@/chart/ChartTile";

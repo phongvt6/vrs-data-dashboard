@@ -79,8 +79,11 @@ Việc của bạn: vào Sửa từng dashboard, điền `route` (vd `tu-doanh`)
       `catalog.sources` chứa secret của mọi nguồn
 - [ ] Đổi mật khẩu database Supabase (đã từng gõ vào cửa sổ chat) và cập nhật
       lại `DATABASE_URL` ở cả `.env.local` lẫn Vercel
-- [ ] Ngừng phát triển app cũ `vrs-data-catalog` — nó dùng chung database nhưng
-      chưa biết gì về lưu trữ, xoá dataset bên đó là mất luôn
+- [~] App cũ `vrs-data-catalog`: đã ĐÓNG BĂNG + vá lỗ hổng xoá.
+      Commit 4eccae6 (chưa push): archive-trước-khi-xoá dùng chung catalog.archive,
+      README/AGENTS đánh dấu deprecated. **Chưa push** vì push = deploy live lên
+      công cụ team đang dùng — chờ bạn quyết. Tắt hẳn app cũ để SAU KHI app mới
+      lên production và team chuyển sang.
 
 ---
 
