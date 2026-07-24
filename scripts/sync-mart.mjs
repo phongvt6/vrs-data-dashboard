@@ -12,6 +12,7 @@
 import pg from "pg";
 import { JWT } from "google-auth-library";
 import { lenKeHoach, doiO, tachHeader } from "./lib/mart.mjs";
+import { docTabPub, tabsPub } from "./lib/csv.mjs";
 
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
@@ -62,6 +63,24 @@ function tenTab(nguonRef, config) {
   return found?.title ?? null;
 }
 
+/** Đọc một dataset về {header, rows, nhan}, đi đường nào tuỳ loại nguồn. */
+async function docDataset(ds) {
+  if (ds.nguon_ref?.type === "sheets_pub") {
+    const gid = String(ds.nguon_ref.path ?? "").split("#gid=")[1];
+    if (!gid) throw new Error("nguon_ref.path thiếu #gid=");
+    const pubId = String(ds.nguon_ref.path).split("#")[0];
+    const tab = tabsPub(ds.config).find((t) => t.gid === gid);
+    const values = await docTabPub(pubId, gid);
+    return { ...tachHeader(values), nhan: tab?.title ?? `gid=${gid}` };
+  }
+
+  const tab = tenTab(ds.nguon_ref, ds.config);
+  if (!tab) throw new Error("không tra được tên tab từ gid trong nguon_ref");
+  const sheetId = String(ds.nguon_ref.path).split("#")[0];
+  const token = await tokenCuaNguon(ds.secret);
+  return { ...(await docTab(token, sheetId, tab)), nhan: tab };
+}
+
 async function napBang(ds, keHoach, rows) {
   const bang = ds.id;
   const tam = `${bang}__nap`;
@@ -109,7 +128,7 @@ try {
     `SELECT d.id, d.ten, d.nguon_ref, s.secret, s.config, s.label, s.enabled
        FROM catalog.datasets d
        JOIN catalog.sources s ON s.id = d.nguon_ref->>'source'
-      WHERE d.nguon_ref->>'type' = 'sheets'
+      WHERE d.nguon_ref->>'type' IN ('sheets', 'sheets_pub')
       ORDER BY d.id`
   );
 
@@ -122,12 +141,7 @@ try {
     const nhan = ds.id.padEnd(24);
     try {
       if (!ds.enabled) { console.log(`${nhan} bỏ qua — nguồn "${ds.label}" đang tắt`); continue; }
-      const tab = tenTab(ds.nguon_ref, ds.config);
-      if (!tab) throw new Error("không tra được tên tab từ gid trong nguon_ref");
-
-      const sheetId = String(ds.nguon_ref.path).split("#")[0];
-      const token = await tokenCuaNguon(ds.secret);
-      const { header, rows } = await docTab(token, sheetId, tab);
+      const { header, rows, nhan: tab } = await docDataset(ds);
       if (!header.length) throw new Error(`tab "${tab}" không có dòng tiêu đề`);
 
       const keHoach = lenKeHoach(header, rows);

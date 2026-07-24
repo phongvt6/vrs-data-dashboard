@@ -171,7 +171,15 @@ Collector kéo schema từ nguồn sống rồi **merge vào Supabase**, **giữ
 người gõ trong Quản trị** (mô tả, chủ sở hữu, khóa PK/FK, liên kết). Bảng mới ở
 nguồn → tự thêm thành *stub* để team điền metadata sau.
 
-**Nguồn hỗ trợ:** Supabase/Postgres, BigQuery, Airtable, Google Sheets.
+**Nguồn hỗ trợ:** Supabase/Postgres, BigQuery, Airtable, Google Sheets, và
+**Google Sheets bản publish** (`sheets_pub`).
+
+Bản publish đọc qua link *File → Share → Publish to web*, **không cần service
+account** — đây là đường mà các tool tự làm trong công ty (vd dashboard thưởng
+khoán) đang lấy số, nên nối vào đúng đường đó thì hai bên luôn nhìn cùng một con
+số. Đổi lại, bản publish không có API liệt kê tab nên phải khai tay từng tab
+dạng `gid|tên` trong Quản trị → Nguồn dữ liệu. Sau khi đồng bộ schema,
+`npm run sync` kéo số thật về `mart` y như nguồn Sheets thường.
 
 ```bash
 npm run collect              # kéo + merge vào Supabase

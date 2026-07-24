@@ -13,7 +13,7 @@ const inp = {
 const lbl = { fontSize: 12, fontWeight: 600, color: "var(--ink-soft)", marginBottom: 5, display: "block" } as const;
 const hint = { fontSize: 12, color: "var(--ink-soft)", marginTop: 4 } as const;
 
-const TYPES: SourceType[] = ["postgres", "airtable", "bigquery", "sheets"];
+const TYPES: SourceType[] = ["postgres", "airtable", "bigquery", "sheets", "sheets_pub"];
 
 export default function SourceForm({ initial, isNew }: { initial?: SourceView; isNew: boolean }) {
   const [state, action, pending] = useActionState<SourceFormState, FormData>(saveSourceAction, {});
@@ -26,8 +26,17 @@ export default function SourceForm({ initial, isNew }: { initial?: SourceView; i
     airtable: "Personal Access Token",
     bigquery: "Service-account JSON",
     sheets: "Service-account JSON",
+    sheets_pub: "Không cần khoá",
   };
   const bigSecret = type === "bigquery" || type === "sheets";
+  const khongCanSecret = type === "sheets_pub";
+  // Bản publish khai tab dạng "gid|tên" mỗi dòng — cần cả hai: gid để lấy CSV,
+  // tên để dataset trong catalog đọc được chứ không phải một dãy số.
+  const tabsPubText = Array.isArray(c.tabs)
+    ? (c.tabs as Array<{ gid?: unknown; title?: unknown }>)
+        .map((t) => `${String(t?.gid ?? "")}|${String(t?.title ?? "")}`)
+        .join("\n")
+    : "";
 
   return (
     <form action={action} style={{ maxWidth: 640 }}>
@@ -103,7 +112,30 @@ export default function SourceForm({ initial, isNew }: { initial?: SourceView; i
         </>
       )}
 
-      <div style={{ marginBottom: 14 }}>
+      {type === "sheets_pub" && (
+        <>
+          <div style={{ marginBottom: 14 }}>
+            <label style={lbl}>Mã publish</label>
+            <input name="pubId" style={inp} defaultValue={String(c.pubId ?? "")} placeholder="2PACX-1v…" />
+            <div style={hint}>
+              Sheet → File → Share → Publish to web. Trong link publish, đoạn sau
+              <code> /d/e/</code> chính là mã này.
+            </div>
+          </div>
+          <div style={{ marginBottom: 14 }}>
+            <label style={lbl}>Tab — mỗi dòng một tab, dạng <code>gid|tên</code></label>
+            <textarea name="tabsPub" defaultValue={tabsPubText}
+              style={{ ...inp, minHeight: 96, fontFamily: "var(--mono, monospace)", resize: "vertical" }}
+              placeholder={"0|data_nhan_vien\n79634772|data_doanh_thu"} />
+            <div style={hint}>
+              Bản publish không cho liệt kê tab nên phải khai tay. gid nằm ở cuối
+              URL khi bạn mở tab đó trong Google Sheets.
+            </div>
+          </div>
+        </>
+      )}
+
+      <div style={{ marginBottom: 14, display: khongCanSecret ? "none" : undefined }}>
         <label style={lbl}>{secretLabel[type]}</label>
         {bigSecret ? (
           <textarea name="secret" style={{ ...inp, minHeight: 96, fontFamily: "var(--mono, monospace)", resize: "vertical" }}

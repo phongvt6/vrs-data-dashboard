@@ -104,7 +104,10 @@ export function dashboardsUsingDataset(
 }
 
 // ---- Nguồn dữ liệu (collector cấu hình trong app) ----
-export type SourceType = "postgres" | "bigquery" | "airtable" | "sheets";
+// sheets     — qua Sheets API, cần service account, thấy được mọi tab.
+// sheets_pub — qua link "Publish to web", KHÔNG cần khoá nào, nhưng phải khai
+//              từng tab bằng gid vì bản publish không cho liệt kê tab.
+export type SourceType = "postgres" | "bigquery" | "airtable" | "sheets" | "sheets_pub";
 
 // Bản gửi cho client: KHÔNG kèm secret, chỉ cờ đã-có-secret.
 export type SourceView = {
@@ -124,6 +127,7 @@ export const SOURCE_TYPE_LABEL: Record<SourceType, string> = {
   bigquery: "BigQuery",
   airtable: "Airtable",
   sheets: "Google Sheets",
+  sheets_pub: "Google Sheets (bản publish)",
 };
 
 export const sourceClass = (nguon: string) =>

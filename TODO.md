@@ -4,6 +4,37 @@ Cập nhật 2026-07-23. Xếp theo thứ tự nên làm.
 
 ---
 
+## 0. Dashboard Thưởng khoán — vừa thêm (nhánh riêng, cần xác nhận)
+
+Dựng lại tool thưởng khoán (Cloudflare Worker `worker.js`) thành dashboard nội
+bộ `/bang/thuong-khoan`. Độc lập với phần doanh thu tự doanh.
+
+- [x] Nguồn **`sheets_pub`** — đọc Google Sheet bản *Publish to web*, không cần
+      service account (tool gốc đọc đúng đường này). Thêm vào collector, form
+      Quản trị, và `npm run sync`. Khai tab dạng `gid|tên`.
+- [x] Sửa lỗi đọc số kiểu Mỹ trong `scripts/lib/mart.mjs`: `"280,000,000"`
+      trước bị đọc thành 280 (giả định chấm-ngăn-nghìn kiểu VN). Nay suy quy ước
+      từ chính chuỗi. **Ảnh hưởng ngược:** ô `"1,234"` trước hiểu 1.234, nay
+      1234 — nếu có sheet dùng phẩy thập phân đúng 3 chữ số cần soi lại.
+- [x] Engine chia thưởng port sang `src/lib/khoan.ts` (mốc KPI luỹ kế, chia hai
+      tầng quầy/cụm, Partime 30/70, sáp nhập quầy, đối soát) + 10 test.
+- [x] 5 dataset khoán vào danh mục + nối dashboard; số thật ở `mart.khoan_*`.
+- [ ] **Đối chiếu số `/bang/thuong-khoan` với tool Worker gốc.** Đối soát nội bộ
+      khớp tuyệt đối (chênh 0 đ / 1,16 tỷ quỹ), nhưng chưa ai so từng số với bản
+      của nhân viên. So một kỳ là đủ yên tâm.
+- [ ] **Mốc KPI tháng 7 đang là 5.000.000.000 cho MỌI quầy** trong sheet cơ chế
+      (tháng 4 thì 280tr–3 tỷ tuỳ quầy) — nhìn như số placeholder. Nếu đúng thì
+      % hoàn thành KPI tháng 7 vô nghĩa; cần team kinh doanh chốt mốc thật.
+- [ ] **Lỗ hổng có sẵn từ bản gốc:** ngày-quầy có người khai giờ nhưng tất cả
+      hệ số 0 → quỹ tính "đang chia" mà không ai nhận; đối soát báo lệch nhưng
+      không nói vì sao. Chưa xảy ra trên dữ liệu thật. Đã chốt bằng test. Cách
+      chữa: xếp quỹ ngày-quầy có tổng điểm 0 vào quỹ treo.
+- [ ] Gom khai báo **sáp nhập/đổi tên quầy** dùng chung với dashboard tự doanh
+      (`catalog.kv` storemap:v1) — hiện khoán đọc từ sheet `khoan_sap_nhap`
+      riêng, tự doanh đọc từ `kv`. Hai chỗ, nên một.
+
+---
+
 ## 1. Chặn trước khi làm tiếp — cần bạn cung cấp
 
 - [ ] **Service account JSON của BigQuery** (biến `GCP_SA_KEY` bên repo

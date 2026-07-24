@@ -9,16 +9,26 @@ import type { SourceType } from "@/lib/types";
 export type SourceFormState = { error?: string; ok?: boolean };
 export type SyncState = { error?: string; report?: SyncReport };
 
-const TYPES: SourceType[] = ["postgres", "bigquery", "airtable", "sheets"];
+const TYPES: SourceType[] = ["postgres", "bigquery", "airtable", "sheets", "sheets_pub"];
 const NGUON_MAC_DINH: Record<SourceType, string> = {
   postgres: "Supabase",
   bigquery: "BigQuery",
   airtable: "Airtable",
   sheets: "Google Sheets",
+  sheets_pub: "Google Sheets",
 };
 
 function splitList(v: string): string[] {
   return v.split(",").map((s) => s.trim()).filter(Boolean);
+}
+
+/** Ô nhập tab của nguồn publish: mỗi dòng "gid|tên". Dòng thiếu vế thì bỏ. */
+function parseTabsPub(v: string): Array<{ gid: string; title: string }> {
+  return v
+    .split("\n")
+    .map((d) => d.split("|"))
+    .map(([gid, title]) => ({ gid: (gid ?? "").trim(), title: (title ?? "").trim() }))
+    .filter((t) => t.gid !== "" && t.title !== "");
 }
 
 export async function saveSourceAction(
@@ -52,6 +62,8 @@ export async function saveSourceAction(
     };
   else if (type === "sheets")
     config = { spreadsheetId: String(formData.get("spreadsheetId") ?? "").trim(), tabs: splitList(String(formData.get("tabs") ?? "")) };
+  else if (type === "sheets_pub")
+    config = { pubId: String(formData.get("pubId") ?? "").trim(), tabs: parseTabsPub(String(formData.get("tabsPub") ?? "")) };
 
   const input: SourceInput = { id, type, label, nguon, enabled, config, secret };
   await saveSource(input);

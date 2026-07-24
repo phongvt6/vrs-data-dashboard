@@ -8,17 +8,41 @@ export const oRong = (v) => v === null || v === undefined || String(v).trim() ==
 
 const SO_CHUOI = /^-?[\d.,\s]+$/;
 
-/** "1.250.000" → 1250000 ; "1,25" → 1.25 ; số thì giữ nguyên. */
+/**
+ * "1.250.000" → 1250000 ; "9,455,000" → 9455000 ; "1,25" → 1.25 ; số giữ nguyên.
+ *
+ * Không thể giả định quy ước Việt (chấm ngăn nghìn): sheet do người dùng tự
+ * định dạng, và các sheet đang có trong công ty dùng CẢ HAI kiểu. Đoán sai
+ * hướng thì "280,000,000" thành 280 — sai 6 chữ số mà không có lỗi nào báo.
+ *
+ * Nên phải suy từ chính chuỗi: dấu xuất hiện SAU CÙNG là ứng viên dấu thập
+ * phân, trừ khi nó lặp lại nhiều lần (=> ngăn nghìn), hoặc nó chia chuỗi thành
+ * đúng các nhóm 3 chữ số và không có dấu kia (=> cũng là ngăn nghìn).
+ */
 export function doiSo(v) {
   if (typeof v === "number") return Number.isFinite(v) ? v : null;
-  const s = String(v).trim();
-  if (!s || !SO_CHUOI.test(s)) return null;
-  // Dấu chấm ngăn nghìn, dấu phẩy thập phân — quy ước Việt Nam.
-  const n = Number(s.replace(/\s/g, "").replace(/\./g, "").replace(",", "."));
+  const goc = String(v).trim();
+  if (!goc || !SO_CHUOI.test(goc)) return null;
+
+  let s = goc.replace(/\s/g, "");
+  const cuoiCham = s.lastIndexOf("."), cuoiPhay = s.lastIndexOf(",");
+  const thapPhan = cuoiCham > cuoiPhay ? "." : cuoiPhay > cuoiCham ? "," : "";
+  if (thapPhan) {
+    const kia = thapPhan === "." ? "," : ".";
+    const soLan = s.split(thapPhan).length - 1;
+    const laNganNghin =
+      soLan > 1 ||
+      (s.indexOf(kia) === -1 && new RegExp(`^-?[1-9]\\d{0,2}(\\${thapPhan}\\d{3})+$`).test(s));
+    s = laNganNghin
+      ? s.replace(/[.,]/g, "")
+      : s.split(kia).join("").replace(thapPhan, ".");
+  }
+  const n = Number(s);
   return Number.isFinite(n) ? n : null;
 }
 
-const ISO = /^(\d{4})-(\d{2})-(\d{2})/;
+// yyyy-mm-dd, và cả yyyy/mm/dd — kiểu sau là mặc định khi sheet để locale Mỹ.
+const ISO = /^(\d{4})[-/.](\d{2})[-/.](\d{2})/;
 const DMY = /^(\d{1,2})[/-](\d{1,2})[/-](\d{4})/;
 
 /**

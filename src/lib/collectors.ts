@@ -1,5 +1,6 @@
 import "server-only";
 import type { SourceFull } from "./sources";
+import { docTabPub, tabsPub } from "./csv";
 
 export type CollectedColumn = { ten: string; kieu: string };
 export type CollectedTable = {
@@ -26,6 +27,8 @@ export async function collect(source: SourceFull): Promise<CollectedTable[]> {
       return collectBigQuery(source);
     case "sheets":
       return collectSheets(source);
+    case "sheets_pub":
+      return collectSheetsPub(source);
     default:
       throw new Error(`Loại nguồn chưa hỗ trợ: ${source.type}`);
   }
@@ -190,6 +193,37 @@ async function collectSheets(source: SourceFull): Promise<CollectedTable[]> {
       nguon: source.nguon || "Google Sheets",
       duong_dan: `Sheet: ${tab}`,
       columns: header.filter((h) => String(h).trim() !== "").map((h) => ({ ten: String(h), kieu: "" })),
+    });
+  }
+  return out;
+}
+
+// ---- Google Sheets bản publish (CSV công khai) ----
+// Khác bản trên ở chỗ không có API liệt kê tab, nên tab phải khai tay bằng gid.
+// Đổi lại đọc được ngay, không cần service account — hợp với các sheet mà tool
+// tự làm trong công ty đang dùng.
+async function collectSheetsPub(source: SourceFull): Promise<CollectedTable[]> {
+  const pubId = cfg(source, "pubId");
+  if (!pubId) throw new Error("Thiếu mã publish (2PACX-…).");
+  const tabs = tabsPub(source.config);
+  if (!tabs.length) throw new Error("Chưa khai tab nào (mỗi tab cần gid + tên).");
+
+  const out: CollectedTable[] = [];
+  for (const tab of tabs) {
+    const rows = await docTabPub(pubId, tab.gid);
+    // Có sheet chừa dòng trống ở trên — tiêu đề là dòng CÓ NỘI DUNG đầu tiên.
+    const i = rows.findIndex((r) => r.some((o) => String(o).trim() !== ""));
+    const header = i < 0 ? [] : rows[i];
+    const soDong = i < 0 ? 0 : rows.slice(i + 1).filter((r) => r.some((o) => String(o).trim() !== "")).length;
+    out.push({
+      nguon_ref: { type: "sheets_pub", source: source.id, path: `${pubId}#gid=${tab.gid}` },
+      ten: tab.title,
+      nguon: source.nguon || "Google Sheets",
+      duong_dan: `Sheet (publish): ${tab.title}`,
+      so_dong: soDong,
+      columns: header
+        .filter((h) => String(h).trim() !== "")
+        .map((h) => ({ ten: String(h), kieu: "" })),
     });
   }
   return out;
