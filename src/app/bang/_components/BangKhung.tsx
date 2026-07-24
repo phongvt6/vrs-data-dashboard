@@ -11,6 +11,7 @@ export default function BangKhung({
   ten,
   mo_ta,
   mocDuLieu,
+  thanhLoc,
   children,
 }: {
   ten: string;
@@ -20,6 +21,8 @@ export default function BangKhung({
    * Nhận ReactNode để truyền được component async, cho nó chảy về sau phần khung.
    */
   mocDuLieu?: React.ReactNode;
+  /** Thanh lọc, hiện ngay dưới header (tuỳ chọn). */
+  thanhLoc?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
@@ -58,6 +61,9 @@ export default function BangKhung({
             </span>
           )}
         </div>
+        {thanhLoc && (
+          <div style={{ borderTop: "1px solid var(--line)", padding: "0 26px" }}>{thanhLoc}</div>
+        )}
       </header>
 
       <main style={{ padding: "20px 26px 60px" }}>{children}</main>

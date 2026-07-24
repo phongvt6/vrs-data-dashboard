@@ -45,11 +45,19 @@ async function chayBigQuery<T>(source: SourceFull, sql: string, params: Params):
   const bq = new BigQuery({ projectId: project, credentials });
   const location = String(source.config?.location ?? "");
 
+  // BigQuery dùng tham số ĐẶT TÊN (@ten). Param null KHÔNG suy được kiểu → phải
+  // khai tay. Dashboard hay truyền loc_tu/loc_den = null (chưa lọc ngày), đều là
+  // chuỗi, nên mặc định STRING cho mọi param null.
+  const named = params && !Array.isArray(params) ? params : undefined;
+  const types = named
+    ? Object.fromEntries(Object.entries(named).filter(([, v]) => v === null).map(([k]) => [k, "STRING"]))
+    : undefined;
+
   const [rows] = await bq.query({
     query: sql,
     ...(location ? { location } : {}),
-    // BigQuery dùng tham số ĐẶT TÊN (@ten), không phải $1.
-    ...(params && !Array.isArray(params) ? { params } : {}),
+    ...(named ? { params: named } : {}),
+    ...(types && Object.keys(types).length ? { types } : {}),
     maxResults: TRAN_DONG,
   });
   return rows as T[];

@@ -38,20 +38,21 @@ Sửa lại thiết kế: **không phải nguồn nào cũng copy về Postgres*
 
 Mục tiêu: làm một cái cho chuẩn, sau cứ thế nhân bản.
 
-- [ ] Nâng `/bang/doanh-thu` lên đủ mức của repo `doanh-thu-tu-doanh`:
-  - [ ] Thanh lọc (khoảng ngày + nút nhanh Tuần/Tháng/Năm, lọc chọn-nhiều
-        theo trạm / điểm trạm / bộ phận / nhóm hàng / cửa hàng)
-  - [ ] Thẻ KPI có delta so tuần trước / tháng trước / cùng kỳ năm trước
-  - [ ] Drill-down: bấm nhóm hàng → xem SKU
-  - [ ] **Phần diễn giải bằng câu chữ** (Điểm sáng / Cảnh báo / Kiến nghị) —
-        thứ khiến sếp đọc được dashboard mà không cần ai giải thích.
-        Bên kia sinh bằng JS theo luật, không gọi LLM
-  - [x] Streaming: bật `cacheComponents`, mỗi hàng một `<Suspense>` riêng
-- [ ] Rút thành khuôn để dashboard sau chỉ việc sửa query và nhãn
-- [ ] Viết lại dashboard doanh thu tự doanh trong app này để so trực tiếp
-      với bản của nhân viên
+- [x] Bản tham chiếu đầy đủ ở `/bang/tu-doanh` (BigQuery):
+  - [x] Thanh lọc trên URL: khoảng ngày + nút nhanh, lọc chọn-nhiều theo
+        trạm / điểm trạm / bộ phận / nhóm hàng / quầy
+  - [x] Thẻ KPI 2 mốc so sánh (kỳ trước liền kề · cùng kỳ năm trước)
+  - [x] Drill-down: bấm nhóm hàng → bảng SKU, giữ nguyên bộ lọc
+  - [x] Diễn giải Điểm sáng / Cảnh báo / Kiến nghị (sinh bằng luật, không LLM)
+  - [x] Streaming: mỗi hàng một `<Suspense>` riêng
+- [x] Khuôn = các component tái dùng: `ThanhLoc`, `TheKPI`, `KhoiDienGiai`,
+      `BangKhung`/`Luoi`/`O` + helper `loc.ts`, `dien-giai.ts`, `nguon.ts`.
+      Dashboard sau chỉ đổi query + nhãn, không viết lại logic.
 
 Giữ bảng màu của app (đã kiểm định mù màu), học bố cục + phần diễn giải của họ.
+
+**Còn có thể làm sau:** nâng `/bang/doanh-thu` (nguồn Sheets) lên cùng mức, và
+để người dùng chọn nhóm cũ vs nhóm mới sau khi chốt cách xử lý dữ liệu nhóm hàng.
 
 ---
 
