@@ -8,7 +8,7 @@
 // nên serialize được), truyền sang client app; client lọc theo kỳ/chiều và vẽ.
 
 import { Suspense } from "react";
-import { docKhoan, DATASETS_KHOAN } from "@/lib/khoan-data";
+import { docKhoanRaw, DATASETS_KHOAN } from "@/lib/khoan-data";
 import { moiNhat } from "@/lib/mart";
 import BangKhung, { Luoi, OTrong } from "../_components/BangKhung";
 import KhoanApp from "./KhoanApp";
@@ -46,6 +46,6 @@ async function MocDuLieu() {
 }
 
 async function NoiDung() {
-  const { ketQua } = await docKhoan();
-  return <KhoanApp data={ketQua} />;
+  const raw = await docKhoanRaw();
+  return <KhoanApp raw={raw} />;
 }

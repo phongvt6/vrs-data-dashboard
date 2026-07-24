@@ -31,7 +31,9 @@ const so = (v: unknown) => {
   return Number.isFinite(n) ? n : 0;
 };
 
-export async function docKhoan(): Promise<{ ketQua: KetQua; datasets: string[] }> {
+// Đọc 5 bảng khoán từ mart, trả DỮ LIỆU THÔ (chưa tính). Client tự chạy engine
+// — vừa có sẵn raw cho trang "Danh sách data", vừa chỉ tính một lần ở client.
+export async function docKhoanRaw(): Promise<DuLieuTho> {
   const [doanhThu, coChe, nhanVien, gioLam, sapNhap] = await Promise.all([
     mart<{ ngay_thang: string; ma_cua_hang: string; doanh_thu: string }>(
       `SELECT to_char(ngay_thang, 'YYYY-MM-DD') AS ngay_thang, ma_cua_hang, doanh_thu
@@ -78,5 +80,10 @@ export async function docKhoan(): Promise<{ ketQua: KetQua; datasets: string[] }
     })),
   };
 
+  return raw;
+}
+
+export async function docKhoan(): Promise<{ ketQua: KetQua; datasets: string[] }> {
+  const raw = await docKhoanRaw();
   return { ketQua: tinhThuong(raw), datasets: DATASETS_KHOAN };
 }
