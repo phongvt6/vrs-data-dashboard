@@ -1,8 +1,8 @@
 import "server-only";
 import { pool, query } from "./db";
-import type { Chart, Dashboard, DashboardDataset } from "./types";
+import type { Dashboard, DashboardDataset } from "./types";
 
-export type { Chart, Dashboard, DashboardDataset } from "./types";
+export type { Dashboard, DashboardDataset } from "./types";
 
 type DashboardRow = Omit<Dashboard, "datasets">;
 
@@ -13,6 +13,7 @@ function toDashboard(row: DashboardRow, datasets: DashboardDataset[]): Dashboard
     mo_ta: row.mo_ta,
     cong_cu: row.cong_cu,
     url: row.url,
+    route: row.route ?? "",
     chu_so_huu: row.chu_so_huu,
     phong_ban: row.phong_ban,
     doi_tuong: row.doi_tuong,
@@ -25,7 +26,7 @@ function toDashboard(row: DashboardRow, datasets: DashboardDataset[]): Dashboard
   };
 }
 
-const SELECT_COLS = `id, ten, mo_ta, cong_cu, url, chu_so_huu, phong_ban, doi_tuong,
+const SELECT_COLS = `id, ten, mo_ta, cong_cu, url, route, chu_so_huu, phong_ban, doi_tuong,
                      tan_suat, phan_loai_bao_mat, trang_thai, anh_bia, cap_nhat_lan_cuoi`;
 
 export async function getDashboards(): Promise<Dashboard[]> {
@@ -63,73 +64,6 @@ export async function getDashboard(id: string): Promise<Dashboard | undefined> {
   return toDashboard(rows[0], links);
 }
 
-export async function getCharts(dashboardId: string): Promise<Chart[]> {
-  return query<Chart>(
-    `SELECT id, dashboard_id, tieu_de, loai, mo_ta, config, pos, w, h
-       FROM catalog.charts WHERE dashboard_id = $1 ORDER BY pos, id`,
-    [dashboardId]
-  );
-}
-
-export async function getChart(id: string): Promise<Chart | undefined> {
-  const rows = await query<Chart>(
-    `SELECT id, dashboard_id, tieu_de, loai, mo_ta, config, pos, w, h
-       FROM catalog.charts WHERE id = $1`,
-    [id]
-  );
-  return rows[0];
-}
-
-export async function saveChart(ch: Chart): Promise<void> {
-  await query(
-    `INSERT INTO catalog.charts (id, dashboard_id, tieu_de, loai, mo_ta, config, pos, w, h, updated_at)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9, now())
-     ON CONFLICT (id) DO UPDATE SET
-       tieu_de=$3, loai=$4, mo_ta=$5, config=$6, pos=$7, w=$8, h=$9, updated_at=now()`,
-    [ch.id, ch.dashboard_id, ch.tieu_de, ch.loai, ch.mo_ta, JSON.stringify(ch.config ?? {}), ch.pos, ch.w, ch.h]
-  );
-}
-
-export async function deleteChart(id: string): Promise<void> {
-  await query(`DELETE FROM catalog.charts WHERE id = $1`, [id]);
-}
-
-/** Đổi chỗ chart với chart liền kề theo thứ tự hiển thị. */
-export async function moveChart(id: string, dir: -1 | 1): Promise<string | undefined> {
-  const ch = await getChart(id);
-  if (!ch) return undefined;
-  const list = await getCharts(ch.dashboard_id);
-  const i = list.findIndex((x) => x.id === id);
-  const j = i + dir;
-  if (i < 0 || j < 0 || j >= list.length) return ch.dashboard_id;
-
-  const client = await pool.connect();
-  try {
-    await client.query("BEGIN");
-    // Ghi lại pos cho cả danh sách: pos cũ có thể trùng nhau (mặc định 0).
-    const sau = [...list];
-    [sau[i], sau[j]] = [sau[j], sau[i]];
-    for (let k = 0; k < sau.length; k++) {
-      await client.query(`UPDATE catalog.charts SET pos = $1 WHERE id = $2`, [k, sau[k].id]);
-    }
-    await client.query("COMMIT");
-  } catch (e) {
-    await client.query("ROLLBACK");
-    throw e;
-  } finally {
-    client.release();
-  }
-  return ch.dashboard_id;
-}
-
-// Số chart theo dashboard, 1 truy vấn cho cả danh sách.
-export async function countChartsByDashboard(): Promise<Record<string, number>> {
-  const rows = await query<{ dashboard_id: string; n: string }>(
-    `SELECT dashboard_id, count(*) AS n FROM catalog.charts GROUP BY dashboard_id`
-  );
-  return Object.fromEntries(rows.map((r) => [r.dashboard_id, Number(r.n) || 0]));
-}
-
 // ---- Mutations (dùng bởi admin) ----
 
 export type DashboardInput = Dashboard;
@@ -140,15 +74,15 @@ export async function saveDashboard(d: DashboardInput): Promise<void> {
     await client.query("BEGIN");
     await client.query(
       `INSERT INTO catalog.dashboards
-         (id, ten, mo_ta, cong_cu, url, chu_so_huu, phong_ban, doi_tuong, tan_suat,
+         (id, ten, mo_ta, cong_cu, url, route, chu_so_huu, phong_ban, doi_tuong, tan_suat,
           phan_loai_bao_mat, trang_thai, anh_bia, cap_nhat_lan_cuoi, updated_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13, now())
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14, now())
        ON CONFLICT (id) DO UPDATE SET
-         ten=$2, mo_ta=$3, cong_cu=$4, url=$5, chu_so_huu=$6, phong_ban=$7,
-         doi_tuong=$8, tan_suat=$9, phan_loai_bao_mat=$10, trang_thai=$11,
-         anh_bia=$12, cap_nhat_lan_cuoi=$13, updated_at=now()`,
+         ten=$2, mo_ta=$3, cong_cu=$4, url=$5, route=$6, chu_so_huu=$7, phong_ban=$8,
+         doi_tuong=$9, tan_suat=$10, phan_loai_bao_mat=$11, trang_thai=$12,
+         anh_bia=$13, cap_nhat_lan_cuoi=$14, updated_at=now()`,
       [
-        d.id, d.ten, d.mo_ta, d.cong_cu, d.url, d.chu_so_huu, d.phong_ban,
+        d.id, d.ten, d.mo_ta, d.cong_cu, d.url, d.route, d.chu_so_huu, d.phong_ban,
         d.doi_tuong, d.tan_suat, d.phan_loai_bao_mat, d.trang_thai, d.anh_bia,
         d.cap_nhat_lan_cuoi ?? "",
       ]

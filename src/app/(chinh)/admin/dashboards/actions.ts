@@ -53,6 +53,12 @@ export async function saveDashboardAction(
   const anh_bia = sanitizeUrl(String(payload.anh_bia ?? ""));
   if (anh_bia === null) return { error: "Link ảnh bìa phải bắt đầu bằng http:// hoặc https://" };
 
+  // route chỉ nhận ký tự an toàn cho URL — nó ghép vào /bang/<route>.
+  const route = String(payload.route ?? "").trim();
+  if (route && !/^[a-z0-9-]+$/.test(route)) {
+    return { error: "Route chỉ gồm chữ thường, số và gạch ngang (vd tu-doanh)." };
+  }
+
   const trang_thai = String(payload.trang_thai ?? "");
   const rawLinks = Array.isArray(payload.datasets) ? payload.datasets : [];
 
@@ -78,6 +84,7 @@ export async function saveDashboardAction(
     mo_ta: String(payload.mo_ta ?? "").trim(),
     cong_cu: String(payload.cong_cu ?? "").trim() || "Khác",
     url,
+    route,
     chu_so_huu: String(payload.chu_so_huu ?? "").trim(),
     phong_ban: String(payload.phong_ban ?? "").trim(),
     doi_tuong: String(payload.doi_tuong ?? "").trim(),

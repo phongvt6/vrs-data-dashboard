@@ -1,10 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCatalog } from "@/lib/catalog";
-import { getCharts, getDashboard } from "@/lib/dashboards";
+import { getDashboard } from "@/lib/dashboards";
 import { sourceClass, toolClass } from "@/lib/types";
-import DashboardGrid, { type DuLieuChart } from "@/app/_components/DashboardGrid";
-import { chayChartQuery, getChartQueries } from "@/lib/chart-data";
 
 
 export default async function DashboardPage({
@@ -16,24 +14,8 @@ export default async function DashboardPage({
   const d = await getDashboard(id);
   if (!d) notFound();
 
-  const [{ datasets }, charts] = await Promise.all([getCatalog(), getCharts(id)]);
+  const { datasets } = await getCatalog();
   const dsById = new Map(datasets.map((x) => [x.id, x]));
-
-  // Lấy số thật cho những chart đã cấu hình nguồn. Chart nào hỏng hoặc chưa cấu
-  // hình thì lùi về số liệu mẫu — dashboard không bao giờ trắng vì một chart lỗi.
-  const queries = await getChartQueries(charts.map((c) => c.id));
-  const ketQua = await Promise.all(
-    charts.map(async (c): Promise<[string, DuLieuChart]> => {
-      const q = queries.get(c.id);
-      if (!q?.source_id) return [c.id, { rows: [], laMau: true }];
-      const kq = await chayChartQuery(q);
-      return kq.loi || !kq.rows.length
-        ? [c.id, { rows: [], laMau: true, loi: kq.loi }]
-        : [c.id, { rows: kq.rows, laMau: false }];
-    })
-  );
-  const duLieu = Object.fromEntries(ketQua);
-  const soChartThat = ketQua.filter(([, d]) => !d.laMau).length;
 
   // Ô trống thì bỏ hẳn khỏi bảng metadata cho đỡ rối.
   const meta = ([
@@ -54,7 +36,17 @@ export default async function DashboardPage({
           ← Quay lại danh mục dashboard
         </Link>
         <div style={{ display: "flex", gap: 8 }}>
-          {d.url && (
+          {d.route ? (
+            <Link
+              href={`/bang/${d.route}`}
+              style={{
+                fontSize: 13, fontWeight: 600, color: "#fff", background: "var(--accent)",
+                border: "1px solid var(--accent)", borderRadius: 7, padding: "5px 12px",
+              }}
+            >
+              Mở trong app →
+            </Link>
+          ) : d.url ? (
             <a
               href={d.url}
               target="_blank"
@@ -66,7 +58,7 @@ export default async function DashboardPage({
             >
               Mở dashboard ↗
             </a>
-          )}
+          ) : null}
           <Link
             href={`/admin/dashboard/${d.id}`}
             style={{
@@ -159,42 +151,6 @@ export default async function DashboardPage({
         )}
       </div>
 
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, margin: "0 0 12px", flexWrap: "wrap" }}>
-        <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>
-          Chart trong app · {charts.length}
-        </h2>
-        <Link href={`/admin/dashboard/${d.id}/charts`} style={{ fontSize: 13, fontWeight: 600, color: "var(--accent)" }}>
-          Quản lý chart →
-        </Link>
-      </div>
-      {charts.length > 0 ? (
-        <>
-          {soChartThat < charts.length && (
-            <p style={{
-              margin: "0 0 14px", fontSize: 12.5, color: "var(--warn)",
-              border: "1px dashed var(--warn)", borderRadius: 8, padding: "8px 12px",
-            }}>
-              {soChartThat === 0
-                ? "Chưa chart nào nối nguồn — tất cả đang vẽ bằng số liệu mẫu."
-                : `${soChartThat}/${charts.length} chart đang lấy số thật, số còn lại vẽ bằng số liệu mẫu.`}{" "}
-              Nối nguồn trong <strong>Quản lý chart</strong>.
-            </p>
-          )}
-          <DashboardGrid charts={charts} duLieu={duLieu} />
-        </>
-      ) : (
-        <div style={{
-          background: "var(--panel)", border: "1px dashed var(--line-strong)",
-          borderRadius: 9, padding: "16px 18px", color: "var(--ink-soft)", fontSize: 14, lineHeight: 1.55,
-        }}>
-          Chưa có chart nào trong app — dashboard này vẫn xem ở công cụ gốc qua nút
-          “Mở dashboard”. Thêm chart trong{" "}
-          <Link href={`/admin/dashboard/${d.id}/charts`} style={{ color: "var(--accent)", fontWeight: 600 }}>
-            Quản lý chart
-          </Link>
-          .
-        </div>
-      )}
     </div>
   );
 }

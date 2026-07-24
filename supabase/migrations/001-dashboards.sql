@@ -44,33 +44,7 @@ create table if not exists catalog.dashboard_datasets (
 create index if not exists dashboard_datasets_dataset_idx
   on catalog.dashboard_datasets (dataset_id);
 
--- ---- Giai đoạn 2: chart trong dashboard ----
--- loai = mã chart trong thư viện (taxonomy lấy từ app ui-chart-catalog).
--- config = option ECharts đã tuỳ biến cho chart này.
-create table if not exists catalog.charts (
-  id           text primary key,
-  dashboard_id text not null references catalog.dashboards(id) on delete cascade,
-  tieu_de      text not null,
-  loai         text not null default '',
-  mo_ta        text not null default '',
-  config       jsonb not null default '{}'::jsonb,
-  pos          int not null default 0,   -- thứ tự trong dashboard
-  w            int not null default 6,   -- bề ngang theo lưới 12 cột
-  h            int not null default 2,
-  updated_at   timestamptz not null default now()
-);
-
-create index if not exists charts_dashboard_idx on catalog.charts (dashboard_id, pos);
-
--- ---- Giai đoạn 3: chart lấy số thật ----
--- source_id trỏ sang catalog.sources — chính là connection collector đang dùng
--- để kéo schema, nay dùng lại để chạy query.
-create table if not exists catalog.chart_queries (
-  chart_id       text primary key references catalog.charts(id)  on delete cascade,
-  source_id      text references catalog.sources(id) on delete set null,
-  sql            text not null default '',
-  params         jsonb not null default '{}'::jsonb,
-  cache_ttl_giay int not null default 900,
-  last_run_at    text not null default '',
-  last_run_note  text not null default ''
-);
+-- Ghi chú lịch sử: bản đầu có thêm 2 bảng charts / chart_queries để ghép chart
+-- qua form trong admin. Cách đó đã bỏ (dashboard giờ là trang code ở /bang/…),
+-- nên migration 004 thêm cột dashboards.route và script drop-chart-tables.mjs
+-- xoá 2 bảng đó. Cài mới thì bỏ qua chúng, chỉ chạy tới đây rồi sang 002/003/004.

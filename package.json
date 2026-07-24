@@ -12,9 +12,11 @@
     "db:dashboards": "node --env-file-if-exists=.env.local scripts/migrate-dashboards.mjs",
     "collect": "node --env-file-if-exists=.env.local scripts/collect-schema.mjs",
     "validate": "node scripts/validate-catalog.mjs",
-    "test": "node scripts/merge.test.mjs && node scripts/db.test.mjs && node scripts/dashboards.test.mjs && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/chart-rows.test.mjs && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/loc.test.mjs && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/dien-giai.test.mjs",
+    "test": "node scripts/merge.test.mjs && node scripts/db.test.mjs && node scripts/dashboards.test.mjs && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/loc.test.mjs && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/dien-giai.test.mjs",
     "sync": "node --env-file-if-exists=.env.local scripts/sync-mart.mjs",
-    "db:mart": "node --env-file-if-exists=.env.local -e \"import('pg').then(async(pg)=>{const fs=await import('node:fs/promises');const c=new pg.default.Client({connectionString:process.env.DATABASE_URL,ssl:{rejectUnauthorized:false}});await c.connect();await c.query(await fs.readFile('supabase/migrations/003-mart.sql','utf8'));console.log('schema mart sẵn sàng');await c.end()})\""
+    "db:mart": "node --env-file-if-exists=.env.local -e \"import('pg').then(async(pg)=>{const fs=await import('node:fs/promises');const c=new pg.default.Client({connectionString:process.env.DATABASE_URL,ssl:{rejectUnauthorized:false}});await c.connect();await c.query(await fs.readFile('supabase/migrations/003-mart.sql','utf8'));console.log('schema mart sẵn sàng');await c.end()})\"",
+    "db:route": "node --env-file-if-exists=.env.local -e \"import('pg').then(async(pg)=>{const fs=await import('node:fs/promises');const c=new pg.default.Client({connectionString:process.env.DATABASE_URL,ssl:{rejectUnauthorized:false}});await c.connect();await c.query(await fs.readFile('supabase/migrations/004-dashboard-route.sql','utf8'));console.log('đã thêm cột route');await c.end()})\"",
+    "db:drop-charts": "node --env-file-if-exists=.env.local scripts/drop-chart-tables.mjs"
   },
   "dependencies": {
     "@google-cloud/bigquery": "^8.3.1",

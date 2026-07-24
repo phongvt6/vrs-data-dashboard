@@ -56,14 +56,18 @@ Giữ bảng màu của app (đã kiểm định mù màu), học bố cục + p
 
 ---
 
-## 4. Dọn phần cũ (đã chốt bỏ, chưa làm)
+## 4. Dọn phần cũ — XONG
 
-- [ ] Gỡ form ghép chart trong Quản trị: route `/admin/dashboard/[id]/charts`,
-      `ChartForm.tsx`, `ChartSource.tsx`, `chart-actions.ts`, `query-actions.ts`
-- [ ] Xoá bảng `catalog.charts` và `catalog.chart_queries`
-- [ ] Thêm cột `route` vào `catalog.dashboards` để `/dashboards` trỏ thẳng vào
-      trang nội bộ `/bang/<ten>` thay vì chỉ link ra tool ngoài
-- [ ] Giữ nguyên thư viện chart và trang `/charts`
+- [x] Gỡ form ghép chart (routes /admin/dashboard/[id]/charts, ChartForm,
+      ChartSource, chart-actions, query-actions, lib/chart-data, DashboardGrid)
+- [x] Xoá bảng `catalog.charts` + `catalog.chart_queries` (sao lưu vào archive
+      trước bằng `npm run db:drop-charts`)
+- [x] Thêm cột `route` vào `catalog.dashboards`; danh mục trỏ thẳng vào
+      `/bang/<route>` khi có, nhãn "Trong app" trên card
+- [x] Giữ nguyên thư viện chart và trang `/charts`
+
+Việc của bạn: vào Sửa từng dashboard, điền `route` (vd `tu-doanh`) để card
+"Doanh thu tự doanh" mở thẳng trang trong app.
 
 ---
 

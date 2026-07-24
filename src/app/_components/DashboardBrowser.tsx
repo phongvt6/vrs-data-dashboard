@@ -22,13 +22,11 @@ const btnCard = {
 export default function DashboardBrowser({
   dashboards,
   datasetNames,
-  chartCounts,
   title,
   subtitle,
 }: {
   dashboards: Dashboard[];
   datasetNames: Record<string, string>;
-  chartCounts: Record<string, number>;
   title?: string;
   subtitle?: string;
 }) {
@@ -106,7 +104,9 @@ export default function DashboardBrowser({
 
       <div style={{ display: "grid", gap: 12 }}>
         {filtered.map((d) => {
-          const soChart = chartCounts[d.id] ?? 0;
+          // Bấm cả thẻ → mở dashboard: trang nội bộ /bang/<route> nếu có, không
+          // thì trang chi tiết trong danh mục.
+          const moLink = d.route ? `/bang/${d.route}` : `/dashboard/${d.id}`;
           return (
             // Link phủ kín để bấm cả thẻ; nội dung tắt pointer-events; nút thao
             // tác nằm trên cùng.
@@ -118,7 +118,7 @@ export default function DashboardBrowser({
               }}
             >
               <Link
-                href={`/dashboard/${d.id}`}
+                href={moLink}
                 aria-label={d.ten}
                 style={{ position: "absolute", inset: 0, borderRadius: 12 }}
               />
@@ -140,15 +140,14 @@ export default function DashboardBrowser({
                 {d.mo_ta}
               </p>
               <div style={{ display: "flex", gap: 20, fontSize: 12.5, color: "var(--ink-soft)", flexWrap: "wrap" }}>
+                {d.route && <span style={{ color: "var(--accent)", fontWeight: 600 }}>Trong app</span>}
                 {d.phong_ban && <span>{d.phong_ban}</span>}
                 {d.chu_so_huu && <span>{d.chu_so_huu}</span>}
                 <span>{d.datasets.length} dataset nguồn</span>
-                {soChart > 0 && <span>{soChart} chart</span>}
                 {d.tan_suat && <span>{d.tan_suat}</span>}
               </div>
               </div>
               <div style={{ position: "absolute", top: 16, right: 18, display: "flex", gap: 6 }}>
-                <Link href={`/admin/dashboard/${d.id}/charts`} style={btnCard}>Chart</Link>
                 <Link href={`/admin/dashboard/${d.id}`} style={btnCard}>Sửa</Link>
               </div>
             </div>

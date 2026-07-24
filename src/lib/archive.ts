@@ -36,23 +36,18 @@ async function snapshotDataset(id: string): Promise<Snapshot | null> {
 async function snapshotDashboard(id: string): Promise<Snapshot | null> {
   const dashboards = await query<Row>(`SELECT * FROM catalog.dashboards WHERE id = $1`, [id]);
   if (!dashboards.length) return null;
-  const [dashboard_datasets, charts] = await Promise.all([
-    query<Row>(`SELECT * FROM catalog.dashboard_datasets WHERE dashboard_id = $1`, [id]),
-    query<Row>(`SELECT * FROM catalog.charts WHERE dashboard_id = $1 ORDER BY pos`, [id]),
-  ]);
-  const chart_queries = charts.length
-    ? await query<Row>(`SELECT * FROM catalog.chart_queries WHERE chart_id = ANY($1)`, [
-        charts.map((c) => c.id),
-      ])
-    : [];
-  return { dashboards, dashboard_datasets, charts, chart_queries };
+  const dashboard_datasets = await query<Row>(
+    `SELECT * FROM catalog.dashboard_datasets WHERE dashboard_id = $1`,
+    [id]
+  );
+  return { dashboards, dashboard_datasets };
 }
 
 function tomTat(loai: ArchiveLoai, s: Snapshot): string {
   const n = (k: string) => s[k]?.length ?? 0;
   return loai === "dataset"
     ? `${n("columns")} cột · ${n("relationships")} liên kết · ${n("dashboard_datasets")} dashboard đang dùng`
-    : `${n("dashboard_datasets")} dataset nguồn · ${n("charts")} chart`;
+    : `${n("dashboard_datasets")} dataset nguồn`;
 }
 
 /**
@@ -145,10 +140,12 @@ export async function restoreArchive(archiveId: number): Promise<RestoreResult> 
   if (dangCo.length) return { ok: false, error: `"${doi_tuong_id}" hiện đã tồn tại — xoá hoặc đổi tên cái đang có trước.` };
 
   // Bảng cha trước, con sau. dashboard_datasets phải đi sau cả hai đầu.
+  // Bản lưu trữ cũ có thể còn khoá charts/chart_queries — chenLai bỏ qua bảng
+  // không tồn tại, nên phục hồi bản cũ vẫn chạy, chỉ là 2 khoá đó rơi rụng.
   const thuTu =
     loai === "dataset"
       ? ["datasets", "columns", "relationships", "dashboard_datasets"]
-      : ["dashboards", "charts", "chart_queries", "dashboard_datasets"];
+      : ["dashboards", "dashboard_datasets"];
 
   const client = await pool.connect();
   try {

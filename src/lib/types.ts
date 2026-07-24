@@ -1,9 +1,5 @@
 // Kiểu dữ liệu + helper THUẦN (không đụng DB) — an toàn để import ở client.
 
-import type { ChartConfig } from "@/chart/types";
-
-export type { ChartConfig };
-
 export type Column = {
   ten: string;
   kieu: string;
@@ -48,35 +44,14 @@ export type DashboardDataset = {
   ghi_chu: string;
 };
 
-// Chart nằm trong dashboard. `loai` là mã trong thư viện chart (src/chart),
-// `config` là tuỳ chọn hiển thị của riêng chart đó.
-export type Chart = {
-  id: string;
-  dashboard_id: string;
-  tieu_de: string;
-  loai: string;
-  mo_ta: string;
-  config: ChartConfig;
-  pos: number;
-  /** Bề ngang theo lưới 12 cột. */
-  w: number;
-  h: number;
-};
-
-export const CHART_WIDTHS = [
-  { w: 3, nhan: "1/4" },
-  { w: 4, nhan: "1/3" },
-  { w: 6, nhan: "1/2" },
-  { w: 8, nhan: "2/3" },
-  { w: 12, nhan: "Cả hàng" },
-];
-
 export type Dashboard = {
   id: string;
   ten: string;
   mo_ta: string;
   cong_cu: string;
   url: string;
+  /** Tên trang dashboard nội bộ dưới /bang/. Rỗng = chỉ có link ra công cụ ngoài. */
+  route: string;
   chu_so_huu: string;
   phong_ban: string;
   doi_tuong: string;

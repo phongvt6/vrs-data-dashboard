@@ -16,7 +16,11 @@ async function freshClient() {
   const { Client } = db.adapters.createPg();
   const client = new Client();
   await client.connect();
-  for (const f of ["../supabase/schema.sql", "../supabase/migrations/001-dashboards.sql"]) {
+  for (const f of [
+    "../supabase/schema.sql",
+    "../supabase/migrations/001-dashboards.sql",
+    "../supabase/migrations/004-dashboard-route.sql",
+  ]) {
     await client.query(await readFile(resolve(here, f), "utf8"));
   }
   return client;
@@ -40,13 +44,18 @@ const addDashboard = (client, id = "bao_cao_ban_hang") =>
 console.log("dashboards.test.mjs");
 
 // pg-mem gộp mọi schema vào "public", nên chỉ đối chiếu theo tên bảng.
-await test("schema.sql + migration chạy được, tạo đủ 4 bảng", async () => {
+await test("schema.sql + migration chạy được, tạo bảng dashboard", async () => {
   const client = await freshClient();
   const { rows } = await client.query(`SELECT table_name FROM information_schema.tables`);
   const co = new Set(rows.map((r) => r.table_name));
-  for (const b of ["dashboards", "dashboard_datasets", "charts", "chart_queries"]) {
+  for (const b of ["dashboards", "dashboard_datasets"]) {
     assert.ok(co.has(b), `thiếu bảng catalog.${b}`);
   }
+  // Cột route (migration 004) phải có.
+  const { rows: cols } = await client.query(
+    `SELECT column_name FROM information_schema.columns WHERE table_name='dashboards' AND column_name='route'`
+  );
+  assert.equal(cols.length, 1, "thiếu cột dashboards.route");
 });
 
 await test("dashboard lưu và đọc lại đúng, có default hợp lý", async () => {
@@ -105,7 +114,7 @@ await test("xóa dataset thì link tự rụng, dashboard vẫn còn", async () 
   assert.equal(dash.rows.length, 1, "dashboard không được biến mất theo dataset");
 });
 
-await test("xóa dashboard thì chart và link của nó rụng theo", async () => {
+await test("xóa dashboard thì link dataset của nó rụng theo", async () => {
   const client = await freshClient();
   const dsId = await seedDataset(client);
   await addDashboard(client);
@@ -113,33 +122,18 @@ await test("xóa dashboard thì chart và link của nó rụng theo", async () 
     `INSERT INTO catalog.dashboard_datasets (dashboard_id, dataset_id) VALUES ($1,$2)`,
     ["bao_cao_ban_hang", dsId]
   );
-  await client.query(
-    `INSERT INTO catalog.charts (id, dashboard_id, tieu_de, loai) VALUES ($1,$2,$3,$4)`,
-    ["c1", "bao_cao_ban_hang", "Doanh thu theo tháng", "line_basic"]
-  );
   await client.query(`DELETE FROM catalog.dashboards WHERE id = 'bao_cao_ban_hang'`);
-
-  for (const t of ["dashboard_datasets", "charts"]) {
-    const { rows } = await client.query(`SELECT * FROM catalog.${t}`);
-    assert.equal(rows.length, 0, `catalog.${t} phải rỗng sau khi xóa dashboard`);
-  }
+  const { rows } = await client.query(`SELECT * FROM catalog.dashboard_datasets`);
+  assert.equal(rows.length, 0, "link phải rụng theo dashboard");
 });
 
-await test("chart_queries trỏ được sang catalog.sources", async () => {
+await test("route lưu và đọc lại đúng", async () => {
   const client = await freshClient();
-  await addDashboard(client);
   await client.query(
-    `INSERT INTO catalog.sources (id, type, label) VALUES ('bq_main', 'bigquery', 'BigQuery chính')`
+    `INSERT INTO catalog.dashboards (id, ten, route) VALUES ('bc', 'Báo cáo', 'tu-doanh')`
   );
-  await client.query(
-    `INSERT INTO catalog.charts (id, dashboard_id, tieu_de) VALUES ('c1', 'bao_cao_ban_hang', 'Doanh thu')`
-  );
-  await client.query(
-    `INSERT INTO catalog.chart_queries (chart_id, source_id, sql) VALUES ('c1', 'bq_main', 'select 1')`
-  );
-  const { rows } = await client.query(`SELECT source_id, cache_ttl_giay FROM catalog.chart_queries`);
-  assert.equal(rows[0].source_id, "bq_main");
-  assert.equal(rows[0].cache_ttl_giay, 900);
+  const { rows } = await client.query(`SELECT route FROM catalog.dashboards WHERE id='bc'`);
+  assert.equal(rows[0].route, "tu-doanh");
 });
 
 console.log(`\n${passed} test đã pass.`);

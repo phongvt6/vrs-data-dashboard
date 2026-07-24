@@ -1,13 +1,12 @@
 import { getCatalog, getSettings } from "@/lib/catalog";
-import { countChartsByDashboard, getDashboards } from "@/lib/dashboards";
+import { getDashboards } from "@/lib/dashboards";
 import DashboardBrowser from "@/app/_components/DashboardBrowser";
 
 
 export default async function DashboardsPage() {
-  const [dashboards, { datasets }, chartCounts, settings] = await Promise.all([
+  const [dashboards, { datasets }, settings] = await Promise.all([
     getDashboards(),
     getCatalog(),
-    countChartsByDashboard(),
     getSettings(),
   ]);
 
@@ -17,7 +16,6 @@ export default async function DashboardsPage() {
     <DashboardBrowser
       dashboards={dashboards}
       datasetNames={datasetNames}
-      chartCounts={chartCounts}
       title={settings.dashboards_title}
       subtitle={settings.dashboards_subtitle}
     />

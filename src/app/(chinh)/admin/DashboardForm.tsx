@@ -38,6 +38,7 @@ export default function DashboardForm({
   const [ten, setTen] = useState(initial?.ten ?? "");
   const [cong_cu, setCongCu] = useState(initial?.cong_cu ?? CONG_CU_GOI_Y[0]);
   const [url, setUrl] = useState(initial?.url ?? "");
+  const [route, setRoute] = useState(initial?.route ?? "");
   const [chu_so_huu, setChuSoHuu] = useState(initial?.chu_so_huu ?? "");
   const [phong_ban, setPhongBan] = useState(initial?.phong_ban ?? "");
   const [doi_tuong, setDoiTuong] = useState(initial?.doi_tuong ?? "");
@@ -53,7 +54,7 @@ export default function DashboardForm({
 
   const payload = {
     id: isNew ? id : initial!.id,
-    ten, mo_ta, cong_cu, url, chu_so_huu, phong_ban, doi_tuong, tan_suat,
+    ten, mo_ta, cong_cu, url, route, chu_so_huu, phong_ban, doi_tuong, tan_suat,
     phan_loai_bao_mat, trang_thai, anh_bia,
     cap_nhat_lan_cuoi: initial?.cap_nhat_lan_cuoi ?? "",
     datasets: links,
@@ -97,7 +98,11 @@ export default function DashboardForm({
           </datalist>
         </div>
         <div>
-          <label style={label}>Link mở dashboard</label>
+          <label style={label}>Trang trong app (route dưới /bang/)</label>
+          <input style={inp} className="mono" value={route} onChange={(e) => setRoute(e.target.value)} placeholder="vd tu-doanh — để trống nếu chỉ link ra ngoài" />
+        </div>
+        <div>
+          <label style={label}>Link ra công cụ ngoài (nếu không có trang trong app)</label>
           <input style={inp} className="mono" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://lookerstudio.google.com/..." />
         </div>
         <div>
