@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { getCatalog } from "@/lib/catalog";
 import { deleteRelationshipAction } from "../actions";
@@ -5,6 +6,8 @@ import RelationshipForm from "./RelationshipForm";
 
 
 export default async function RelationshipsPage() {
+  // Trang đọc DB trực tiếp — chạy tại request-time, không prerender lúc build.
+  await connection();
   const { datasets, relationships } = await getCatalog();
   const nameById = new Map(datasets.map((d) => [d.id, d.ten]));
 

@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { getDashboards } from "@/lib/dashboards";
 import { toolClass } from "@/lib/types";
@@ -5,6 +6,8 @@ import { deleteDashboardAction } from "./actions";
 
 
 export default async function AdminDashboardsPage() {
+  // Trang đọc DB trực tiếp — chạy tại request-time, không prerender lúc build.
+  await connection();
   const dashboards = await getDashboards();
 
   return (

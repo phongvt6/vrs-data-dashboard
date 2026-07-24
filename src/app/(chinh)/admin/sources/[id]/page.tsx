@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { getSourceView } from "@/lib/sources";
 import SourceForm from "../SourceForm";
@@ -8,6 +9,8 @@ export default async function EditSourcePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  // Trang đọc DB trực tiếp — chạy tại request-time, không prerender lúc build.
+  await connection();
   const { id } = await params;
   if (id === "new") return <SourceForm isNew />;
 

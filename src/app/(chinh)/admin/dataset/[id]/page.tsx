@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { getCatalog, getDataset } from "@/lib/catalog";
 import { sourcesInUse } from "@/lib/types";
@@ -9,6 +10,8 @@ export default async function EditDatasetPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  // Trang đọc DB trực tiếp — chạy tại request-time, không prerender lúc build.
+  await connection();
   const { id } = await params;
   const isNew = id === "new";
 

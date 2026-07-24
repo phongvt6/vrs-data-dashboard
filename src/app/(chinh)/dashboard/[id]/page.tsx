@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCatalog } from "@/lib/catalog";
@@ -10,6 +11,8 @@ export default async function DashboardPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  // Trang đọc DB trực tiếp — chạy tại request-time, không prerender lúc build.
+  await connection();
   const { id } = await params;
   const d = await getDashboard(id);
   if (!d) notFound();

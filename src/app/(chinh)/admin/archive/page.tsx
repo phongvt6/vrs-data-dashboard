@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { getArchive } from "@/lib/archive";
 import { purgeArchiveAction, restoreArchiveAction } from "./actions";
@@ -8,6 +9,8 @@ export default async function ArchivePage({
 }: {
   searchParams: Promise<{ loi?: string }>;
 }) {
+  // Trang đọc DB trực tiếp — chạy tại request-time, không prerender lúc build.
+  await connection();
   const [items, { loi }] = await Promise.all([getArchive(), searchParams]);
 
   return (

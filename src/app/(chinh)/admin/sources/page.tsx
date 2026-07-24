@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { getSources } from "@/lib/sources";
 import { SOURCE_TYPE_LABEL } from "@/lib/types";
@@ -7,6 +8,8 @@ import SourceSyncButton from "./SourceSyncButton";
 export const maxDuration = 60; // sync có thể mất vài chục giây (BigQuery/Sheets)
 
 export default async function SourcesPage() {
+  // Trang đọc DB trực tiếp — chạy tại request-time, không prerender lúc build.
+  await connection();
   const sources = await getSources();
 
   return (

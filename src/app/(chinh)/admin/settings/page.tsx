@@ -1,9 +1,12 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { getSettings } from "@/lib/catalog";
 import SettingsForm from "./SettingsForm";
 
 
 export default async function SettingsPage() {
+  // Trang đọc DB trực tiếp — chạy tại request-time, không prerender lúc build.
+  await connection();
   const settings = await getSettings();
 
   return (

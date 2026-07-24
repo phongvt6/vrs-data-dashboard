@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { getCatalog } from "@/lib/catalog";
 import { getDashboards } from "@/lib/dashboards";
@@ -6,6 +7,8 @@ import { deleteDatasetAction } from "./actions";
 
 
 export default async function AdminPage() {
+  // Trang đọc DB trực tiếp — chạy tại request-time, không prerender lúc build.
+  await connection();
   const [{ datasets, relationships }, dashboards] = await Promise.all([
     getCatalog(),
     getDashboards(),

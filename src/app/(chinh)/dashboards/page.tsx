@@ -1,9 +1,12 @@
+import { connection } from "next/server";
 import { getCatalog, getSettings } from "@/lib/catalog";
 import { getDashboards } from "@/lib/dashboards";
 import DashboardBrowser from "@/app/_components/DashboardBrowser";
 
 
 export default async function DashboardsPage() {
+  // Trang đọc DB trực tiếp — chạy tại request-time, không prerender lúc build.
+  await connection();
   const [dashboards, { datasets }, settings] = await Promise.all([
     getDashboards(),
     getCatalog(),

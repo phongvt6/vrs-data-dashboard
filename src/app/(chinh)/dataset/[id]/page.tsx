@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCatalog } from "@/lib/catalog";
@@ -15,6 +16,8 @@ export default async function DatasetPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  // Trang đọc DB trực tiếp — chạy tại request-time, không prerender lúc build.
+  await connection();
   const { id } = await params;
   const [{ datasets, relationships }, allDashboards] = await Promise.all([
     getCatalog(),
