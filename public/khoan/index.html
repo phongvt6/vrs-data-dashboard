@@ -1,0 +1,2574 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tính thưởng khoán VRS</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --navy:#4f46e5; --navy2:#6366f1; --bg:#f4f5fb; --card:#fff; --line:#e7e8f2;
+  --txt:#1c2033; --mut:#6b7280; --ok:#15a34a; --warn:#e08600; --err:#ef2d56;
+  --kiosk:#3b82f6; --st:#8b5cf6;
+  --side-bg1:#1a2140; --side-bg2:#10142a; --side-txt:#aab3d0; --side-mut:#7883a6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:14px/1.5 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt)}
+button{font:inherit;cursor:pointer}
+input,select{font:inherit}
+
+/* ---------- layout: sidebar + content ---------- */
+.btn{background:var(--navy);color:#fff;border:0;border-radius:8px;padding:8px 14px;font-weight:600;font-size:13px}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.22)}
+.btn.ghost:hover{background:rgba(255,255,255,.14)}
+.btn.sm{padding:6px 11px;font-size:12px}
+
+.shell{display:flex;min-height:100vh;align-items:stretch}
+.sidebar{flex:none;width:250px;background:linear-gradient(185deg,var(--side-bg1),var(--side-bg2));color:var(--side-txt);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;transition:width .18s ease}
+.content{flex:1;min-width:0;display:flex;flex-direction:column}
+.side-brand{display:flex;align-items:center;gap:12px;padding:20px 18px 16px}
+.side-logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex:none;box-shadow:0 6px 16px rgba(79,70,229,.45)}
+.side-brandtxt{min-width:0}
+.side-name{font-weight:700;color:#fff;font-size:14px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.side-role{font-size:11.5px;color:var(--side-mut);white-space:nowrap}
+#nav{flex:1;flex-direction:column;gap:3px;padding:6px 12px;overflow-y:auto;overflow-x:hidden}
+#nav button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:0;border-radius:11px;padding:11px 12px;color:var(--side-txt);font-size:13.8px;font-weight:500;white-space:nowrap}
+#nav button:hover{background:rgba(255,255,255,.07);color:#fff}
+#nav button.on{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;font-weight:700;box-shadow:0 8px 18px rgba(79,70,229,.42)}
+.nav-ic{width:22px;text-align:center;font-size:15px;flex:none}
+.nav-lb{overflow:hidden;text-overflow:ellipsis}
+#nav .badge{display:inline-block;background:var(--err);color:#fff;border-radius:9px;padding:1px 7px;font-size:10.5px;margin-left:auto;font-weight:700}
+.side-foot{padding:14px 16px;border-top:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:9px}
+.side-note{font-size:11px;color:var(--side-mut);line-height:1.45}
+.side-collapse{background:rgba(255,255,255,.06);border:0;border-radius:9px;padding:9px;color:var(--side-txt);font-weight:600;font-size:12.5px}
+.side-collapse:hover{background:rgba(255,255,255,.13);color:#fff}
+/* collapsed */
+.shell.collapsed .sidebar{width:70px}
+.shell.collapsed .side-brandtxt,.shell.collapsed .nav-lb,.shell.collapsed .side-note,.shell.collapsed #btnRefresh .lbl,.shell.collapsed #nav .badge{display:none}
+.shell.collapsed .side-brand{justify-content:center;padding:20px 0 16px}
+.shell.collapsed #nav button{justify-content:center;padding:11px 0}
+.shell.collapsed .side-collapse{font-size:0;padding:9px 0}
+.shell.collapsed .side-collapse:before{content:"»";font-size:15px}
+.shell.collapsed #btnRefresh{padding:8px 0;text-align:center}
+
+main{padding:20px 24px 60px;max-width:1580px;margin:0 auto;width:100%}
+.page{display:none}.page.on{display:block}
+@media(max-width:820px){.sidebar{width:70px}.side-brandtxt,.nav-lb,.side-note,#btnRefresh .lbl,#nav .badge{display:none}.side-brand{justify-content:center;padding:20px 0 16px}#nav button{justify-content:center;padding:11px 0}.side-collapse{display:none}}
+
+/* ---------- dropzone ---------- */
+#drop{border:2px dashed #c3cede;border-radius:14px;background:#fff;padding:52px 24px;text-align:center;margin:40px auto;max-width:660px}
+#drop.hot{border-color:var(--navy);background:#eef3fd}
+#drop h2{font-size:19px;margin-bottom:8px;color:var(--navy)}
+#drop p{color:var(--mut);font-size:13px;margin-bottom:6px}
+#drop .req{margin-top:20px;text-align:left;display:inline-block;background:#f7f9fc;border:1px solid var(--line);border-radius:8px;padding:14px 18px;font-size:12.5px;color:var(--mut)}
+#drop .req code{background:#e8edf7;color:var(--navy);padding:1px 5px;border-radius:3px;font-size:12px}
+
+/* ---------- filters ---------- */
+.filters{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px}
+.f{display:flex;flex-direction:column;gap:4px}
+.f label{font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}
+.f select,.f input{border:1px solid var(--line);border-radius:6px;padding:7px 9px;min-width:130px;background:#fff}
+.f input{min-width:180px}
+
+/* ---------- cards ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.kpi .lb{font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.kpi .vl{font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px}
+.kpi .sb{font-size:11.5px;color:var(--mut);margin-top:3px}
+.kpi.ok .vl{color:var(--ok)} .kpi.err .vl{color:var(--err)} .kpi.warn .vl{color:var(--warn)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+@media(max-width:1000px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.card h3{font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card h3 .tag{font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:10px;background:#eef2f8;color:var(--mut)}
+.chartbox{height:250px;position:relative}
+
+/* ---------- tables ---------- */
+.tw{overflow:auto;max-height:560px;border:1px solid var(--line);border-radius:10px;background:#fff}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th{background:var(--navy);color:#fff;text-align:left;padding:9px 10px;font-weight:600;font-size:11.5px;position:sticky;top:0;z-index:2;white-space:nowrap}
+th.r,td.r{text-align:right}
+th.c,td.c{text-align:center}
+td{padding:7px 10px;border-bottom:1px solid #eef1f6;white-space:nowrap}
+/* bảng Cảnh báo: vừa màn hình, ô dài tự xuống dòng, không cuộn ngang */
+#tCheck{table-layout:auto}
+#tCheck td{white-space:normal;line-height:1.45;vertical-align:top}
+#tCheck td:last-child{word-break:break-word}
+tbody tr:hover{background:#f5f8fe}
+tbody tr.tot{background:#eef2f8;font-weight:700}
+tbody tr.tot td{border-top:2px solid var(--navy)}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.pill.k{background:#e3eefe;color:#1c5fc4}
+.pill.s{background:#f2e6f8;color:#7a3a9e}
+.pill.pt{background:#fdeee0;color:#a2601a}
+.pill.ql{background:#e2f3e9;color:#1e7145}
+.muted{color:var(--mut)}
+.neg{color:var(--err)}
+.bar{height:6px;background:#e8edf5;border-radius:3px;overflow:hidden;min-width:70px;display:inline-block;vertical-align:middle}
+.bar i{display:block;height:100%;background:var(--navy2)}
+.bar i.over{background:var(--ok)}
+
+/* ---------- alerts ---------- */
+.alert{border-radius:8px;padding:11px 14px;margin-bottom:12px;font-size:13px;display:flex;gap:10px;align-items:flex-start}
+.alert.e{background:#fdecea;border:1px solid #f5c6c0;color:#8c2c22}
+.alert.w{background:#fdf6e3;border:1px solid #f0dfae;color:#7d5a10}
+.alert.o{background:#e8f6ee;border:1px solid #b9e2c9;color:#155f39}
+.alert.i{background:#eaf1fb;border:1px solid #c3d6f2;color:#1c4380}
+.alert b{font-weight:700}
+.empty{text-align:center;padding:50px;color:var(--mut)}
+
+.hint{font-size:12px;color:var(--mut);margin-top:8px;line-height:1.6}
+.snRow{display:flex;gap:8px;margin-bottom:8px;align-items:center;flex-wrap:wrap}
+.snRow input{border:1px solid var(--line);border-radius:6px;padding:6px 9px}
+
+#drop{display:none}
+/* thanh lọc thời gian (dùng chung mọi trang) */
+#dateBar{background:#fff;border-bottom:1px solid var(--line);padding:11px 0;position:sticky;top:0;z-index:9}
+.datebar-inner{max-width:1600px;margin:0 auto;padding:0 22px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#dateBar .dlbl{font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-right:2px}
+#dateBar input[type=date]{border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:13px;color:var(--txt)}
+#dateBar .darrow{color:var(--mut)}
+#dateBar .dsep{width:1px;height:24px;background:var(--line);margin:0 4px}
+#dateBar .dexp{color:var(--navy);border-color:var(--navy);font-weight:700}
+#dateBar .dexp:hover{background:var(--navy);color:#fff}
+.qbtn{border:1px solid var(--line);background:#fff;border-radius:99px;padding:7px 14px;font-size:12.5px;font-weight:600;color:var(--mut);cursor:pointer;font-family:inherit}
+.qbtn:hover{background:#f2f5fa;color:var(--navy)}
+.qbtn.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.qbtn.dreset{margin-left:auto;color:var(--navy);border-style:dashed}
+/* modal + block sáp nhập */
+.modal-ov{position:fixed;inset:0;background:rgba(16,24,40,.45);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-box{background:#fff;border-radius:14px;box-shadow:0 24px 60px rgba(16,24,40,.3);width:100%;max-width:560px;max-height:85vh;overflow:auto}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff}
+.modal-x{border:1px solid var(--line);background:#fff;border-radius:8px;width:30px;height:30px;cursor:pointer;color:var(--mut);font-size:15px}
+.modal-x:hover{background:#f2f5fa}
+.modal-body{padding:18px 20px}
+.sn-list{max-height:300px;overflow-y:auto}
+/* trang Hướng dẫn */
+.guide-wrap{display:block}
+.guide-nav{display:flex;flex-flow:row wrap;gap:8px;margin-bottom:16px}
+.guide-nav button{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:99px;padding:8px 14px;font-family:inherit;font-size:13px;font-weight:600;color:var(--mut);cursor:pointer;display:inline-flex;gap:7px;align-items:center;white-space:nowrap;line-height:1.2}
+.guide-nav button:hover{border-color:var(--navy);color:var(--navy)}
+.guide-nav button.on{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border-color:transparent;box-shadow:0 6px 14px rgba(79,70,229,.35)}
+.guide-nav .g-navsep{display:none}
+.guide-content{width:100%}
+.g-lead{font-size:14.5px;line-height:1.65;color:var(--txt);margin-bottom:8px}
+.g-sub{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);margin:18px 0 8px}
+.g-list{margin:0 0 4px;padding-left:2px;list-style:none}
+.g-list li{position:relative;padding:5px 0 5px 24px;font-size:13.7px;line-height:1.55;border-bottom:1px dashed #eef1f6}
+.g-list li:last-child{border-bottom:none}
+.g-list li:before{content:"";position:absolute;left:4px;top:12px;width:7px;height:7px;border-radius:50%;background:var(--navy2)}
+.g-steps{margin:0;padding-left:22px}
+.g-steps li{padding:5px 0;font-size:13.7px;line-height:1.55}
+.g-tip{background:#eaf1fb;border:1px solid #c3d6f2;border-radius:10px;padding:11px 14px;color:#1c4380;margin-top:14px;font-size:13.4px;line-height:1.55}
+.g-pill{display:inline-block;background:#eef2f8;border-radius:6px;padding:1px 7px;font-size:12.5px;font-weight:600;color:var(--navy)}
+.g-hero{background:linear-gradient(135deg,#1f3864,#2d4f8f);color:#fff;border-radius:14px;padding:22px 24px;margin-bottom:16px}
+.g-hero h2{margin:0 0 6px;font-size:20px}
+.g-hero p{margin:0;opacity:.92;font-size:14px;line-height:1.6}
+.sn-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;margin-bottom:10px;background:#fafbfd}
+.sn-old{font-family:ui-monospace,monospace;font-weight:700;color:var(--err)}
+.sn-arrow{color:var(--mut)}
+.sn-new{font-family:ui-monospace,monospace;font-weight:700;color:var(--ok)}
+.sn-date{margin-left:auto;color:var(--mut);font-size:12.5px}
+.snRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.snRow input{border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:13px}
+.snRow input:disabled{background:#f4f6fa;color:var(--mut)}
+/* nút xuất Excel: nổi góc trên-phải trang, không chiếm chỗ trong layout */
+.page{position:relative}
+.exp-toolbar{position:absolute;top:0;right:0;z-index:6}
+.exp-toolbar .qbtn{background:#fff;box-shadow:0 1px 3px rgba(16,24,40,.08)}
+@media(max-width:820px){.exp-toolbar{position:static;display:flex;justify-content:flex-end;margin-bottom:8px}}
+/* thanh lọc trang Báo cáo (dùng lại .datebar-inner nhưng nằm trong card) */
+.rep-filter{padding:12px 14px;margin-bottom:14px}
+#repBar .datebar-inner{max-width:none;padding:0;align-items:flex-end;gap:8px 10px}
+#repBar .dlbl{font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-right:2px;padding-bottom:8px}
+#repBar input[type=date]{border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:13px;color:var(--txt)}
+#repBar .darrow{color:var(--mut);padding-bottom:8px}
+#repBar .dsep{width:1px;height:24px;background:var(--line);margin:0 4px 6px}
+#repBar .f{margin:0}
+#repBar .f label{display:block;font-size:11px;color:var(--mut);margin-bottom:3px}
+#repBar .qbtn{margin-bottom:1px}
+#repBar .qbtn.dreset{margin-left:auto}
+/* facet (Bảng tính thưởng) */
+.facets{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+@media(max-width:1050px){.facets{grid-template-columns:1fr 1fr}}
+.facet-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.facet-head{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:800;color:var(--navy);margin-bottom:8px}
+.facet-head .muted{font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em}
+.facet-body{max-height:200px;overflow:auto;display:flex;flex-direction:column;gap:2px}
+.facet-row{display:grid;grid-template-columns:1fr 78px auto;gap:8px;align-items:center;padding:6px 6px;border-radius:7px;cursor:pointer}
+.facet-row:hover{background:#f5f8fe}
+.facet-row.on{background:#e6efff;box-shadow:inset 2px 0 0 var(--navy)}
+.facet-name{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.facet-val{font-size:12px;font-weight:700;color:#1e7145;text-align:right}
+.facet-bar{height:7px;background:#eef1f6;border-radius:99px;overflow:hidden}
+.facet-bar>i{display:block;height:100%;border-radius:99px;background:#2ea36a}
+.bang-grid{display:grid;grid-template-columns:1fr 340px;gap:14px}
+@media(max-width:1050px){.bang-grid{grid-template-columns:1fr}}
+.gio-grid{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:14px}
+@media(max-width:1050px){.gio-grid{grid-template-columns:1fr}}
+tbody tr.rankrow{cursor:pointer} tbody tr.rankrow:hover{background:#f5f8fe}
+/* dropdown chọn nhân viên có tìm kiếm (Tra cứu giờ) */
+.empdd{position:relative}
+.empdd-btn{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-width:220px;border:1px solid var(--line);border-radius:8px;padding:7px 10px;background:#fff;font-family:inherit;font-size:13px;color:var(--txt);cursor:pointer}
+.empdd-btn.sel{border-color:var(--navy);font-weight:600}
+.empdd-lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empdd-caret{color:var(--mut);flex:none}
+.empdd-panel{display:none;position:absolute;top:calc(100% + 5px);left:0;min-width:280px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 28px rgba(16,24,40,.16);z-index:30;padding:8px}
+.empdd-panel.open{display:block}
+.empdd-search{width:100%;box-sizing:border-box;border:1px solid var(--navy);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;margin-bottom:6px;outline:none}
+.empdd-list{max-height:250px;overflow-y:auto}
+.empdd-item{padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empdd-item:hover{background:#f2f5fa} .empdd-item.on{background:#e6efff;font-weight:600}
+.empdd-clear{color:var(--err);font-weight:600}
+.empdd-empty{padding:10px;color:var(--mut);font-size:13px}
+/* dropdown MULTI-SELECT dùng chung (msel) */
+.msel{position:relative}
+.msel-btn{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-width:130px;border:1px solid var(--line);border-radius:8px;padding:7px 10px;background:#fff;font-family:inherit;font-size:13px;color:var(--txt);cursor:pointer}
+.msel-btn.sel{border-color:var(--navy);font-weight:600}
+.msel-blbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msel-caret{color:var(--mut);flex:none}
+.msel-panel{display:none;position:absolute;top:calc(100% + 5px);left:0;min-width:240px;max-width:340px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 30px rgba(16,24,40,.18);z-index:30;padding:10px}
+.msel-panel.open{display:block}
+.msel-search{width:100%;box-sizing:border-box;border:1.5px solid var(--navy2);border-radius:9px;padding:9px 12px;font-family:inherit;font-size:14px;margin-bottom:8px;outline:none}
+.msel-list{max-height:280px;overflow-y:auto}
+.msel-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer;font-size:14px}
+.msel-item:hover{background:#f2f5fa}
+.msel-item.on{background:#eef1ff}
+.msel-cb{flex:none;width:20px;height:20px;border:1.5px solid #c4cbd8;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;background:#fff}
+.msel-item.on .msel-cb{background:var(--navy2);border-color:var(--navy2)}
+.msel-txt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msel-only{flex:none;display:none;border:1px solid #d3d9e6;background:#f4f6fb;color:var(--navy2);font-family:inherit;font-size:10px;font-weight:700;letter-spacing:.03em;border-radius:6px;padding:3px 8px;cursor:pointer}
+.msel-item:hover .msel-only{display:inline-block}
+.msel-only:hover{background:var(--navy2);color:#fff;border-color:var(--navy2)}
+.msel-empty{padding:10px;color:var(--mut);font-size:13px}
+/* pivot chi tiết theo ngày */
+.pivot-scroll{overflow:auto;max-height:640px;border:1px solid var(--line);border-radius:10px;background:#fff}
+table.pivot{border-collapse:separate;border-spacing:0;font-size:12px;white-space:nowrap}
+table.pivot th,table.pivot td{padding:6px 9px;border-bottom:1px solid #eef1f6;border-right:1px solid #f0f3f8}
+table.pivot thead th{position:sticky;top:0;background:var(--navy);color:#fff;z-index:3;font-size:11px;font-weight:600}
+table.pivot .stick{position:sticky;background:#fff;z-index:2;overflow:hidden;text-overflow:ellipsis}
+table.pivot thead .stick{z-index:4;background:var(--navy)}
+table.pivot tbody tr:hover td{background:#f6f9ff}
+table.pivot tbody tr:hover .stick{background:#f6f9ff}
+table.pivot td.r{text-align:right}
+table.pivot th.d,table.pivot td.d{padding:5px 4px;min-width:30px;text-align:center;font-size:11px}
+table.pivot .gt{font-weight:800;background:#fafbfd}
+table.pivot tfoot td{position:sticky;bottom:0;background:#eef2f8;font-weight:700;border-top:2px solid var(--navy)}
+table.pivot tfoot .stick{z-index:2;background:#eef2f8}
+table.pivot .stickend{border-right:2px solid var(--navy)}
+/* chips (báo cáo + thi đua) */
+.chips{display:inline-flex;background:#eef2f8;border:1px solid var(--line);border-radius:9px;padding:3px;gap:2px;vertical-align:middle}
+.chip{border:0;background:none;border-radius:7px;padding:6px 13px;font-size:12.5px;font-weight:600;color:var(--mut);cursor:pointer;font-family:inherit}
+.chip:hover{color:var(--navy)} .chip.on{background:var(--navy);color:#fff}
+.rep-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+tbody tr.rowsel{background:#e6efff !important;box-shadow:inset 3px 0 0 var(--navy)}
+.miniClr{border:1px solid var(--line);background:#fff;border-radius:7px;padding:2px 9px;font-size:11.5px;font-weight:600;color:var(--navy);cursor:pointer;margin-left:6px}
+.miniClr:hover{background:#f2f5fa}
+
+/* ===== BẢNG THI ĐUA (giao diện tím) ===== */
+#p-thidua{margin:-20px -22px -60px}
+.td-wrap{background:linear-gradient(160deg,#4c1d95 0%,#5b21b6 45%,#6d28d9 100%);min-height:100vh;padding:34px 22px 60px;text-align:center;color:#eaddff;position:relative;overflow:hidden}
+.td-fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.td-inner{position:relative;z-index:1}
+.td-cheer{max-width:640px;margin:12px auto 0;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:11px 16px;font-size:13px;color:#f0e8ff;line-height:1.55}
+.td-foot{max-width:820px;margin:22px auto 0;font-size:13px;color:#e8dcff;line-height:1.6;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:14px 18px}
+.dl-flat{color:#f0d98b;font-weight:700} .dl-new{color:#9fe0ff;font-weight:700}
+.td-rank.td-rankscroll{max-height:520px;overflow-x:hidden;overflow-y:auto}
+.td-rankscroll thead th{position:sticky;top:0;background:#3b1d78;z-index:1}
+.m0b{background:rgba(255,255,255,.18);color:#eaddff}
+.td-slist{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.td-slistscroll{max-height:430px;overflow-y:auto;padding-right:4px}
+.td-srow{display:grid;grid-template-columns:30px 1fr 150px auto;gap:12px;align-items:center;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:11px 14px;text-align:left}
+.td-srow .ts-name{font-weight:700;color:#fff;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+.ts-bar{height:8px;background:rgba(255,255,255,.14);border-radius:99px;overflow:hidden}
+.ts-bar>i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#f5c542,#e0a92e)}
+.ts-val{font-weight:800;color:#f5d98b;font-size:12.5px;text-align:right;white-space:nowrap}
+.ts-gr{color:#5fe39b;font-weight:800;font-size:11.5px;margin-left:4px}
+.ts-rocket{font-size:16px;text-align:center}
+.ts-tag{font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:99px;background:rgba(255,255,255,.16);color:#eaddff}
+.ts-tag.up{background:rgba(95,227,155,.2);color:#5fe39b} .ts-tag.new{background:rgba(159,224,255,.2);color:#9fe0ff}
+.td-sempty{max-width:900px;margin:0 auto;color:#c9b8f0;background:rgba(255,255,255,.06);border-radius:12px;padding:16px;font-size:13px}
+.td-badge{display:inline-block;background:rgba(255,255,255,.12);color:#f5e6b8;border:1px solid rgba(245,230,184,.35);border-radius:99px;padding:5px 16px;font-size:11px;font-weight:800;letter-spacing:.12em}
+.td-title{font-size:34px;font-weight:900;color:#fff;margin:14px 0 4px;letter-spacing:-.5px}
+.td-sub{font-style:italic;color:#c9b8f0;margin-bottom:18px}
+.td-toggle{margin:0 auto 16px;background:rgba(255,255,255,.12);border:0}
+.td-toggle .chip{color:#d9ccf5} .td-toggle .chip.on{background:#fff;color:#5b21b6}
+.td-cvrow{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:-6px auto 18px}
+.td-cvlb{color:#c9b8f0;font-size:12.5px;font-weight:600}
+.td-navrow{display:flex;align-items:center;justify-content:center;gap:22px;margin-bottom:20px}
+.td-arrow{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:18px;cursor:pointer}
+.td-arrow:hover{background:rgba(255,255,255,.22)}
+.td-navsub{font-size:10.5px;letter-spacing:.14em;color:#b9a6e8;font-weight:700}
+.td-navlabel{font-size:16px;font-weight:800;color:#fff}
+.td-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:820px;margin:0 auto 26px}
+@media(max-width:720px){.td-stats{grid-template-columns:1fr 1fr}}
+.td-stat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:14px}
+.td-stat .v{font-size:19px;font-weight:800;color:#f5d98b}
+.td-stat .l{font-size:11.5px;color:#c9b8f0;margin-top:3px}
+.td-secttitle{text-align:left;max-width:900px;margin:22px auto 12px;font-size:15px;font-weight:800;color:#fff}
+.td-podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;max-width:900px;margin:0 auto;align-items:end}
+@media(max-width:720px){.td-podium{grid-template-columns:1fr}}
+.td-pod{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:20px 14px 0;position:relative;overflow:hidden}
+.td-pod.r1{background:linear-gradient(180deg,rgba(245,197,66,.28),rgba(255,255,255,.08));border-color:rgba(245,197,66,.5);transform:translateY(-14px)}
+.td-pod .medal-badge{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#3a2a00;font-size:14px}
+.medal-badge.m1{background:#f5c542} .medal-badge.m2{background:#c9d0dc} .medal-badge.m3{background:#cd8b52}
+.td-pod .ava{width:66px;height:66px;border-radius:50%;background:#f5c542;color:#4c1d95;font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;margin:26px auto 10px}
+.td-pod.r2 .ava{background:#c9d0dc} .td-pod.r3 .ava{background:#cd8b52;color:#fff}
+.td-pod .pname{font-weight:800;color:#fff;font-size:15px}
+.td-pod .prole{font-size:11.5px;color:#c9b8f0;margin:3px 0 8px}
+.td-pod .pmoney{font-weight:800;color:#f5d98b;font-size:16px;margin-bottom:14px}
+.td-pod .prankbar{background:rgba(0,0,0,.18);color:#fff;font-weight:800;font-size:18px;padding:12px;margin:0 -14px}
+.td-pod.r1 .prankbar{background:linear-gradient(90deg,#f5c542,#e0a92e);color:#4c1d95}
+.td-pod.r2 .prankbar{background:linear-gradient(90deg,#c9d0dc,#aab3c2);color:#2a3242}
+.td-pod.r3 .prankbar{background:linear-gradient(90deg,#cd8b52,#b5763f)}
+.td-pod .empty2{padding:40px 0;color:#b9a6e8}
+.td-honors{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:900px;margin:0 auto}
+@media(max-width:720px){.td-honors{grid-template-columns:1fr}}
+.td-honor{display:flex;gap:11px;align-items:center;text-align:left;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:13px 15px}
+.td-honor .hi{font-size:22px}
+.td-honor .hl{font-size:10.5px;font-weight:800;letter-spacing:.05em;color:#f5d98b}
+.td-honor .hn{font-weight:800;color:#fff;font-size:14px}
+.td-honor .hs{font-size:11px;color:#c9b8f0}
+.td-rank{max-width:900px;margin:0 auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;overflow:hidden}
+.td-ranktbl{width:100%;border-collapse:collapse;font-size:13px}
+.td-ranktbl th{color:#b9a6e8;font-size:10.5px;letter-spacing:.06em;text-align:left;padding:11px 16px;font-weight:700}
+.td-ranktbl td{padding:11px 16px;border-top:1px solid rgba(255,255,255,.08);color:#eaddff;text-align:left}
+.td-ranktbl .rk-c{width:44px}
+.rk-name{font-weight:700;color:#fff}
+.rk-sub{font-size:11px;color:#b9a6e8}
+.rk-medal{display:inline-flex;width:22px;height:22px;border-radius:50%;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#3a2a00}
+.rk-medal.m1{background:#f5c542}.rk-medal.m2{background:#c9d0dc}.rk-medal.m3{background:#cd8b52;color:#fff}
+.rk-num{color:#b9a6e8;font-weight:700;padding-left:5px}
+.rk-d{text-align:right} .rk-m{text-align:right;font-weight:800;color:#f5d98b}
+.dlu{color:#5fe39b;font-weight:700} .dld{color:#ff8a8a;font-weight:700} .dl0{color:#9a8ec4}
+#boot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:90px 20px}
+.spin{width:32px;height:32px;border:3px solid #dce3ee;border-top-color:var(--navy);border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="shell" id="shell">
+  <aside class="sidebar">
+    <div class="side-brand">
+      <div class="side-logo">V</div>
+      <div class="side-brandtxt">
+        <div class="side-name">Thưởng khoán VRS</div>
+        <div class="side-role">Điều hành kinh doanh</div>
+      </div>
+    </div>
+    <nav id="nav" style="display:none">
+      <button data-p="dash" class="on"><span class="nav-ic">📊</span><span class="nav-lb">Dashboard</span></button>
+      <button data-p="report"><span class="nav-ic">📈</span><span class="nav-lb">Báo cáo &amp; Thống kê</span></button>
+      <button data-p="thidua"><span class="nav-ic">🏆</span><span class="nav-lb">Bảng thi đua</span></button>
+      <button data-p="bang"><span class="nav-ic">🧮</span><span class="nav-lb">Bảng tính thưởng</span></button>
+      <button data-p="kiosk"><span class="nav-ic">🏪</span><span class="nav-lb">Kiosk</span></button>
+      <button data-p="st"><span class="nav-ic">🛒</span><span class="nav-lb">Siêu thị</span></button>
+      <button data-p="gio"><span class="nav-ic">⏱️</span><span class="nav-lb">Tra cứu giờ làm</span></button>
+      <button data-p="check"><span class="nav-ic">✅</span><span class="nav-lb">Kiểm tra</span><span class="badge" id="nBadge" style="display:none">0</span></button>
+      <button data-p="data"><span class="nav-ic">🗂️</span><span class="nav-lb">Danh sách data</span></button>
+      <button data-p="guide"><span class="nav-ic">❓</span><span class="nav-lb">Hướng dẫn</span></button>
+    </nav>
+    <div class="side-foot">
+      <div class="side-note" id="hsub">Chưa nạp dữ liệu</div>
+      <button class="btn ghost sm" id="btnRefresh" style="display:none">↻ <span class="lbl">Làm mới</span></button>
+      <button class="side-collapse" id="sideCollapse">« Thu gọn</button>
+    </div>
+  </aside>
+  <div class="content">
+    <div id="dateBar" style="display:none"></div>
+    <main>
+  <div id="boot"><div class="spin"></div><div class="muted">Đang đọc dữ liệu từ Google Sheet…</div></div>
+  <div id="bootErr" style="display:none"></div>
+
+  <!-- ===== DASHBOARD ===== -->
+  <div class="page" id="p-dash">
+    <div class="filters" id="fDash"></div>
+    <div class="kpis" id="kDash"></div>
+    <div class="grid2">
+      <div class="card"><h3>Doanh thu &amp; quỹ thưởng theo ngày</h3><div class="chartbox"><canvas id="c1"></canvas></div></div>
+      <div class="card"><h3>Quỹ thưởng theo quầy</h3><div class="chartbox"><canvas id="c2"></canvas></div></div>
+    </div>
+    <div class="card">
+      <h3>Tiến độ hoàn thành KPI tháng <span class="tag" id="kpiTag"></span></h3>
+      <div class="tw" style="max-height:420px"><table id="tKpi"></table></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>Top 15 nhân viên theo thực nhận</h3><div class="tw" style="max-height:400px"><table id="tTop"></table></div></div>
+      <div class="card"><h3>Phân bổ theo chức danh</h3><div class="chartbox"><canvas id="c3"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- ===== BÁO CÁO & THỐNG KÊ ===== -->
+  <div class="page" id="p-report">
+    <div class="card rep-filter"><div id="repBar"></div></div>
+    <div class="kpis" id="cmpCards"></div>
+    <div id="repAnalysis"></div>
+    <div class="card"><h3>Diễn biến — kỳ này vs <span id="repCmpName" style="font-weight:600"></span></h3><div class="chartbox"><canvas id="cRepCmp"></canvas></div></div>
+    <div class="grid2">
+      <div class="card"><h3>Doanh thu theo ngày</h3><div class="chartbox"><canvas id="cRepDt"></canvas></div></div>
+      <div class="card"><h3>Quỹ thưởng theo ngày</h3><div class="chartbox"><canvas id="cRepQuy"></canvas></div></div>
+    </div>
+    <div class="card"><h3>So sánh theo cửa hàng <span class="tag" id="cmpTblSub"></span></h3><div class="tw"><table id="tCmp"></table></div></div>
+  </div>
+
+  <!-- ===== BẢNG THI ĐUA ===== -->
+  <div class="page" id="p-thidua">
+    <div class="td-wrap">
+      <canvas id="tdFx" class="td-fx"></canvas>
+      <div class="td-inner">
+      <div class="td-badge">VRS · THI ĐUA</div>
+      <h2 class="td-title">🏆 BẢNG VÀNG THI ĐUA</h2>
+      <div class="td-sub">Cùng nhau tỏa sáng trên bảng vàng VRS! ✨</div>
+      <div class="td-cheer" id="tdCheer">💜 Mỗi nỗ lực đều đáng trân trọng — dù đứng ở đâu, bạn cũng đang góp phần làm nên VRS. Cùng bứt phá nhé!</div>
+      <div class="chips td-toggle" id="tdMode"><button class="chip on" data-m="week">Theo tuần</button><button class="chip" data-m="month">Theo tháng</button></div>
+      <div class="td-cvrow"><span class="td-cvlb">Lọc chức danh:</span><span class="chips td-toggle" id="tdCvChips" style="margin:0;flex-wrap:wrap"></span></div>
+      <div class="td-navrow" id="tdNav">
+        <button class="td-arrow" id="tdPrev">‹</button>
+        <div><div class="td-navsub" id="tdSubLabel">KỲ THI ĐUA</div><div class="td-navlabel" id="tdPeriodLabel"></div></div>
+        <button class="td-arrow" id="tdNext">›</button>
+      </div>
+      <div class="td-stats" id="tdStats"></div>
+      <div class="td-secttitle">👑 Top 3 ngôi sao của kỳ</div>
+      <div class="td-podium" id="tdPodium"></div>
+      <div class="td-secttitle">🎖️ Vinh danh đặc biệt</div>
+      <div class="td-honors" id="tdHonors"></div>
+      <div class="td-secttitle">🔥 Bảng xếp hạng nhân viên</div>
+      <div class="td-rank td-rankscroll"><table class="td-ranktbl"><thead><tr><th>#</th><th>Họ tên</th><th style="text-align:right">Nhịp thi đua</th><th style="text-align:right">Số tiền</th></tr></thead><tbody id="tdRankBody"></tbody></table></div>
+
+      <div class="td-secttitle">🏪 Tốp điểm bán dẫn đầu về thưởng</div>
+      <div class="td-slist" id="tdTopStore"></div>
+
+      <div class="td-secttitle">🚀 Điểm bán đang bứt tốc <span style="font-weight:400;font-style:italic;color:#c9b8f0">· cùng cổ vũ nhé!</span></div>
+      <div class="td-slist td-slistscroll" id="tdBurstStore"></div>
+
+      <div class="td-foot">🌟 Cảm ơn tất cả các bạn đã cống hiến! Tuần mới lại là một cơ hội mới để bứt phá. VRS luôn ghi nhận từng nỗ lực của bạn 💪</div>
+      </div><!-- td-inner -->
+    </div>
+  </div>
+
+  <!-- ===== BẢNG TÍNH THƯỞNG (bộ lọc chéo) ===== -->
+  <div class="page" id="p-bang">    <div class="filters" id="fBang"></div>
+    <div class="hint" style="margin:-6px 0 12px">Bấm vào một giá trị ở các thẻ dưới (Trạm / Điểm trạm / Bộ phận / Chức vụ) hoặc một quầy ở bảng xếp hạng — mọi bảng khác sẽ lọc theo. Bấm lần nữa để bỏ chọn.</div>
+    <div class="facets" id="bangFacets"></div>
+    <div class="kpis" id="kBang"></div>
+    <div class="bang-grid">
+      <div class="card">
+        <h3>Danh sách thưởng chi tiết <span class="tag" id="bangTag"></span>
+          <span class="chips" id="bangDetailTab" style="margin-left:auto"><button class="chip on" data-b="nv">Theo nhân viên</button><button class="chip" data-b="ct">Chi tiết theo ngày</button></span>
+        </h3>
+        <div class="tw" style="max-height:600px"><table id="tBang"></table></div>
+        <div class="hint">Tối đa 500 dòng · đã loại Partime (không nhận thưởng).</div>
+      </div>
+      <div class="card">
+        <h3>Xếp hạng theo quầy</h3>
+        <div class="tw" style="max-height:648px"><table id="tBangRank"></table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== KIOSK ===== -->
+  <div class="page" id="p-kiosk">    <div class="filters" id="fKiosk"></div>
+    <div class="alert i"><div><b>Cơ chế Kiosk:</b> quỹ thưởng chia gọn trong một mã cửa hàng, một ngày. Mọi chức danh (kể cả Partime) đều nằm chung mẫu số điểm. Tỷ lệ trích: 2,5% dưới mốc / 15% vượt mốc.</div></div>
+    <div class="kpis" id="kKiosk"></div>
+    <div class="card"><h3>Quỹ thưởng &amp; phân bổ theo quầy Kiosk <span class="muted" style="font-weight:400;font-size:12px">· bấm một dòng để xem NV quầy đó</span></h3><div class="tw"><table id="tKiosk"></table></div></div>
+    <div class="card"><h3 id="tKioskNvHead">Danh sách NV</h3>
+      <span class="chips" id="tKioskNvTab" style="margin-bottom:10px"><button class="chip on" data-n="nv">Tổng hợp theo NV</button><button class="chip" data-n="ct">Chi tiết theo ngày</button></span>
+      <div class="tw" style="max-height:640px"><table id="tKioskNv"></table></div></div>
+  </div>
+
+  <!-- ===== SIÊU THỊ ===== -->
+  <div class="page" id="p-st">    <div class="filters" id="fSt"></div>
+    <div class="alert i"><div><b>Cơ chế Siêu thị (2 tầng):</b> Trưởng ca / Phó trưởng ca chia trong mã cửa hàng của mình. Nhân viên chia chung theo <b>cụm quầy</b> (gộp các mã cùng trạm + cùng 3 ký tự cuối), lấy quỹ toàn cụm trừ đi phần quản lý đã nhận. Tỷ lệ trích: 1% dưới mốc / 10% vượt mốc.</div></div>
+    <div class="kpis" id="kSt"></div>
+    <div class="card"><h3>Quỹ theo cụm quầy &amp; cách chia 2 tầng</h3><div class="tw"><table id="tCum"></table></div></div>
+    <div class="card"><h3>Chi tiết từng mã cửa hàng trong cụm <span class="muted" style="font-weight:400;font-size:12px">· bấm một dòng để xem NV quầy đó</span></h3><div class="tw"><table id="tStQ"></table></div></div>
+    <div class="card"><h3 id="tStNvHead">Danh sách NV</h3>
+      <span class="chips" id="tStNvTab" style="margin-bottom:10px"><button class="chip on" data-n="nv">Tổng hợp theo NV</button><button class="chip" data-n="ct">Chi tiết theo ngày</button></span>
+      <div class="tw" style="max-height:640px"><table id="tStNv"></table></div></div>
+  </div>
+
+  <!-- ===== GIỜ LÀM ===== -->
+  <div class="page" id="p-gio">    <div class="filters" id="fGio"></div>
+    <div class="hint" style="margin:-6px 0 12px">Bấm vào một giá trị ở các thẻ dưới (Trạm / Điểm trạm / Bộ phận / Chức danh) hoặc một quầy ở bảng xếp hạng — mọi bảng khác sẽ lọc theo. Bấm lần nữa để bỏ chọn.</div>
+    <div class="facets" id="gioFacets"></div>
+    <div class="kpis" id="kGio"></div>
+    <div class="gio-grid">
+      <div class="card">
+        <h3>Khai báo giờ làm <span class="tag" id="gioTag"></span>
+          <span class="chips" id="gioTab" style="margin-left:auto"><button class="chip on" data-g="ct">Chi tiết theo ngày</button><button class="chip" data-g="nv">Tổng hợp theo NV</button></span>
+        </h3>
+        <div id="gioCtCard"><div class="tw" style="max-height:640px"><table id="tGioCt"></table></div><div class="hint">Cố định tới cột Cửa hàng · cuộn ngang để xem các ngày · tự nhảy tới ngày mới nhất.</div></div>
+        <div id="gioNvCard" style="display:none"><div class="tw" style="max-height:640px"><table id="tGioNv"></table></div></div>
+      </div>
+      <div class="card">
+        <h3>Xếp hạng quầy theo giờ</h3>
+        <div class="tw" style="max-height:660px"><table id="tGioRank"></table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DANH SÁCH DATA ===== -->
+  <div class="page" id="p-data">
+    <div style="margin-bottom:12px"><span class="chips" id="dvTabs">
+      <button class="chip on" data-d="nv">Nhân viên</button>
+      <button class="chip" data-d="cc">Cơ chế khoán</button>
+      <button class="chip" data-d="dt">Doanh thu</button>
+      <button class="chip" data-d="gl">Giờ làm</button>
+    </span></div>
+    <div class="card">
+      <div class="filters" id="dvBar" style="margin-bottom:10px"></div>
+      <h3>Dữ liệu gốc <span class="tag" id="dvTag"></span></h3>
+      <div class="tw" style="max-height:660px"><table id="tData"></table></div>
+      <div class="hint" id="dvHint"></div>
+    </div>
+  </div>
+
+  <!-- ===== KIỂM TRA ===== -->
+  <div class="page" id="p-check">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="btn" id="btnExpCheck">⬇ Xuất Excel</button></div>
+    <div class="card">
+      <h3>Đối soát quỹ thưởng</h3>
+      <div id="doiSoat"></div>
+      <div class="hint"><b>Bất biến:</b> mọi đồng quỹ thưởng phát sinh phải đi đúng một trong hai chỗ — vào tay nhân viên (thực nhận), hoặc về công ty (70% phần Partime). Nếu chênh lệch khác 0, chắc chắn có gì đó hỏng.</div>
+    </div>
+    <div class="card" id="snCard">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <h3 style="margin:0">Thông tin sáp nhập quầy</h3>
+        <span class="tag" id="snCount"></span>
+        <button class="btn sm" id="snToggle" style="margin-left:auto;border:1px solid var(--line)">Hiện ▾</button>
+      </div>
+      <div id="snBody" style="display:none;margin-top:14px">
+        <div id="snView" class="sn-list"></div>
+        <div class="hint" style="margin-top:12px">Quầy cũ đóng cửa, gộp vào quầy mới; quầy mới <b>thừa hưởng doanh thu luỹ kế</b> của quầy cũ từ ngày sáp nhập để tính mốc KPI chung (quầy cũ vẫn giữ nguyên quỹ của những ngày còn hoạt động).<br>
+        Danh sách lấy từ sheet <code>data_sap_nhap</code> — muốn thêm/sửa, khai báo trực tiếp trong Google Sheet với 3 cột: <code>quay_cu</code>, <code>quay_moi</code>, <code>tu_ngay</code>.</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Cảnh báo <span class="tag" id="cbTag"></span></h3>
+      <div class="filters" id="fCheck" style="margin-bottom:12px"></div>
+      <div class="tw"><table id="tCheck"></table></div>
+    </div>
+  </div>
+
+  <!-- ===== HƯỚNG DẪN ===== -->
+  <div class="page" id="p-guide">
+    <div class="guide-wrap">
+      <div class="guide-nav" id="guideNav">
+        <button data-g="start" class="on">🚀 Bắt đầu nhanh</button>
+        <div class="g-navsep"></div>
+        <button data-g="dash">📊 Dashboard</button>
+        <button data-g="report">📈 Báo cáo &amp; Thống kê</button>
+        <button data-g="thidua">🏆 Bảng thi đua</button>
+        <button data-g="bang">🧮 Bảng tính thưởng</button>
+        <button data-g="kiosk">🏪 Kiosk</button>
+        <button data-g="st">🛒 Siêu thị</button>
+        <button data-g="gio">⏱️ Tra cứu giờ làm</button>
+        <button data-g="check">✅ Kiểm tra</button>
+        <button data-g="data">🗂️ Danh sách data</button>
+      </div>
+      <div class="guide-content">
+
+        <div class="g-sec" data-g="start">
+          <div class="g-hero"><h2>Chào mừng đến với app Tính thưởng khoán VRS 👋</h2><p>App tự động đọc dữ liệu từ Google Sheet và tính thưởng khoán cho từng nhân viên. Bạn chỉ cần xem — mọi con số được tính lại mỗi khi dữ liệu trên Sheet thay đổi. Trang này giải thích từng màn hình và cách dùng.</p></div>
+          <div class="card">
+            <div class="g-sub">Thanh menu trên cùng</div>
+            <div class="g-lead">Bấm vào tên từng trang ở menu bên trái để chuyển trang. Chọn một chủ đề ở dãy phía trên để đọc hướng dẫn chi tiết của trang đó.</div>
+            <div class="g-sub">Thao tác chung có ở nhiều trang</div>
+            <ul class="g-list">
+              <li><b>Khoảng thời gian</b> — thanh trên cùng: chọn ngày <span class="g-pill">từ → đến</span> hoặc bấm nhanh <span class="g-pill">Tuần này</span> / <span class="g-pill">Tháng</span> / <span class="g-pill">Toàn bộ</span>. Mỗi trang có kỳ thời gian <b>riêng</b>.</li>
+              <li><b>Bộ lọc dropdown</b> (Trạm, Bộ phận, Điểm trạm…): bấm để mở, có ô <b>tìm kiếm</b>, tích chọn <b>nhiều mục</b>, hoặc bấm <b>ONLY</b> để chỉ chọn một. Các bộ lọc <b>liên thông</b>: chọn Trạm thì Điểm trạm/Cửa hàng chỉ hiện phần thuộc trạm đó.</li>
+              <li><b>Tìm nhân viên</b>: ô dropdown gõ tên hoặc mã NV để lọc nhanh một người.</li>
+              <li><b>Đặt lại</b>: đưa mọi bộ lọc + thời gian của tất cả các trang về mặc định.</li>
+              <li><b>⬇ Xuất Excel</b>: xuất đúng nội dung + đúng bộ lọc đang xem của trang đó (có ở Bảng tính thưởng, Kiosk, Siêu thị, Tra cứu giờ, Kiểm tra).</li>
+              <li><b>↻ Làm mới</b> (góc trên phải): đọc lại dữ liệu mới nhất từ Google Sheet.</li>
+            </ul>
+            <div class="g-tip">💡 <b>Mẹo:</b> hầu hết bảng đều bấm được — ví dụ bấm một quầy ở bảng xếp hạng sẽ lọc các bảng còn lại theo quầy đó. Bấm lần nữa để bỏ chọn.</div>
+          </div>
+        </div>
+
+        <div class="g-sec" data-g="dash" style="display:none">
+          <div class="card">
+            <h3>📊 Dashboard — Tổng quan</h3>
+            <div class="g-lead">Bức tranh nhanh về doanh thu, quỹ thưởng và nhân sự trong kỳ đang chọn.</div>
+            <div class="g-sub">Có gì trên trang</div>
+            <ul class="g-list">
+              <li>Các thẻ số tổng: doanh thu, quỹ thưởng, thực nhận, số quầy, số nhân viên…</li>
+              <li>Biểu đồ <b>Doanh thu &amp; quỹ thưởng theo ngày</b> và <b>Quỹ thưởng theo quầy</b>.</li>
+              <li>Bảng <b>Tiến độ hoàn thành KPI</b> theo tháng.</li>
+              <li><b>Top 15 nhân viên</b> theo thực nhận và biểu đồ <b>phân bổ theo chức danh</b>.</li>
+            </ul>
+            <div class="g-sub">Cách dùng</div>
+            <ol class="g-steps">
+              <li>Chọn kỳ thời gian ở thanh trên.</li>
+              <li>Lọc theo <b>Trạm / Mã cửa hàng / Bộ phận</b> để thu hẹp phạm vi.</li>
+              <li>Rê chuột lên biểu đồ để xem số chi tiết.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="g-sec" data-g="report" style="display:none">
+          <div class="card">
+            <h3>📈 Báo cáo &amp; Thống kê</h3>
+            <div class="g-lead">So sánh <b>quỹ thưởng</b> của kỳ này với kỳ trước để thấy xu hướng tăng/giảm.</div>
+            <div class="g-sub">Có gì trên trang</div>
+            <ul class="g-list">
+              <li>Chọn kỳ: <span class="g-pill">Tuần này</span>, <span class="g-pill">Tháng</span>, <span class="g-pill">Năm</span> — phần so sánh tự đổi theo: Tháng → <i>vs tháng trước</i> &amp; <i>vs cùng kỳ năm trước</i>; Tuần → <i>vs tuần trước</i>…; Năm → <i>vs lũy kế năm trước</i>.</li>
+              <li>Thẻ <b>Quỹ thưởng kỳ</b>, các thẻ <b>so sánh %</b>, và <b>Doanh thu kỳ</b>.</li>
+              <li><b>Phân tích nhanh</b>: câu tóm tắt tăng/giảm, quầy kéo tăng/giảm, quầy dẫn đầu.</li>
+              <li>Biểu đồ diễn biến kỳ này vs kỳ so sánh, biểu đồ theo ngày, bảng so sánh theo cửa hàng.</li>
+            </ul>
+            <div class="g-sub">Cách dùng</div>
+            <ol class="g-steps">
+              <li>Bấm <b>Tuần này / Tháng / Năm</b> để chọn kỳ (hoặc nhập ngày tùy ý).</li>
+              <li>Lọc <b>Bộ phận / Trạm / Điểm trạm</b> nếu muốn xem riêng.</li>
+              <li>Đọc thẻ % và phần Phân tích nhanh; bấm <b>Cập nhật dữ liệu</b> để lấy số mới nhất.</li>
+            </ol>
+            <div class="g-tip">ℹ️ Mục <i>“cùng kỳ năm trước”</i> hiện “chưa có dữ liệu” nếu Sheet chưa có số của năm trước.</div>
+          </div>
+        </div>
+
+        <div class="g-sec" data-g="thidua" style="display:none">
+          <div class="card">
+            <h3>🏆 Bảng thi đua</h3>
+            <div class="g-lead">Bảng vàng cổ vũ tinh thần: vinh danh nhân viên và điểm bán xuất sắc theo kỳ.</div>
+            <div class="g-sub">Có gì trên trang</div>
+            <ul class="g-list">
+              <li><b>Top 3 ngôi sao</b> của kỳ và các <b>vinh danh đặc biệt</b>.</li>
+              <li><b>Bảng xếp hạng nhân viên</b> theo số tiền (có thanh cuộn).</li>
+              <li><b>Tốp điểm bán dẫn đầu</b> và <b>Điểm bán đang bứt tốc</b>.</li>
+            </ul>
+            <div class="g-sub">Cách dùng</div>
+            <ol class="g-steps">
+              <li>Chọn <b>Theo tuần</b> hoặc <b>Theo tháng</b>.</li>
+              <li>Dùng mũi tên ‹ › để xem các kỳ trước/sau.</li>
+            </ol>
+            <div class="g-tip">💜 Trang này để chiếu lên màn hình chung, khích lệ mọi người — số tiền hiển thị đầy đủ.</div>
+          </div>
+        </div>
+
+        <div class="g-sec" data-g="bang" style="display:none">
+          <div class="card">
+            <h3>🧮 Bảng tính thưởng</h3>
+            <div class="g-lead">Bảng chi tiết thưởng thực nhận của từng nhân viên, có bộ lọc chéo linh hoạt (đã loại Partime).</div>
+            <div class="g-sub">Có gì trên trang</div>
+            <ul class="g-list">
+              <li>4 thẻ lọc chéo: <b>Trạm · Điểm trạm · Bộ phận · Chức vụ</b> — bấm một giá trị để lọc tất cả các bảng theo.</li>
+              <li><b>Xếp hạng theo quầy</b> — bấm một quầy để lọc theo quầy đó.</li>
+              <li>Ô <b>Tìm nhân viên</b>.</li>
+              <li>Hai tab: <b>Theo nhân viên</b> (tổng hợp) và <b>Chi tiết theo ngày</b>.</li>
+            </ul>
+            <div class="g-sub">Cách dùng</div>
+            <ol class="g-steps">
+              <li>Bấm các thẻ / quầy để lọc; bấm <b>× xóa lọc</b> để bỏ.</li>
+              <li>Chuyển tab để xem tổng hợp hoặc chi tiết từng ngày.</li>
+              <li>Bấm <b>⬇ Xuất Excel</b> (trên thanh thời gian) để tải bảng đang xem.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="g-sec" data-g="kiosk" style="display:none">
+          <div class="card">
+            <h3>🏪 Kiosk</h3>
+            <div class="g-lead">Quỹ thưởng &amp; phân bổ cho các quầy Kiosk. Cơ chế: quỹ chia gọn trong một mã cửa hàng, một ngày.</div>
+            <div class="g-sub">Có gì trên trang</div>
+            <ul class="g-list">
+              <li>Lọc <b>Trạm · Điểm trạm</b> + <b>Tìm nhân viên</b> (riêng cho Kiosk).</li>
+              <li>Bảng <b>Quỹ thưởng &amp; phân bổ theo quầy</b> — bấm một dòng để xem nhân viên của quầy đó.</li>
+              <li><b>Danh sách NV</b> với 2 tab: Tổng hợp theo NV / Chi tiết theo ngày.</li>
+            </ul>
+            <div class="g-sub">Cách dùng</div>
+            <ol class="g-steps">
+              <li>Lọc trạm/điểm trạm nếu cần; bấm một quầy để soi nhân viên.</li>
+              <li>Dùng ô Tìm nhân viên để tra một người cụ thể.</li>
+              <li>Xuất Excel để lấy quỹ theo quầy + danh sách NV.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="g-sec" data-g="st" style="display:none">
+          <div class="card">
+            <h3>🛒 Siêu thị</h3>
+            <div class="g-lead">Quỹ thưởng Siêu thị chia <b>2 tầng</b>: Trưởng ca / PTC chia trong mã cửa hàng của mình; nhân viên chia chung theo <b>cụm quầy</b>.</div>
+            <div class="g-sub">Có gì trên trang</div>
+            <ul class="g-list">
+              <li>Lọc <b>Trạm · Điểm trạm</b> + <b>Tìm nhân viên</b> (riêng cho Siêu thị).</li>
+              <li>Bảng <b>Quỹ theo cụm quầy</b> và <b>Chi tiết từng mã cửa hàng</b>.</li>
+              <li><b>Danh sách NV</b> 2 tab như trang Kiosk.</li>
+            </ul>
+            <div class="g-sub">Cách dùng</div>
+            <ol class="g-steps">
+              <li>Xem quỹ theo cụm để hiểu cách chia 2 tầng.</li>
+              <li>Bấm một mã cửa hàng để xem nhân viên; lọc/tìm NV khi cần.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="g-sec" data-g="gio" style="display:none">
+          <div class="card">
+            <h3>⏱️ Tra cứu giờ làm</h3>
+            <div class="g-lead">Tra cứu giờ công đã khai báo của nhân viên theo nhiều chiều.</div>
+            <div class="g-sub">Có gì trên trang</div>
+            <ul class="g-list">
+              <li>Thẻ lọc chéo: <b>Trạm · Điểm trạm · Bộ phận · Chức danh</b> (hiển thị theo giờ làm) + <b>Xếp hạng quầy theo giờ</b>.</li>
+              <li>Ô <b>Tìm nhân viên</b>.</li>
+              <li>Hai tab: <b>Chi tiết theo ngày</b> (ma trận nhân viên × ngày) và <b>Tổng hợp theo NV</b>.</li>
+            </ul>
+            <div class="g-sub">Cách dùng</div>
+            <ol class="g-steps">
+              <li>Bấm thẻ/quầy để lọc; dùng ô Tìm nhân viên để tra một người.</li>
+              <li>Tab Chi tiết theo ngày: cuộn ngang xem giờ từng ngày trong tháng (cột nhận diện được ghim bên trái).</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="g-sec" data-g="check" style="display:none">
+          <div class="card">
+            <h3>✅ Kiểm tra</h3>
+            <div class="g-lead">Kiểm tra tính đúng đắn trước khi chốt lương.</div>
+            <div class="g-sub">Có gì trên trang</div>
+            <ul class="g-list">
+              <li><b>Đối soát quỹ thưởng</b>: mọi đồng quỹ phải về đúng chỗ — chênh lệch phải = 0 mới an toàn.</li>
+              <li><b>Cảnh báo</b>: liệt kê các vấn đề (thiếu khai báo nhân sự, thiếu cơ chế khoán, quỹ treo…). Lọc theo loại cảnh báo.</li>
+              <li><b>Thông tin sáp nhập quầy</b>: danh sách các quầy đã sáp nhập (chỉ để xem).</li>
+            </ul>
+            <div class="g-sub">Cách dùng</div>
+            <ol class="g-steps">
+              <li>Xem dòng Đối soát: nếu “ĐỐI SOÁT ĐẠT” là ổn; nếu SAI thì xử lý trước khi chốt.</li>
+              <li>Đọc bảng Cảnh báo để biết cần bổ sung gì trên Google Sheet.</li>
+            </ol>
+            <div class="g-tip">🔧 Khai báo sáp nhập quầy được nhập trực tiếp trong Google Sheet (sheet <code>data_sap_nhap</code>), app chỉ hiển thị lại.</div>
+          </div>
+        </div>
+
+        <div class="g-sec" data-g="data" style="display:none">
+          <div class="card">
+            <h3>🗂️ Danh sách data</h3>
+            <div class="g-lead">Xem trực tiếp dữ liệu gốc từ Google Sheet mà không cần mở Sheet.</div>
+            <div class="g-sub">Có gì trên trang</div>
+            <ul class="g-list">
+              <li>4 tab: <b>Nhân viên · Cơ chế khoán · Doanh thu · Giờ làm</b>.</li>
+              <li>Bộ lọc: <b>Trạm · Bộ phận · Cửa hàng · Chức vụ · Tháng</b> (liên thông).</li>
+              <li>Tab Nhân viên &amp; Giờ làm có thêm ô <b>Tìm nhân viên</b>.</li>
+            </ul>
+            <div class="g-sub">Cách dùng</div>
+            <ol class="g-steps">
+              <li>Chọn tab dữ liệu muốn xem.</li>
+              <li>Lọc để thu hẹp; bảng hiển thị tối đa 2.000 dòng — dùng bộ lọc nếu nhiều hơn.</li>
+            </ol>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+  </div>
+</div>
+
+
+<script>
+/* ============================================================
+   ENGINE TÍNH THƯỞNG KHOÁN VRS
+   Đầu vào: 4 bảng dữ liệu THÔ (không công thức)
+   Đầu ra : bảng tính thưởng chi tiết + cảnh báo + đối soát
+   ============================================================ */
+
+const QL = ["truong ca", "pho truong ca"];          // nhóm quản lý chia theo quầy
+const TQ = "truong quay";
+
+/* ---------- tiện ích ---------- */
+function norm(s) {
+  return String(s ?? "")
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .replace(/đ/g, "d").replace(/Đ/g, "D")
+    .toLowerCase().trim().replace(/\s+/g, " ");
+}
+function key(...a) { return a.map(x => String(x ?? "")).join("|"); }
+function ymKey(nam, thang) { return `${nam}/${String(thang).padStart(2, "0")}`; }
+function dayKey(d) {
+  if (!(d instanceof Date) || isNaN(d)) return "";
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+/* Parse số chịu được cả 2 kiểu: 9.455.000 (VN) và 9,455,000 (EN), 1,5 và 1.5 */
+function num(v) {
+  if (typeof v === "number") return isFinite(v) ? v : 0;
+  if (v == null || v === "") return 0;
+  let s = String(v).trim().replace(/[^\d.,\-]/g, "");
+  if (!s || s === "-") return 0;
+  const lastDot = s.lastIndexOf("."), lastCom = s.lastIndexOf(",");
+  const dec = lastDot > lastCom ? "." : (lastCom > lastDot ? "," : "");
+  if (dec) {
+    const other = dec === "." ? "," : ".";
+    const decCount = s.split(dec).length - 1;
+    // nhiều hơn 1 dấu => chắc chắn là dấu phân cách hàng nghìn
+    // hoặc dạng 1.234 / 550,000 (nhóm 3 chữ số, không có dấu kia) => cũng là hàng nghìn.
+    // Nhóm đầu KHÔNG được bắt đầu bằng 0 — nếu không "0.025" sẽ bị hiểu nhầm thành 25.
+    const laHangNghin = decCount > 1
+      || (s.indexOf(other) === -1 && new RegExp("^-?[1-9]\\d{0,2}([" + (dec === "." ? "." : ",") + "]\\d{3})+$").test(s));
+    if (laHangNghin) s = s.replace(/[.,]/g, "");
+    else s = s.split(other).join("").replace(dec, ".");
+  }
+  const n = parseFloat(s);
+  return isFinite(n) ? n : 0;
+}
+
+/* bộ phận suy từ mã cửa hàng — K hoặc X => Kiosk, còn lại có S => Siêu thị
+   (kiểm tra K|X TRƯỚC, vì mọi mã đều chứa chữ S của tên trạm) */
+function boPhan(maCH) {
+  const s = String(maCH || "").toUpperCase();
+  if (/[KX]/.test(s)) return "Kiosk";
+  if (/S/.test(s)) return "Siêu thị";
+  return "";
+}
+/* CỤM QUẦY — có mã trạm để không gộp nhầm giữa các trạm (V52S01 ≠ V23S01) */
+function cumQuay(maCH) {
+  const s = String(maCH || "");
+  return s.length >= 6 ? s.slice(0, 3) + s.slice(-3) : s;
+}
+function tram(maCH) { return String(maCH || "").slice(0, 3); }
+
+/* ---------- tính toán chính ---------- */
+function tinhThuong(raw, opts = {}) {
+  const namMacDinh = opts.namMacDinh || new Date().getFullYear();
+  const canhBao = [];
+
+  /* ===== 1. Suy ra NĂM cho từng tháng (lấy từ data_doanh_thu — nguồn duy nhất có ngày thật) =====
+     Đây là cách gỡ bỏ việc hardcode năm 2026 trong file gốc. */
+  const namTheoThang = {};
+  raw.doanh_thu.forEach(r => {
+    if (r.ngay_thang instanceof Date && !isNaN(r.ngay_thang)) {
+      namTheoThang[r.ngay_thang.getMonth() + 1] = r.ngay_thang.getFullYear();
+    }
+  });
+  const namCua = t => namTheoThang[Number(t)] ?? namMacDinh;
+
+  /* ===== 2. Chính sách khoán: (mã cửa hàng + năm/tháng) -> {mốc, % dưới, % vượt} ===== */
+  const coChe = new Map();
+  raw.co_che.forEach(r => {
+    const nam = r.nam || namCua(r.thang);
+    coChe.set(key(r.ma_cua_hang, ymKey(nam, r.thang)), {
+      moc: num(r.moc_dt_kpi), pDuoi: num(r.pct_duoi_moc), pVuot: num(r.pct_vuot_moc),
+    });
+  });
+
+  /* ===== 3. Danh mục nhân sự: nhiều mức khoá tra cứu, từ chặt tới lỏng ===== */
+  const nvChat = new Map();   // ma_nv + thang + chuc_vu + ma_cua_hang  (đúng như file gốc)
+  const nvLong = new Map();   // ma_nv + thang
+  raw.nhan_vien.forEach(r => {
+    const rec = {
+      ma_nv: r.ma_nv, ho_ten: r.ho_ten, chuc_vu: r.chuc_vu,
+      he_so: num(r.he_so_kpi), ma_cua_hang: r.ma_cua_hang, thang: Number(r.thang),
+    };
+    nvChat.set(key(r.ma_nv, Number(r.thang), norm(r.chuc_vu), r.ma_cua_hang), rec);
+    nvLong.set(key(r.ma_nv, Number(r.thang)), rec);
+  });
+
+  /* ===== 4. DOANH THU -> QUỸ THƯỞNG (theo ngày) ===== */
+  const dt = raw.doanh_thu
+    .filter(r => r.ma_cua_hang && r.ngay_thang instanceof Date && !isNaN(r.ngay_thang))
+    .map(r => {
+      const d = r.ngay_thang, thang = d.getMonth() + 1, nam = d.getFullYear();
+      return {
+        d, ngay_key: dayKey(d), ngay: d.getDate(), thang, nam, nam_thang: ymKey(nam, thang),
+        ma_cua_hang: r.ma_cua_hang, doanh_thu: num(r.doanh_thu),
+        bo_phan: boPhan(r.ma_cua_hang), cum: cumQuay(r.ma_cua_hang), tram: tram(r.ma_cua_hang),
+      };
+    })
+    .sort((a, b) => a.ma_cua_hang.localeCompare(b.ma_cua_hang) || a.d - b.d);
+
+  /* ===== 4b. SÁP NHẬP QUẦY =====
+     Khi một quầy đóng cửa và gộp vào quầy khác, quầy tiếp nhận được THỪA HƯỞNG doanh thu
+     luỹ kế của quầy cũ (để tính mốc KPI chung). Trước đây việc này được cài bằng cách gõ tay
+     địa chỉ ô tuyệt đối (+$K$177) vào công thức — nay khai báo bằng bảng data_sap_nhap:
+        quay_cu | quay_moi | tu_ngay
+     VD:  V52SA1K07 | V52SA1K04 | 2026-05-13
+     Doanh thu của quay_cu phát sinh TRƯỚC tu_ngay (trong cùng tháng) được cộng vào luỹ kế
+     của quay_moi kể từ tu_ngay. Quầy cũ vẫn giữ nguyên quỹ thưởng riêng của những ngày nó
+     còn hoạt động — nhân viên quầy cũ không bị ảnh hưởng. */
+  const carry = new Map();   // (quay_moi, nam_thang) -> {tuNgay, soTien}
+  (raw.sap_nhap || []).forEach(sn => {
+    const tuNgay = sn.tu_ngay instanceof Date ? sn.tu_ngay : new Date(sn.tu_ngay);
+    if (isNaN(tuNgay)) return;
+    const ym = ymKey(tuNgay.getFullYear(), tuNgay.getMonth() + 1);
+    const soTien = dt
+      .filter(r => r.ma_cua_hang === sn.quay_cu && r.nam_thang === ym && r.d < tuNgay)
+      .reduce((s, r) => s + r.doanh_thu, 0);
+    const k = key(sn.quay_moi, ym);
+    const cur = carry.get(k) || { tuNgay, soTien: 0 };
+    cur.soTien += soTien;
+    cur.tuNgay = tuNgay < cur.tuNgay ? tuNgay : cur.tuNgay;
+    carry.set(k, cur);
+    canhBao.push({ loai: "Sáp nhập quầy", ngay: dayKey(tuNgay), ma_cua_hang: sn.quay_moi,
+      chi_tiet: `${sn.quay_cu} sáp nhập vào ${sn.quay_moi} từ ${dayKey(tuNgay)} — cộng ${Math.round(soTien).toLocaleString("vi-VN")} đ doanh thu luỹ kế vào mốc KPI của ${sn.quay_moi}`, muc: "info" });
+  });
+
+  const luyKe = new Map();
+  dt.forEach(r => {
+    const cs = coChe.get(key(r.ma_cua_hang, r.nam_thang));
+    if (!cs) {
+      canhBao.push({ loai: "Thiếu cơ chế khoán", ngay: dayKey(r.d), ma_cua_hang: r.ma_cua_hang,
+        chi_tiet: `Quầy ${r.ma_cua_hang} có doanh thu tháng ${r.nam_thang} nhưng KHÔNG có dòng nào trong data_co_che_thuong → quỹ thưởng = 0` });
+    }
+    r.moc = cs ? cs.moc : 0;
+    r.pDuoi = cs ? cs.pDuoi : 0;
+    r.pVuot = cs ? cs.pVuot : 0;
+
+    const k = key(r.ma_cua_hang, r.nam_thang);
+    const cr = carry.get(k);
+    r.thua_huong = (cr && r.d >= cr.tuNgay) ? cr.soTien : 0;   // doanh thu thừa hưởng từ quầy sáp nhập
+
+    const truocGoc = luyKe.get(k) || 0;
+    luyKe.set(k, truocGoc + r.doanh_thu);
+
+    r.truoc_ngay = truocGoc + r.thua_huong;
+    r.luy_ke = truocGoc + r.doanh_thu + r.thua_huong;
+
+    // phần doanh thu của RIÊNG ngày hôm nay nằm trên mốc KPI tháng
+    if (!cs || r.luy_ke <= r.moc) r.vuot_moc = 0;
+    else if (r.truoc_ngay >= r.moc) r.vuot_moc = r.doanh_thu;
+    else r.vuot_moc = r.luy_ke - r.moc;
+
+    r.quy_thuong = (r.doanh_thu - r.vuot_moc) * r.pDuoi + r.vuot_moc * r.pVuot;
+    r.ht_kpi = r.moc ? r.luy_ke / r.moc : 0;
+  });
+
+  const quyTheoQuay = new Map();   // (ngày, mã cửa hàng) -> quỹ
+  const quyTheoCum = new Map();    // (ngày, cụm)         -> quỹ  (chỉ Siêu thị)
+  dt.forEach(r => {
+    quyTheoQuay.set(key(dayKey(r.d), r.ma_cua_hang), r.quy_thuong);
+    if (r.bo_phan === "Siêu thị") {
+      const k = key(dayKey(r.d), r.cum);
+      quyTheoCum.set(k, (quyTheoCum.get(k) || 0) + r.quy_thuong);
+    }
+  });
+
+  /* ===== 5. GIỜ LÀM -> ĐIỂM THƯỞNG ===== */
+  const rows = raw.gio_lam
+    .filter(r => r.ma_nv && r.ngay && r.thang)
+    .map(r => {
+      const thang = Number(r.thang), nam = Number(r.nam) || namCua(thang);
+      const d = new Date(nam, thang - 1, Number(r.ngay));
+
+      // ưu tiên khoá chặt (giống file gốc); nếu không khớp thì tra khoá lỏng NHƯNG phải báo lệch
+      let nv = null, lech = false;
+      if (r.chuc_vu && r.ma_cua_hang) nv = nvChat.get(key(r.ma_nv, thang, norm(r.chuc_vu), r.ma_cua_hang));
+      if (!nv) {
+        nv = nvLong.get(key(r.ma_nv, thang));
+        if (nv && r.chuc_vu && r.ma_cua_hang) lech = true;
+      }
+
+      const ma_cua_hang = r.ma_cua_hang || nv?.ma_cua_hang || "";
+      const chuc_vu = r.chuc_vu || nv?.chuc_vu || "";
+      const he_so = nv ? nv.he_so : 0;   // KHÔNG để #N/A lan ra cả quầy — thiếu khai báo thì hệ số 0 + cảnh báo
+
+      const o = {
+        ma_nv: r.ma_nv,
+        ho_ten: r.ho_ten || nv?.ho_ten || "",
+        gio_lam: num(r.gio_lam),
+        ngay: Number(r.ngay), thang, nam, d, ngay_key: dayKey(d), nam_thang: ymKey(nam, thang),
+        ma_cua_hang, chuc_vu, cv: norm(chuc_vu),
+        tram: tram(ma_cua_hang), cum: cumQuay(ma_cua_hang), bo_phan: boPhan(ma_cua_hang),
+        he_so, diem: num(r.gio_lam) * he_so,
+        thieu_khai_bao: !nv,
+      };
+      if (!nv) canhBao.push({ loai: "Thiếu khai báo nhân sự", ngay: o.ngay_key, ma_nv: o.ma_nv,
+        ma_cua_hang, chi_tiet: `Không tìm thấy ${o.ma_nv} (tháng ${thang}) trong data_nhan_vien → hệ số 0, thưởng 0` });
+      if (lech) canhBao.push({ loai: "Khai báo lệch", ngay: o.ngay_key, ma_nv: o.ma_nv, ma_cua_hang,
+        chi_tiet: `App khai "${r.chuc_vu} @ ${r.ma_cua_hang}" nhưng data_nhan_vien tháng ${thang} ghi "${nv.chuc_vu} @ ${nv.ma_cua_hang}" → đang lấy hệ số ${nv.he_so} theo data_nhan_vien` });
+      if (o.bo_phan === "Siêu thị" && o.cv === TQ) canhBao.push({ loai: "Trưởng quầy ở Siêu thị", ngay: o.ngay_key,
+        ma_nv: o.ma_nv, ma_cua_hang, chi_tiet: "Cơ chế chưa quy định cách chia cho Trưởng quầy tại Siêu thị — cần BGĐ chốt" });
+      return o;
+    });
+
+  /* ===== 6. MẪU SỐ ===== */
+  const tongDiemQuay = new Map();   // (ngày, mã cửa hàng) — mọi chức danh
+  const tongDiemNvCum = new Map();  // (ngày, cụm) — chỉ nhóm nhân viên, Siêu thị
+  rows.forEach(r => {
+    const kq = key(r.ngay_key, r.ma_cua_hang);
+    tongDiemQuay.set(kq, (tongDiemQuay.get(kq) || 0) + r.diem);
+    if (r.bo_phan === "Siêu thị" && !QL.includes(r.cv) && r.cv !== TQ) {
+      const kc = key(r.ngay_key, r.cum);
+      tongDiemNvCum.set(kc, (tongDiemNvCum.get(kc) || 0) + r.diem);
+    }
+  });
+
+  const laQuayLevel = r => r.bo_phan === "Kiosk" || QL.includes(r.cv);
+
+  /* ===== 7. TẦNG 1 — thưởng chia theo QUẦY (Kiosk mọi chức danh + TC/PTC Siêu thị) ===== */
+  rows.forEach(r => {
+    const M = tongDiemQuay.get(key(r.ngay_key, r.ma_cua_hang)) || 0;
+    r.tong_diem_quay = M;
+    r.tong_diem_nv_cum = tongDiemNvCum.get(key(r.ngay_key, r.cum)) || 0;
+    r.thuong_ql = (laQuayLevel(r) && M > 0)
+      ? (r.diem / M) * (quyTheoQuay.get(key(r.ngay_key, r.ma_cua_hang)) || 0)
+      : 0;
+  });
+
+  /* ===== 8. TẦNG 2 — thưởng chia theo CỤM (nhân viên / thử việc / partime Siêu thị) ===== */
+  const qlTheoCum = new Map();
+  rows.forEach(r => {
+    if (r.bo_phan !== "Siêu thị") return;
+    const k = key(r.ngay_key, r.cum);
+    qlTheoCum.set(k, (qlTheoCum.get(k) || 0) + r.thuong_ql);
+  });
+  rows.forEach(r => {
+    if (laQuayLevel(r)) { r.thuong_cum = 0; }
+    else {
+      const k = key(r.ngay_key, r.cum);
+      const quyConLai = (quyTheoCum.get(k) || 0) - (qlTheoCum.get(k) || 0);
+      r.thuong_cum = r.tong_diem_nv_cum > 0 ? (r.diem / r.tong_diem_nv_cum) * quyConLai : 0;
+    }
+    r.thuong_nv = r.thuong_ql + r.thuong_cum;
+  });
+
+  /* ===== 9. PARTIME 30/70 — tầng 1 ===== */
+  const sPtQuay = new Map(), mNonPtQuay = new Map();
+  rows.forEach(r => {
+    const k = key(r.ngay_key, r.ma_cua_hang);
+    if (r.cv === "partime") sPtQuay.set(k, (sPtQuay.get(k) || 0) + r.thuong_nv);
+    else mNonPtQuay.set(k, (mNonPtQuay.get(k) || 0) + r.diem);
+  });
+  rows.forEach(r => {
+    const k = key(r.ngay_key, r.ma_cua_hang);
+    const potPt = (sPtQuay.get(k) || 0) * 0.3;
+    if (r.cv === "partime") r.pt30_ql = 0;
+    else if (r.bo_phan === "Kiosk") {
+      const d = mNonPtQuay.get(k) || 0;
+      r.pt30_ql = d > 0 ? potPt * r.diem / d : 0;
+    } else if (QL.includes(r.cv)) {
+      r.pt30_ql = r.tong_diem_quay > 0 ? (r.diem / r.tong_diem_quay) * potPt : 0;
+    } else r.pt30_ql = 0;
+  });
+
+  /* ===== 10. PARTIME 30/70 — tầng 2 (nhân viên Siêu thị nhận phần còn lại của cụm) ===== */
+  const sPtCum = new Map(), tCum = new Map(), mNvCum = new Map();
+  rows.forEach(r => {
+    if (r.bo_phan !== "Siêu thị") return;
+    const k = key(r.ngay_key, r.cum);
+    if (r.cv === "partime") sPtCum.set(k, (sPtCum.get(k) || 0) + r.thuong_nv);
+    tCum.set(k, (tCum.get(k) || 0) + r.pt30_ql);
+    if (!QL.includes(r.cv) && r.cv !== "partime" && r.cv !== TQ) mNvCum.set(k, (mNvCum.get(k) || 0) + r.diem);
+  });
+  rows.forEach(r => {
+    if (r.cv === "partime" || laQuayLevel(r)) r.pt30_cum = 0;
+    else {
+      const k = key(r.ngay_key, r.cum);
+      const conLai = (sPtCum.get(k) || 0) * 0.3 - (tCum.get(k) || 0);
+      const d = mNvCum.get(k) || 0;
+      r.pt30_cum = d > 0 ? (r.diem / d) * conLai : 0;
+    }
+    r.thuong_pt30 = r.pt30_ql + r.pt30_cum;
+    r.quy_thuong_vrs = r.cv === "partime" ? r.thuong_nv * 0.7 : 0;
+    r.thuc_nhan = r.cv === "partime" ? 0 : r.thuong_nv + r.thuong_pt30;
+  });
+
+  /* ===== 11. ĐỐI SOÁT — bất biến: Σ quỹ = Σ thực nhận + Σ VRS giữ lại ===== */
+  const coGioLam = new Set(rows.map(r => key(r.ngay_key, r.ma_cua_hang)));
+  let quyPhatSinh = 0, quyDangChia = 0, quyTreo = 0;
+  const treoChiTiet = new Map();
+  dt.forEach(r => {
+    quyPhatSinh += r.quy_thuong;
+    if (coGioLam.has(key(dayKey(r.d), r.ma_cua_hang))) quyDangChia += r.quy_thuong;
+    else {
+      quyTreo += r.quy_thuong;
+      const t = treoChiTiet.get(r.ma_cua_hang) || { so_ngay: 0, quy: 0 };
+      t.so_ngay++; t.quy += r.quy_thuong;
+      treoChiTiet.set(r.ma_cua_hang, t);
+      if (r.quy_thuong > 0) canhBao.push({ loai: "Quỹ treo", ngay: dayKey(r.d), ma_cua_hang: r.ma_cua_hang,
+        chi_tiet: `Có doanh thu ${Math.round(r.doanh_thu).toLocaleString("vi-VN")} đ nhưng KHÔNG ai khai giờ làm → quỹ ${Math.round(r.quy_thuong).toLocaleString("vi-VN")} đ không đến tay ai` });
+    }
+  });
+  /* Chiều ngược lại của "quỹ treo": nhân viên CÓ khai giờ nhưng quầy KHÔNG có doanh thu ngày đó
+     (quầy đã đóng, khai nhầm quầy, hoặc chưa nhập doanh thu) → làm việc mà không có thưởng. */
+  const coDoanhThu = new Set(dt.map(r => key(r.ngay_key, r.ma_cua_hang)));
+  const daBao = new Set();
+  rows.forEach(r => {
+    if (r.gio_lam <= 0) return;
+    const k = key(r.ngay_key, r.ma_cua_hang);
+    if (coDoanhThu.has(k) || daBao.has(k)) return;
+    daBao.add(k);
+    const nguoi = rows.filter(x => x.ngay_key === r.ngay_key && x.ma_cua_hang === r.ma_cua_hang && x.gio_lam > 0);
+    canhBao.push({ loai: "Khai giờ nhưng quầy không có doanh thu", ngay: r.ngay_key, ma_cua_hang: r.ma_cua_hang,
+      ma_nv: nguoi.map(x => x.ma_nv).join(", "),
+      chi_tiet: `${nguoi.length} người khai tổng ${nguoi.reduce((s, x) => s + x.gio_lam, 0)} giờ, nhưng quầy ${r.ma_cua_hang} không có dòng doanh thu ngày này → thưởng = 0. Kiểm tra: quầy đã đóng? khai nhầm quầy? hay quên nhập doanh thu?` });
+  });
+
+  const tongThucNhan = rows.reduce((s, r) => s + r.thuc_nhan, 0);
+  const tongVrs = rows.reduce((s, r) => s + r.quy_thuong_vrs, 0);
+  const chenhLech = quyDangChia - tongThucNhan - tongVrs;
+
+  return {
+    rows, dt, canhBao,
+    doiSoat: {
+      quyPhatSinh, quyDangChia, quyTreo, tongThucNhan, tongVrs, chenhLech,
+      treoChiTiet: [...treoChiTiet.entries()].map(([ma, v]) => ({ ma_cua_hang: ma, ...v })).sort((a, b) => b.quy - a.quy),
+      dat: Math.abs(chenhLech) < 1,
+    },
+  };
+}
+
+
+</script>
+<script>
+/* ================== STATE ================== */
+let REV = [];
+const TD = { mode: "week", weekStart: null, month: "", cv: [] };   // trạng thái trang Thi đua (cv = lọc chức danh, multi-select; rỗng = tất cả)
+let RES = null, RAW = null, CHARTS = {};
+const SN_KEY = "vrs_sap_nhap_v1";
+const SN_DEFAULT = [
+  { quay_cu: "V52SA1K07", quay_moi: "V52SA1K04", tu_ngay: "2026-05-13" },
+  { quay_cu: "V52SA2K07", quay_moi: "V52SA2K04", tu_ngay: "2026-05-13" },
+];
+function getSN() {
+  try { const v = JSON.parse(localStorage.getItem(SN_KEY)); if (Array.isArray(v)) return v; } catch (e) {}
+  return SN_DEFAULT.slice();
+}
+function setSN(v) { localStorage.setItem(SN_KEY, JSON.stringify(v)); }
+
+/* ================== FORMAT ================== */
+/* Tiền hiển thị đồng bộ dạng rút gọn: K / M (triệu) / B (tỷ), 1 chữ số thập phân */
+const mfmt = n => {
+  const x = n || 0, sg = x < 0 ? "-" : "", a = Math.abs(Math.round(x));
+  if (a >= 1e9) return sg + (a / 1e9).toFixed(1).replace(".", ",") + "B";
+  if (a >= 1e6) return sg + (a / 1e6).toFixed(1).replace(".", ",") + "M";
+  if (a >= 1e3) return sg + (a / 1e3).toFixed(1).replace(".", ",") + "K";
+  return sg + a;
+};
+const vndFull = n => Math.round(n || 0).toLocaleString("vi-VN");   // số đầy đủ (dùng khi thật cần)
+const vnd = n => mfmt(n);
+const vnd0 = n => (n ? mfmt(n) : "—");
+const short = n => mfmt(n);
+const pc = n => (n * 100).toFixed(1).replace(".", ",") + "%";
+const gio = n => (Math.round(n * 10) / 10).toString().replace(".", ",");
+const dmy = s => { const p = String(s).split("-"); return p.length === 3 ? `${p[2]}/${p[1]}` : s; };
+const cvPill = cv => {
+  const n = norm(cv);
+  if (n === "partime") return `<span class="pill pt">Partime</span>`;
+  if (n === "truong ca" || n === "pho truong ca" || n === "truong quay") return `<span class="pill ql">${cv}</span>`;
+  return cv || "—";
+};
+
+/* ================== NẠP DỮ LIỆU TỪ WORKER ================== */
+const D = s => (s ? new Date(s + "T00:00:00") : null);
+let META = null;
+async function loadData(fresh) {
+  const pv = document.getElementById("__preview__");
+  if (pv && pv.textContent.trim()) return JSON.parse(pv.textContent);
+  const r = await fetch("/api/khoan/data" + (fresh ? "?fresh=1" : ""), { cache: "no-store" });
+  if (r.status === 401) { location.reload(); return null; }
+  return r.json();
+}
+async function tai(fresh) {
+  const boot = document.getElementById("boot"), err = document.getElementById("bootErr");
+  err.style.display = "none";
+  if (!RES) boot.style.display = "flex";
+  try {
+    const j = await loadData(fresh);
+    if (!j) return;
+    if (j.loi) throw new Error(j.loi);
+    RAW = {
+      nhan_vien: j.nhan_vien, co_che: j.co_che,
+      doanh_thu: j.doanh_thu.map(r => ({ ...r, ngay_thang: D(r.ngay_thang) })),
+      gio_lam: j.gio_lam,
+      sap_nhap: j.sap_nhap.map(s => ({ ...s, tu_ngay: D(s.tu_ngay) })),
+    };
+    META = j.meta;
+    boot.style.display = "none";
+    document.getElementById("nav").style.display = "flex";
+    document.getElementById("dateBar").style.display = "flex";
+      const br = document.getElementById("btnRefresh"); if (br) br.style.display = "";
+    recompute();
+    if (!document.querySelector(".page.on")) show("dash");
+  } catch (e) {
+    boot.style.display = "none"; err.style.display = "";
+    err.innerHTML = `<div class="alert e" style="max-width:760px;margin:40px auto"><div><b>Không đọc được Google Sheet.</b><br>${e.message}<br><br>Kiểm tra: File → Share → Publish to web cho cả 4 sheet, và gid trong worker.<br><br><button class="btn" id="btnRetry" style="border:1px solid var(--line)">Thử lại</button></div></div>`;
+    document.getElementById("btnRetry").onclick = () => tai(true);
+  }
+}
+function recompute() {
+  RES = tinhThuong(RAW, { namMacDinh: 2026 });
+  REV = RES.dt.map(r => ({ ts: r.d.getTime(), dt: r.doanh_thu, quy: r.quy_thuong, store: r.ma_cua_hang, bp: r.bo_phan, tram: r.tram, nam_thang: r.nam_thang }));
+  const nCb = RES.canhBao.filter(c => c.muc !== "info").length;
+  const b = document.getElementById("nBadge"); b.style.display = nCb ? "" : "none"; b.textContent = nCb;
+  const ky = [...new Set(RES.rows.map(r => r.nam_thang))].sort();
+  const latest = ky[ky.length - 1] || "";
+  if (!F.thang) F.thang = latest;
+  if (!F.preset) { F.preset = "m:" + latest; F.from = monISO(latest, false); F.to = monISO(latest, true); F.thang = latest; }   // MẶC ĐỊNH = tháng mới nhất
+  const ngayDT = RES.dt.length ? RES.dt.map(r => r.ngay_key).sort().slice(-1)[0] : "—";
+  const t = META ? new Date(META.cap_nhat).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) : "";
+  const dmy = s => { const p = String(s).split("-"); return p.length === 3 ? p[2] + "/" + p[1] : s; };
+  document.getElementById("hsub").innerHTML = `<span style="color:#2ea36a">●</span> Google Sheet · doanh thu đến <b>${dmy(ngayDT)}</b> · ${RES.rows.length.toLocaleString("vi-VN")} dòng chấm công · kỳ ${ky[0] || "—"} → ${ky[ky.length - 1] || "—"}${t ? " · đọc lúc " + t : ""}`;
+  buildFilters();
+  renderAll();
+}
+
+/* ================== BỘ LỌC ================== */
+const F = {
+  thang: "", from: "", to: "", preset: "", dates: {},   // dates = khoảng thời gian RIÊNG mỗi trang
+  d_tram: [], d_quay: [], d_bp: [],                 // Dashboard (riêng, multi-select)
+  g_tram: "", g_quay: "", g_bp: "", g_cv: "", g_emp: "", // Tra cứu giờ (riêng, liên thông)
+  tramK: [], dtK: [], tramS: [], dtS: [],           // Kiosk / Siêu thị (riêng: trạm + điểm trạm, multi-select)
+  empBang: "", empK: "", empS: "", empGio: "",      // Tìm nhân viên (dropdown) riêng từng trang
+  rep_mode: "month", rep_from: "", rep_to: "", rep_bp: [], rep_tram: [], rep_dt: [],  // Báo cáo: kỳ + so sánh + lọc
+  dv_ds: "nv", dv_emp: "", dv_tram: [], dv_bp: [], dv_ch: [], dv_cv: [], dv_thang: [],  // Danh sách data: dataset + lọc + tìm NV
+  cbLoai: [], cbStore: [], cmpMode: "month", cmpMetric: "quy", gioTab: "ct", nvTab: "nv",
+};
+const _p2 = n => ("0" + n).slice(-2);
+const isoTs = ts => { const d = new Date(ts); return d.getFullYear() + "-" + _p2(d.getMonth() + 1) + "-" + _p2(d.getDate()); };
+const monISO = (ym, end) => { const [y, m] = ym.split("/").map(Number); return end ? `${y}-${_p2(m)}-${_p2(new Date(y, m, 0).getDate())}` : `${y}-${_p2(m)}-01`; };
+const inRange = k => (!F.from || k >= F.from) && (!F.to || k <= F.to);
+function uniq(a) { return [...new Set(a.filter(Boolean))].sort(); }
+function mkSel(id, label, opts, all = "Tất cả") {
+  return `<div class="f"><label>${label}</label><select data-f="${id}">
+    <option value="">${all}</option>${opts.map(o => `<option value="${o}">${o}</option>`).join("")}</select></div>`;
+}
+/* ===== Dropdown MULTI-SELECT có tìm kiếm + nút ONLY (dùng chung) =====
+   key = tên khoá trong F, giá trị là MẢNG (rỗng = tất cả). */
+function selArr(key) { const v = F[key]; return Array.isArray(v) ? v : (v ? [v] : []); }
+function mselHtml(id, label, opts, minw = 170) {
+  const norm = o => (o && o.v !== undefined) ? o : { v: o, label: o };
+  const list = opts.map(norm);
+  const sel = new Set(selArr(id));
+  const btnLbl = sel.size === 0 ? "Tất cả" : (sel.size === 1 ? (list.find(o => sel.has(o.v)) || { label: "1 mục" }).label : sel.size + " mục đã chọn");
+  const item = o => `<div class="msel-item ${sel.has(o.v) ? "on" : ""}" data-v="${esc2(String(o.v))}">
+      <span class="msel-cb">${sel.has(o.v) ? "✓" : ""}</span>
+      <span class="msel-txt">${esc2(String(o.label))}</span>
+      <button type="button" class="msel-only" data-only="${esc2(String(o.v))}">ONLY</button></div>`;
+  return `<div class="f" style="min-width:${minw}px"><label>${label}</label>
+    <div class="msel" data-msel="${id}">
+      <button type="button" class="msel-btn ${sel.size ? "sel" : ""}"><span class="msel-blbl">${esc2(String(btnLbl))}</span><span class="msel-caret">▾</span></button>
+      <div class="msel-panel">
+        <input class="msel-search" placeholder="Tìm…" autocomplete="off">
+        <div class="msel-list">${list.map(item).join("") || '<div class="msel-empty">—</div>'}</div>
+      </div>
+    </div></div>`;
+}
+function reopenMSel(cid, key, q) {
+  const dd = document.querySelector("#" + cid + " .msel[data-msel='" + key + "']");
+  if (!dd) return;
+  const panel = dd.querySelector(".msel-panel"), search = dd.querySelector(".msel-search"), list = dd.querySelector(".msel-list");
+  document.querySelectorAll(".msel-panel.open").forEach(p => { if (p !== panel) p.classList.remove("open"); });
+  panel.classList.add("open");
+  search.value = q || "";
+  const ql = (q || "").toLowerCase();
+  list.querySelectorAll(".msel-item").forEach(it => it.style.display = it.textContent.toLowerCase().includes(ql) ? "" : "none");
+  search.focus();
+}
+/* onChange(key, searchText) — thường: cập nhật F[key] (đã làm), render lại rồi mở lại đúng dropdown */
+function wireMSel(containerId, onChange) {
+  document.querySelectorAll("#" + containerId + " .msel").forEach(dd => {
+    const key = dd.dataset.msel, btn = dd.querySelector(".msel-btn"), panel = dd.querySelector(".msel-panel"), search = dd.querySelector(".msel-search"), list = dd.querySelector(".msel-list");
+    if (!Array.isArray(F[key])) F[key] = F[key] ? [F[key]] : [];
+    btn.onclick = e => { e.stopPropagation(); document.querySelectorAll(".msel-panel.open").forEach(p => { if (p !== panel) p.classList.remove("open"); }); const open = panel.classList.toggle("open"); if (open) { search.value = ""; list.querySelectorAll(".msel-item").forEach(it => it.style.display = ""); search.focus(); } };
+    search.oninput = () => { const q = search.value.toLowerCase(); list.querySelectorAll(".msel-item").forEach(it => it.style.display = it.textContent.toLowerCase().includes(q) ? "" : "none"); };
+    list.querySelectorAll(".msel-item").forEach(it => it.onclick = e => {
+      if (e.target.closest(".msel-only")) return;
+      const v = it.dataset.v, arr = F[key], i = arr.indexOf(v);
+      if (i >= 0) arr.splice(i, 1); else arr.push(v);
+      onChange(key, search.value);
+    });
+    list.querySelectorAll(".msel-only").forEach(b => b.onclick = e => {
+      e.stopPropagation(); F[key] = [b.dataset.only]; onChange(key, search.value);
+    });
+  });
+}
+/* ===== Dropdown TÌM NHÂN VIÊN (single-select, có tìm kiếm) ===== */
+function empListOf(rows) {
+  return [...new Map(rows.map(r => [r.ma_nv, r.ho_ten])).entries()]
+    .map(([ma, ht]) => ({ ma, ht })).sort((a, b) => (a.ht || "").localeCompare(b.ht || "", "vi"));
+}
+function empSelHtml(key, emps, minw = 250) {
+  const sel = F[key] || "";
+  if (sel && !emps.some(e => e.ma === sel)) { /* giữ nguyên lựa chọn dù ngoài danh sách hiện tại */ }
+  const cur = sel ? emps.find(e => e.ma === sel) : null;
+  const lbl = cur ? `${esc2(cur.ht || "—")} · ${cur.ma}` : (sel ? sel : "Tất cả nhân viên");
+  const listHtml = (sel ? `<div class="empdd-item empdd-clear" data-ma="">✕ Bỏ chọn — Tất cả nhân viên</div>` : "")
+    + emps.map(e => `<div class="empdd-item ${sel === e.ma ? "on" : ""}" data-ma="${e.ma}">${esc2(e.ht || "—")} · <span class="mono">${e.ma}</span></div>`).join("");
+  return `<div class="f" style="min-width:${minw}px"><label>Tìm nhân viên</label>
+    <div class="empdd" data-empdd="${key}">
+      <button type="button" class="empdd-btn ${sel ? "sel" : ""}"><span class="empdd-lbl">${lbl}</span><span class="empdd-caret">▾</span></button>
+      <div class="empdd-panel">
+        <input class="empdd-search" placeholder="Tìm tên hoặc mã NV…" autocomplete="off">
+        <div class="empdd-list">${listHtml || '<div class="empdd-empty">Không có nhân viên</div>'}</div>
+      </div></div></div>`;
+}
+function wireEmpSel(containerId, onPick) {
+  document.querySelectorAll("#" + containerId + " .empdd").forEach(dd => {
+    const key = dd.dataset.empdd, btn = dd.querySelector(".empdd-btn"), panel = dd.querySelector(".empdd-panel"), search = dd.querySelector(".empdd-search"), list = dd.querySelector(".empdd-list");
+    btn.onclick = e => { e.stopPropagation(); document.querySelectorAll(".empdd-panel.open").forEach(p => { if (p !== panel) p.classList.remove("open"); }); const open = panel.classList.toggle("open"); if (open) { search.value = ""; list.querySelectorAll(".empdd-item").forEach(it => it.style.display = ""); search.focus(); } };
+    search.oninput = () => { const q = search.value.toLowerCase(); list.querySelectorAll(".empdd-item").forEach(it => { if (it.classList.contains("empdd-clear")) return; it.style.display = it.textContent.toLowerCase().includes(q) ? "" : "none"; }); };
+    list.querySelectorAll(".empdd-item").forEach(it => it.onclick = () => { F[key] = it.dataset.ma; onPick(key); });
+  });
+}
+function defDate() {
+  const ky = uniq(RES.rows.map(r => r.nam_thang)), latest = ky[ky.length - 1] || "";
+  return { preset: "m:" + latest, from: latest ? monISO(latest, false) : "", to: latest ? monISO(latest, true) : "", thang: latest };
+}
+function defWeek() {
+  const mx = maxDataTs(), mon = mondayOf(mx);
+  return { preset: "week", from: isoTs(mon), to: isoTs(mx), thang: isoTs(mx).slice(0, 7).replace("-", "/") };
+}
+function curPage() { return typeof CUR !== "undefined" ? CUR : "dash"; }
+function syncDate(p) { if (!F.dates[p]) F.dates[p] = (p === "gio" ? defWeek() : defDate()); const d = F.dates[p]; F.from = d.from; F.to = d.to; F.preset = d.preset; F.thang = d.thang; }
+function saveDate(p) { F.dates[p] = { from: F.from, to: F.to, preset: F.preset, thang: F.thang }; }
+function buildDateBar() {
+  syncDate(curPage());
+  const ky = uniq(RES.rows.map(r => r.nam_thang));
+  const latest = ky[ky.length - 1], prev = ky[ky.length - 2];
+  const mLabel = m => { const [y, mm] = m.split("/"); return "Tháng " + (+mm) + "/" + y; };
+  const qb = (id, label) => `<button class="qbtn ${F.preset === id ? "on" : ""}" data-preset="${id}">${label}</button>`;
+  const expFn = { bang: exportBang, kiosk: exportKiosk, st: exportSt, gio: exportGio }[curPage()];
+  document.getElementById("dateBar").innerHTML =
+    `<div class="datebar-inner">
+     <span class="dlbl">Khoảng thời gian</span>
+     <input type="date" id="dFrom" value="${F.from || ""}">
+     <span class="darrow">→</span>
+     <input type="date" id="dTo" value="${F.to || ""}">
+     <span class="dsep"></span>
+     ${qb("week", "Tuần này")}
+     ${latest ? qb("m:" + latest, mLabel(latest)) : ""}
+     ${prev ? qb("m:" + prev, mLabel(prev)) : ""}
+     ${qb("all", "Toàn bộ")}
+     <button class="qbtn dreset" data-preset="reset">↺ Đặt lại</button>
+     ${expFn ? `<span class="dsep"></span><button class="qbtn dexp" id="dateExp">⬇ Xuất Excel</button>` : ""}
+     </div>`;
+  const de = document.getElementById("dateExp");
+  if (de) de.onclick = expFn;
+  function apply(preset) {
+    if (preset === "reset") {
+      F.dates = {};   // mọi trang về mặc định thời gian
+      ["d_tram", "d_quay", "d_bp", "tramK", "dtK", "tramS", "dtS", "cbLoai", "cbStore"].forEach(k => F[k] = []);
+      ["empBang", "empK", "empS", "empGio"].forEach(k => F[k] = "");
+      if (typeof G !== "undefined") { G.tram = G.diemtram = G.bo_phan = G.chuc_vu = G.quay = G.q = ""; }
+      if (typeof B !== "undefined") { B.tram = B.diemtram = B.bo_phan = B.quay = B.chuc_vu = B.q = ""; }
+      F.rep_mode = "month"; F.rep_from = F.rep_to = ""; F.rep_bp = []; F.rep_tram = []; F.rep_dt = [];
+      STORE_SEL.Kiosk = ""; STORE_SEL["Siêu thị"] = "";
+      buildFilters(); renderAll(); return;
+    }
+    if (preset === "all") { F.preset = "all"; F.from = ""; F.to = ""; F.thang = latest; }
+    else if (preset === "week") { const mx = maxDataTs(), mon = mondayOf(mx); F.preset = "week"; F.from = isoTs(mon); F.to = isoTs(mx); F.thang = isoTs(mx).slice(0, 7).replace("-", "/"); }
+    else if (preset.startsWith("m:")) { const ym = preset.slice(2); F.preset = preset; F.from = monISO(ym, false); F.to = monISO(ym, true); F.thang = ym; }
+    saveDate(curPage()); buildDateBar(); renderAll();
+  }
+  document.querySelectorAll("#dateBar [data-preset]").forEach(b => b.onclick = () => apply(b.dataset.preset));
+  document.getElementById("dFrom").onchange = e => { F.from = e.target.value; F.preset = "custom"; if (F.to) F.thang = (F.to).slice(0, 7).replace("-", "/"); saveDate(curPage()); buildDateBar(); renderAll(); };
+  document.getElementById("dTo").onchange = e => { F.to = e.target.value; F.preset = "custom"; if (F.to) F.thang = (F.to).slice(0, 7).replace("-", "/"); saveDate(curPage()); buildDateBar(); renderAll(); };
+}
+function buildFilters() {
+  const R = RES.rows;
+  const trams = uniq(R.map(r => r.tram));
+  const quays = uniq(R.map(r => r.ma_cua_hang));
+  const cvs = uniq(R.map(r => r.chuc_vu));
+  buildDateBar();
+  // fBang / fGio (tìm nhân viên) + fDash / fKiosk / fSt / fCheck + facet Gio dựng động trong hàm render tương ứng.
+}
+/* khớp giá trị với bộ chọn: sel = "" | undefined | mảng rỗng => nhận tất cả; mảng => thuộc mảng; chuỗi => bằng */
+function inSel(val, sel) {
+  if (sel == null || sel === "") return true;
+  if (Array.isArray(sel)) return sel.length === 0 || sel.includes(val);
+  return val === sel;
+}
+/* lọc theo bộ lọc truyền vào (mỗi trang có bộ riêng); luôn kèm khoảng thời gian */
+function fRowsF(ff = {}) {
+  return RES.rows.filter(r =>
+    inRange(r.ngay_key) && inSel(r.tram, ff.tram) &&
+    inSel(r.bo_phan, ff.bo_phan) && inSel(r.ma_cua_hang, ff.quay) &&
+    inSel(r.chuc_vu, ff.chuc_vu) &&
+    (!ff.q || (r.ma_nv + " " + (r.ho_ten || "")).toLowerCase().includes(ff.q.toLowerCase()))
+  );
+}
+function fDtF(ff = {}) {
+  return RES.dt.filter(r =>
+    inRange(r.ngay_key) && inSel(r.tram, ff.tram) &&
+    inSel(r.bo_phan, ff.bo_phan) && inSel(r.ma_cua_hang, ff.quay)
+  );
+}
+const fRows = () => fRowsF({});   // chỉ lọc theo ngày (dùng cho export)
+const fDt = () => fDtF({});
+
+/* ================== HELPERS RENDER ================== */
+function tbl(el, cols, rows, totalRow) {
+  const th = cols.map(c => `<th class="${c.a || ""}">${c.t}</th>`).join("");
+  const tb = rows.map(r => `<tr>${cols.map(c => `<td class="${c.a || ""} ${c.cls || ""}">${c.f(r)}</td>`).join("")}</tr>`).join("");
+  const tf = totalRow ? `<tr class="tot">${cols.map(c => `<td class="${c.a || ""}">${totalRow[c.t] ?? ""}</td>`).join("")}</tr>` : "";
+  el.innerHTML = `<thead><tr>${th}</tr></thead><tbody>${tb}${tf}</tbody>`;
+  if (!rows.length) el.innerHTML = `<thead><tr>${th}</tr></thead><tbody><tr><td colspan="${cols.length}"><div class="empty">Không có dữ liệu khớp bộ lọc</div></td></tr></tbody>`;
+}
+function chart(id, cfg) {
+  if (typeof Chart === "undefined") return;
+  if (CHARTS[id]) CHARTS[id].destroy();
+  CHARTS[id] = new Chart(document.getElementById(id), cfg);
+}
+function kpis(el, arr) {
+  el.innerHTML = arr.map(k => `<div class="kpi ${k.cls || ""}"><div class="lb">${k.lb}</div><div class="vl">${k.vl}</div>${k.sb ? `<div class="sb">${k.sb}</div>` : ""}</div>`).join("");
+}
+function groupBy(arr, fn) {
+  const m = new Map();
+  arr.forEach(x => { const k = fn(x); if (!m.has(k)) m.set(k, []); m.get(k).push(x); });
+  return m;
+}
+const sum = (a, f) => a.reduce((s, x) => s + (f(x) || 0), 0);
+
+/* ================== DASHBOARD ================== */
+function renderDashFilters() {
+  const base = RES.rows.filter(r => inRange(r.ngay_key));
+  const filt = ex => base.filter(r => (ex === "d_tram" || inSel(r.tram, F.d_tram)) && (ex === "d_quay" || inSel(r.ma_cua_hang, F.d_quay)) && (ex === "d_bp" || inSel(r.bo_phan, F.d_bp)));
+  const trams = uniq(filt("d_tram").map(r => r.tram)), quays = uniq(filt("d_quay").map(r => r.ma_cua_hang)), bps = uniq(filt("d_bp").map(r => r.bo_phan));
+  document.getElementById("fDash").innerHTML = mselHtml("d_tram", "Trạm", trams) + mselHtml("d_quay", "Mã cửa hàng", quays) + mselHtml("d_bp", "Bộ phận", bps);
+  wireMSel("fDash", (key, q) => { renderDash(); reopenMSel("fDash", key, q); });
+}
+function renderDash() {
+  renderDashFilters();
+  const R = fRowsF({ tram: F.d_tram, bo_phan: F.d_bp, quay: F.d_quay }), D = fDtF({ tram: F.d_tram, bo_phan: F.d_bp, quay: F.d_quay });
+  const dtTong = sum(D, r => r.doanh_thu), quy = sum(D, r => r.quy_thuong);
+  const tn = sum(R, r => r.thuc_nhan), vrs = sum(R, r => r.quy_thuong_vrs);
+  const nNV = new Set(R.filter(r => r.thuc_nhan > 0).map(r => r.ma_nv)).size;
+
+  kpis(document.getElementById("kDash"), [
+    { lb: "Doanh thu", vl: short(dtTong), sb: short(dtTong) },
+    { lb: "Quỹ thưởng", vl: short(quy), sb: dtTong ? pc(quy / dtTong) + " doanh thu" : "—" },
+    { lb: "Nhân viên thực nhận", vl: vnd(tn), sb: nNV + " người có thưởng", cls: "ok" },
+    { lb: "Công ty giữ lại (70% PT)", vl: vnd(vrs), sb: quy ? pc(vrs / quy) + " quỹ" : "—" },
+    { lb: "Thưởng BQ / nhân viên", vl: nNV ? vnd(tn / nNV) : "—", sb: "trong kỳ đang lọc" },
+  ]);
+
+  // chart 1: doanh thu + quỹ theo ngày
+  const byDay = [...groupBy(D, r => r.ngay_key)].sort((a, b) => a[0].localeCompare(b[0]));
+  chart("c1", {
+    type: "bar",
+    data: {
+      labels: byDay.map(([d]) => dmy(d)),
+      datasets: [
+        { label: "Doanh thu", data: byDay.map(([, v]) => sum(v, x => x.doanh_thu)), backgroundColor: "#c9d8f2", yAxisID: "y", order: 2 },
+        { label: "Quỹ thưởng", data: byDay.map(([, v]) => sum(v, x => x.quy_thuong)), type: "line", borderColor: "#1e7145", backgroundColor: "#1e7145", borderWidth: 2, pointRadius: 0, yAxisID: "y1", order: 1 },
+      ],
+    },
+    options: {
+      maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
+      plugins: { legend: { labels: { boxWidth: 12, font: { size: 11 } } },
+        tooltip: { callbacks: { label: c => c.dataset.label + ": " + vnd(c.parsed.y) } } },
+      scales: {
+        x: { ticks: { font: { size: 9 }, maxRotation: 0, autoSkipPadding: 12 }, grid: { display: false } },
+        y: { position: "left", ticks: { callback: short, font: { size: 10 } }, grid: { color: "#eef1f6" } },
+        y1: { position: "right", ticks: { callback: short, font: { size: 10 } }, grid: { display: false } },
+      },
+    },
+  });
+
+  // chart 2: quỹ theo quầy
+  const byQ = [...groupBy(D, r => r.ma_cua_hang)]
+    .map(([q, v]) => ({ q, quy: sum(v, x => x.quy_thuong), bp: v[0].bo_phan }))
+    .sort((a, b) => b.quy - a.quy).slice(0, 14);
+  chart("c2", {
+    type: "bar",
+    data: {
+      labels: byQ.map(x => x.q),
+      datasets: [{ label: "Quỹ thưởng", data: byQ.map(x => x.quy),
+        backgroundColor: byQ.map(x => x.bp === "Kiosk" ? "#2d7ff9" : "#8e44ad") }],
+    },
+    options: {
+      maintainAspectRatio: false, indexAxis: "y",
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => vnd(c.parsed.x) } } },
+      scales: { x: { ticks: { callback: short, font: { size: 10 } } }, y: { ticks: { font: { size: 10 } }, grid: { display: false } } },
+    },
+  });
+
+  // KPI progress: lấy dòng doanh thu MỚI NHẤT của mỗi quầy trong kỳ
+  const last = new Map();
+  D.forEach(r => { const p = last.get(r.ma_cua_hang); if (!p || r.d > p.d) last.set(r.ma_cua_hang, r); });
+  const kpiRows = [...last.values()].sort((a, b) => b.ht_kpi - a.ht_kpi);
+  document.getElementById("kpiTag").textContent = F.thang || "tất cả các kỳ";
+  tbl(document.getElementById("tKpi"), [
+    { t: "Mã cửa hàng", f: r => `<span class="mono">${r.ma_cua_hang}</span>` },
+    { t: "Bộ phận", f: r => `<span class="pill ${r.bo_phan === "Kiosk" ? "k" : "s"}">${r.bo_phan}</span>` },
+    { t: "Doanh thu luỹ kế", a: "r", f: r => vnd(r.luy_ke) },
+    { t: "Mốc KPI", a: "r", f: r => r.moc ? vnd(r.moc) : `<span class="neg">chưa có</span>` },
+    { t: "% hoàn thành", a: "r", f: r => {
+        const p = Math.min(r.ht_kpi, 1.6), w = Math.min(r.ht_kpi * 100, 100);
+        return `<span class="bar"><i class="${r.ht_kpi >= 1 ? "over" : ""}" style="width:${w}%"></i></span> <b style="color:${r.ht_kpi >= 1 ? "var(--ok)" : "var(--txt)"}">${pc(r.ht_kpi)}</b>`;
+      } },
+    { t: "Còn thiếu", a: "r", f: r => r.ht_kpi >= 1 ? `<span style="color:var(--ok);font-weight:600">Đã vượt mốc</span>` : vnd(r.moc - r.luy_ke) },
+    { t: "Quỹ thưởng kỳ", a: "r", f: r => vnd(sum(D.filter(x => x.ma_cua_hang === r.ma_cua_hang), x => x.quy_thuong)) },
+  ], kpiRows);
+
+  // top nhân viên
+  const byNv = [...groupBy(R.filter(r => r.thuc_nhan > 0), r => r.ma_nv)]
+    .map(([id, v]) => ({ id, ten: v[0].ho_ten, cv: v[0].chuc_vu, q: v[0].ma_cua_hang,
+      gio: sum(v, x => x.gio_lam), tn: sum(v, x => x.thuc_nhan) }))
+    .sort((a, b) => b.tn - a.tn).slice(0, 15);
+  tbl(document.getElementById("tTop"), [
+    { t: "Mã NV", f: r => `<span class="mono">${r.id}</span>` },
+    { t: "Họ tên", f: r => r.ten || "—" },
+    { t: "Chức danh", f: r => cvPill(r.cv) },
+    { t: "Giờ", a: "r", f: r => gio(r.gio) },
+    { t: "Thực nhận", a: "r", f: r => `<b>${vnd(r.tn)}</b>` },
+  ], byNv);
+
+  // chart 3: phân bổ theo chức danh
+  const byCv = [...groupBy(R.filter(r => r.thuc_nhan > 0), r => r.chuc_vu)]
+    .map(([cv, v]) => ({ cv, tn: sum(v, x => x.thuc_nhan) })).sort((a, b) => b.tn - a.tn);
+  chart("c3", {
+    type: "doughnut",
+    data: { labels: byCv.map(x => x.cv), datasets: [{ data: byCv.map(x => x.tn),
+      backgroundColor: ["#1f3864", "#2d7ff9", "#8e44ad", "#1e7145", "#b7791f", "#c0392b", "#7f8c9d"] }] },
+    options: { maintainAspectRatio: false,
+      plugins: { legend: { position: "right", labels: { boxWidth: 12, font: { size: 11 } } },
+        tooltip: { callbacks: { label: c => c.label + ": " + vnd(c.parsed) } } } },
+  });
+}
+
+/* ================== BẢNG TÍNH THƯỞNG (bộ lọc chéo — loại Partime) ================== */
+const B = { tram: "", diemtram: "", bo_phan: "", quay: "", chuc_vu: "", tab: "nv", q: "" };
+const diemTram = ma => String(ma || "").slice(0, 6);
+const diemTramLabel = d => d.length >= 6 ? d.slice(0, 3) + "-" + d.slice(3, 6) : d;
+/* Ma trận NV × ngày trong tháng (pivot): cột nhận diện cố định, cột ngày cuộn ngang.
+   valFn: giá trị mỗi dòng; fmt: hàm định dạng ô. */
+/* Cột ngày cho ma trận: đủ mọi ngày trong kỳ lọc (từ F.from tới ngày mới nhất có dữ liệu),
+   ngày không có dữ liệu vẫn có cột (để trống) → dễ soi ngày thiếu vân tay. */
+function pivotDays(rows) {
+  if (F.from && F.to) {
+    const maxISO = isoTs(maxDataTs());
+    const endISO = F.to < maxISO ? F.to : maxISO;     // không hiện ngày tương lai chưa có dữ liệu
+    const startD = new Date(F.from + "T00:00:00"), endD = new Date(endISO + "T00:00:00");
+    if (endD >= startD && (endD - startD) / DAY <= 70) {
+      const out = [];
+      for (const d = new Date(startD); d <= endD; d.setDate(d.getDate() + 1)) out.push(isoTs(d.getTime()));
+      return out;
+    }
+  }
+  return uniq(rows.map(r => r.ngay_key)).sort();
+}
+function pivotHtml(rows, valFn, valLabel, fmt) {
+  const days = pivotDays(rows);
+  const W = [["Mã NV", 62], ["Tên NV", 118], ["Chức danh", 78], ["Cửa hàng", 98]];
+  const lefts = []; let acc = 0; W.forEach(([, w]) => { lefts.push(acc); acc += w; });
+  const cls = i => "stick" + (i === W.length - 1 ? " stickend" : "");
+  const st = i => `left:${lefts[i]}px;min-width:${W[i][1]}px;max-width:${W[i][1]}px`;
+  const map = new Map();
+  rows.forEach(r => {
+    const k = r.ma_nv + "|" + r.ma_cua_hang;
+    let o = map.get(k);
+    if (!o) { o = { id: r.ma_nv, ten: r.ho_ten, cv: r.chuc_vu, q: r.ma_cua_hang, d: {}, tot: 0 }; map.set(k, o); }
+    const v = valFn(r) || 0; o.d[r.ngay_key] = (o.d[r.ngay_key] || 0) + v; o.tot += v;
+  });
+  const list = [...map.values()].sort((a, b) => b.tot - a.tot);
+  if (!list.length) return `<thead><tr><th>—</th></tr></thead><tbody><tr><td class="muted" style="padding:14px">Không có dữ liệu.</td></tr></tbody>`;
+  let h = `<thead><tr>`
+    + W.map((w, i) => `<th class="${cls(i)}" style="${st(i)}">${w[0]}</th>`).join("")
+    + days.map(d => `<th class="r d">${d.slice(8, 10)}</th>`).join("")
+    + `<th class="r gt">Tổng</th></tr></thead><tbody>`;
+  list.forEach(o => {
+    h += `<tr>`
+      + `<td class="${cls(0)}" style="${st(0)}"><span class="mono">${o.id}</span></td>`
+      + `<td class="${cls(1)}" style="${st(1)}">${esc2(o.ten) || "—"}</td>`
+      + `<td class="${cls(2)}" style="${st(2)}">${cvPill(o.cv)}</td>`
+      + `<td class="${cls(3)}" style="${st(3)}"><span class="mono">${o.q}</span></td>`
+      + days.map(d => { const v = o.d[d] || 0; return `<td class="r d">${v ? fmt(v) : '<span class="muted">·</span>'}</td>`; }).join("")
+      + `<td class="r gt">${fmt(o.tot)}</td></tr>`;
+  });
+  h += `</tbody><tfoot><tr>`
+    + `<td class="${cls(0)}" style="${st(0)}">TỔNG</td>`
+    + `<td class="${cls(1)}" style="${st(1)}"><span class="muted">${list.length} dòng</span></td>`
+    + `<td class="${cls(2)}" style="${st(2)}"></td>`
+    + `<td class="${cls(3)}" style="${st(3)}"></td>`
+    + days.map(d => { const s = sum(list, o => o.d[d] || 0); return `<td class="r d">${s ? fmt(s) : '<span class="muted">·</span>'}</td>`; }).join("")
+    + `<td class="r gt">${fmt(sum(list, o => o.tot))}</td></tr></tfoot>`;
+  return h;
+}
+/* cuộn ma trận tới ngày mới nhất (bên phải) sau khi render */
+function scrollPivotRight(el) { const tw = el && el.closest && el.closest(".tw"); if (tw) tw.scrollLeft = tw.scrollWidth; }
+function bangBase() {
+  return RES.rows.filter(r => r.cv !== "partime" && inRange(r.ngay_key));
+}
+function bangFilter(rows, exclude) {
+  return rows.filter(r =>
+    (exclude === "tram" || !B.tram || r.tram === B.tram) &&
+    (exclude === "diemtram" || !B.diemtram || diemTram(r.ma_cua_hang) === B.diemtram) &&
+    (exclude === "bo_phan" || !B.bo_phan || r.bo_phan === B.bo_phan) &&
+    (exclude === "quay" || !B.quay || r.ma_cua_hang === B.quay) &&
+    (exclude === "chuc_vu" || !B.chuc_vu || r.chuc_vu === B.chuc_vu));
+}
+function facetCard(title, key, keyFn, labelFn, base) {
+  const m = new Map();
+  bangFilter(base, key).forEach(r => { const k = keyFn(r); if (k == null || k === "") return; m.set(k, (m.get(k) || 0) + r.thuc_nhan); });
+  const arr = [...m.entries()].sort((a, b) => b[1] - a[1]), max = Math.max(1, ...arr.map(x => x[1])), sel = B[key];
+  const body = arr.map(([k, v]) => `<div class="facet-row ${sel === k ? "on" : ""}" data-fk="${key}" data-fv="${esc2(k)}">
+      <div class="facet-name">${labelFn ? labelFn(k) : esc2(k)}</div>
+      <div class="facet-bar"><i style="width:${v / max * 100}%"></i></div>
+      <div class="facet-val">${short(v)}</div></div>`).join("") || `<div class="muted" style="padding:8px 4px">—</div>`;
+  return `<div class="facet-card"><div class="facet-head"><span>${title}${sel ? ` <button class="miniClr" data-fclr="${key}">×</button>` : ""}</span><span class="muted">Thưởng NV</span></div><div class="facet-body">${body}</div></div>`;
+}
+function renderBang() {
+  const base = bangBase(), facetRows = bangFilter(base, null);
+  const emps = empListOf(facetRows);
+  if (F.empBang && !emps.some(e => e.ma === F.empBang)) F.empBang = "";
+  document.getElementById("fBang").innerHTML = empSelHtml("empBang", emps);
+  wireEmpSel("fBang", () => renderBang());
+  const final = facetRows.filter(r => !F.empBang || r.ma_nv === F.empBang);
+  document.getElementById("bangFacets").innerHTML =
+    facetCard("Trạm", "tram", r => r.tram, null, base) +
+    facetCard("Điểm trạm", "diemtram", r => diemTram(r.ma_cua_hang), diemTramLabel, base) +
+    facetCard("Bộ phận", "bo_phan", r => r.bo_phan, null, base) +
+    facetCard("Chức vụ", "chuc_vu", r => r.chuc_vu, null, base);
+  document.querySelectorAll("#bangFacets .facet-row").forEach(el => el.onclick = () => {
+    const k = el.dataset.fk, v = el.dataset.fv; B[k] = B[k] === v ? "" : v; renderBang();
+  });
+  document.querySelectorAll("#bangFacets [data-fclr]").forEach(el => el.onclick = (e) => { e.stopPropagation(); B[el.dataset.fclr] = ""; renderBang(); });
+
+  const tn = sum(final, r => r.thuc_nhan);
+  const nNv = new Set(final.filter(r => r.thuc_nhan > 0).map(r => r.ma_nv)).size;
+  const activeChips = [["tram", B.tram], ["diemtram", B.diemtram && diemTramLabel(B.diemtram)], ["bo_phan", B.bo_phan], ["chuc_vu", B.chuc_vu], ["quay", B.quay]].filter(x => x[1]);
+  kpis(document.getElementById("kBang"), [
+    { lb: "Thưởng nhân viên", vl: vnd(tn), cls: "ok", sb: short(tn) },
+    { lb: "Số nhân viên", vl: nNv },
+    { lb: "Số quầy", vl: new Set(final.map(r => r.ma_cua_hang)).size },
+    { lb: "Ngày công", vl: sum([...groupBy(final, r => r.ma_nv)].map(([, v]) => aggNvNgay(v)), x => x.ngay) },
+    { lb: "Bộ lọc đang chọn", vl: activeChips.length ? activeChips.length + " mục" : "Không", sb: activeChips.map(x => esc2(x[1])).join(", ") || "toàn bộ" },
+  ]);
+
+  // ---- Danh sách chi tiết (2 tab) ----
+  document.querySelectorAll("#bangDetailTab .chip").forEach(c => c.classList.toggle("on", c.dataset.b === B.tab));
+  const bt = document.getElementById("bangTag");
+  const anyB = activeChips.length || B.quay;
+  if (anyB) bt.innerHTML = `${[B.quay ? "quầy " + B.quay : "", ...activeChips.filter(x => x[0] !== "quay").map(x => x[1])].filter(Boolean).join(" · ")} <button class="miniClr" id="bangClrAll">× xóa lọc</button>`;
+  else bt.textContent = "tất cả";
+  const bca = document.getElementById("bangClrAll");
+  if (bca) bca.onclick = () => { B.tram = B.diemtram = B.bo_phan = B.quay = B.chuc_vu = ""; renderBang(); };
+  const elB = document.getElementById("tBang");
+  elB.className = "";
+  if (B.tab === "ct") {
+    const ct = final.slice().sort((a, b) => b.ngay_key.localeCompare(a.ngay_key) || b.thuc_nhan - a.thuc_nhan);
+    tbl(elB, [
+      { t: "Ngày", f: r => dmy(r.ngay_key) },
+      { t: "Mã NV", f: r => `<span class="mono">${r.ma_nv}</span>` },
+      { t: "Họ tên", f: r => r.ho_ten || "—" },
+      { t: "Chức danh", f: r => cvPill(r.chuc_vu) },
+      { t: "Cửa hàng", f: r => `<span class="mono">${r.ma_cua_hang}</span>` },
+      { t: "Giờ", a: "r", f: r => gio(r.gio_lam) },
+      { t: "Thưởng gốc", a: "r", f: r => vnd0(r.thuong_nv) },
+      { t: "+30% PT", a: "r", f: r => r.thuong_pt30 ? `<span style="color:var(--warn)">${vnd(r.thuong_pt30)}</span>` : "—" },
+      { t: "THỰC NHẬN", a: "r", f: r => `<b>${vnd(r.thuc_nhan)}</b>` },
+    ], ct.slice(0, 500));
+  } else {
+    const byNv = [...groupBy(final, r => r.ma_nv + "|" + r.ma_cua_hang)].map(([, v]) => ({
+      id: v[0].ma_nv, ten: v[0].ho_ten, cv: v[0].chuc_vu, q: v[0].ma_cua_hang,
+      ...aggNvNgay(v), goc: sum(v, x => x.thuong_nv), pt: sum(v, x => x.thuong_pt30), tn: sum(v, x => x.thuc_nhan),
+    })).sort((a, b) => b.tn - a.tn).map((e, i) => ({ ...e, stt: i + 1 }));
+    tbl(document.getElementById("tBang"), [
+      { t: "#", a: "r", f: r => `<span class="muted">${r.stt}</span>` },
+      { t: "Mã NV", f: r => `<span class="mono">${r.id}</span>` },
+      { t: "Họ tên", f: r => `<b>${esc2(r.ten) || "—"}</b>` },
+      { t: "Chức danh", f: r => cvPill(r.cv) },
+      { t: "Cửa hàng", f: r => `<span class="mono">${r.q}</span>` },
+      { t: "Ngày công", a: "r", f: r => r.ngay },
+      { t: "Giờ", a: "r", f: r => gio(r.gio) },
+      { t: "Thưởng gốc", a: "r", f: r => vnd0(r.goc) },
+      { t: "+30% PT", a: "r", f: r => vnd0(r.pt) },
+      { t: "THỰC NHẬN", a: "r", f: r => `<b>${vnd(r.tn)}</b>` },
+    ], byNv, { "#": "", "Mã NV": "TỔNG", "Ngày công": sum(byNv, x => x.ngay), "Giờ": gio(sum(byNv, x => x.gio)), "Thưởng gốc": vnd(sum(byNv, x => x.goc)), "+30% PT": vnd(sum(byNv, x => x.pt)), "THỰC NHẬN": vnd(tn) });
+  }
+
+  // ---- Xếp hạng theo quầy (bấm để lọc) ----
+  const byQ = [...groupBy(bangFilter(base, "quay"), r => r.ma_cua_hang)].map(([q, v]) => ({ q, tn: sum(v, r => r.thuc_nhan) })).sort((a, b) => b.tn - a.tn).map((e, i) => ({ ...e, stt: i + 1 }));
+  const maxQ = Math.max(1, ...byQ.map(x => x.tn));
+  document.getElementById("tBangRank").innerHTML = `<thead><tr><th class="r">#</th><th>Tên quầy</th><th class="r">Thưởng</th></tr></thead><tbody>` +
+    byQ.map(e => `<tr class="rankrow ${B.quay === e.q ? "rowsel" : ""}" data-q="${e.q}"><td class="r muted">${e.stt}</td><td><span class="mono">${e.q}</span><div class="facet-bar" style="margin-top:3px"><i style="width:${e.tn / maxQ * 100}%"></i></div></td><td class="r"><b>${short(e.tn)}</b></td></tr>`).join("") +
+    `</tbody><tfoot><tr class="tot"><td></td><td>Tổng cộng</td><td class="r">${short(sum(byQ, x => x.tn))}</td></tr></tfoot>`;
+  document.querySelectorAll("#tBangRank .rankrow").forEach(tr => tr.onclick = () => { B.quay = B.quay === tr.dataset.q ? "" : tr.dataset.q; renderBang(); });
+}
+
+/* ================== KIOSK ================== */
+/* Kiosk & Siêu thị lọc ĐỘC LẬP: trạm + điểm trạm, có tìm kiếm, liên thông */
+function fRowsKS(tram, dt, bp) { return RES.rows.filter(r => inRange(r.ngay_key) && r.bo_phan === bp && inSel(r.tram, tram) && inSel(diemTram(r.ma_cua_hang), dt)); }
+function fDtKS(tram, dt, bp) { return RES.dt.filter(r => inRange(r.ngay_key) && r.bo_phan === bp && inSel(r.tram, tram) && inSel(diemTram(r.ma_cua_hang), dt)); }
+function renderKSFilters(fid, bp, kTram, kDt, kEmp) {
+  const base = RES.rows.filter(r => inRange(r.ngay_key) && r.bo_phan === bp);
+  const trams = uniq(base.filter(r => inSel(diemTram(r.ma_cua_hang), F[kDt])).map(r => r.tram));
+  const dts = uniq(base.filter(r => inSel(r.tram, F[kTram])).map(r => diemTram(r.ma_cua_hang)));
+  const emps = empListOf(fRowsKS(F[kTram], F[kDt], bp).filter(r => r.cv !== "partime"));
+  if (F[kEmp] && !emps.some(e => e.ma === F[kEmp])) F[kEmp] = "";
+  const rerender = bp === "Kiosk" ? renderKiosk : renderSt;
+  document.getElementById(fid).innerHTML = mselHtml(kTram, "Trạm", trams) + mselHtml(kDt, "Điểm trạm", dts.map(d => ({ v: d, label: diemTramLabel(d) }))) + empSelHtml(kEmp, emps);
+  wireMSel(fid, (key, q) => { rerender(); reopenMSel(fid, key, q); });
+  wireEmpSel(fid, () => rerender());
+}
+function renderKiosk() {
+  renderKSFilters("fKiosk", "Kiosk", "tramK", "dtK", "empK");
+  const R = fRowsKS(F.tramK, F.dtK, "Kiosk");
+  const D = fDtKS(F.tramK, F.dtK, "Kiosk");
+  const quy = sum(D, r => r.quy_thuong);
+  kpis(document.getElementById("kKiosk"), [
+    { lb: "Số quầy Kiosk", vl: new Set(D.map(r => r.ma_cua_hang)).size },
+    { lb: "Doanh thu", vl: short(sum(D, r => r.doanh_thu)) },
+    { lb: "Quỹ thưởng", vl: vnd(quy) },
+    { lb: "Thực nhận", vl: vnd(sum(R, r => r.thuc_nhan)), cls: "ok" },
+    { lb: "VRS giữ lại", vl: vnd(sum(R, r => r.quy_thuong_vrs)) },
+  ]);
+  const byQ = [...groupBy(D, r => r.ma_cua_hang)].map(([q, v]) => {
+    const rr = R.filter(x => x.ma_cua_hang === q);
+    const rrNP = rr.filter(x => x.cv !== "partime");
+    const lastD = v.reduce((a, b) => (a.d > b.d ? a : b));
+    return { q, dt: sum(v, x => x.doanh_thu), quy: sum(v, x => x.quy_thuong), moc: lastD.moc, ht: lastD.ht_kpi,
+      ngay: v.length, nnv: new Set(rrNP.map(x => x.ma_nv)).size, diem: sum(rrNP, x => x.diem),
+      tn: sum(rr, x => x.thuc_nhan), vrs: sum(rr, x => x.quy_thuong_vrs) };
+  }).sort((a, b) => b.quy - a.quy);
+  const T = { "Mã cửa hàng": "TỔNG", "Doanh thu": vnd(sum(byQ, x => x.dt)), "Quỹ thưởng": vnd(sum(byQ, x => x.quy)),
+    "Thực nhận": vnd(sum(byQ, x => x.tn)), "VRS giữ": vnd(sum(byQ, x => x.vrs)) };
+  tbl(document.getElementById("tKiosk"), [
+    { t: "Mã cửa hàng", f: r => `<span class="mono">${r.q}</span>` },
+    { t: "Ngày có DT", a: "r", f: r => r.ngay },
+    { t: "Doanh thu", a: "r", f: r => vnd(r.dt) },
+    { t: "Mốc KPI", a: "r", f: r => r.moc ? short(r.moc) : "—" },
+    { t: "% HT", a: "r", f: r => `<b style="color:${r.ht >= 1 ? "var(--ok)" : "var(--txt)"}">${pc(r.ht)}</b>` },
+    { t: "Quỹ thưởng", a: "r", f: r => vnd(r.quy) },
+    { t: "% trên DT", a: "r", f: r => r.dt ? pc(r.quy / r.dt) : "—" },
+    { t: "Số NV", a: "r", f: r => r.nnv },
+    { t: "Thực nhận", a: "r", f: r => `<b>${vnd(r.tn)}</b>` },
+    { t: "VRS giữ", a: "r", f: r => vnd0(r.vrs) },
+  ], byQ, T);
+  wireStoreClicks("tKiosk", byQ, "Kiosk");
+  renderNvList("tKioskNv", R, STORE_SEL["Kiosk"], "Kiosk", "empK");
+}
+
+/* ================== SIÊU THỊ ================== */
+function renderSt() {
+  renderKSFilters("fSt", "Siêu thị", "tramS", "dtS", "empS");
+  const R = fRowsKS(F.tramS, F.dtS, "Siêu thị");
+  const D = fDtKS(F.tramS, F.dtS, "Siêu thị");
+  const QL2 = ["truong ca", "pho truong ca"];
+  kpis(document.getElementById("kSt"), [
+    { lb: "Số cụm quầy", vl: new Set(D.map(r => r.cum)).size },
+    { lb: "Doanh thu", vl: short(sum(D, r => r.doanh_thu)) },
+    { lb: "Quỹ thưởng", vl: vnd(sum(D, r => r.quy_thuong)) },
+    { lb: "Phần Trưởng ca / PTC", vl: vnd(sum(R.filter(r => QL2.includes(r.cv)), r => r.thuc_nhan)), cls: "warn" },
+    { lb: "Phần nhân viên", vl: vnd(sum(R.filter(r => !QL2.includes(r.cv)), r => r.thuc_nhan)), cls: "ok" },
+  ]);
+  const byCum = [...groupBy(D, r => r.cum)].map(([c, v]) => {
+    const rr = R.filter(x => x.cum === c);
+    const ql = rr.filter(x => QL2.includes(x.cv));
+    const nv = rr.filter(x => !QL2.includes(x.cv));
+    return { c, quays: uniq(v.map(x => x.ma_cua_hang)), dt: sum(v, x => x.doanh_thu), quy: sum(v, x => x.quy_thuong),
+      qlTn: sum(ql, x => x.thuc_nhan), nQl: new Set(ql.map(x => x.ma_nv)).size,
+      nvTn: sum(nv, x => x.thuc_nhan), nNv: new Set(nv.filter(x => x.cv !== "partime").map(x => x.ma_nv)).size,
+      vrs: sum(rr, x => x.quy_thuong_vrs) };
+  }).sort((a, b) => b.quy - a.quy);
+  tbl(document.getElementById("tCum"), [
+    { t: "Cụm", f: r => `<b class="mono">${r.c}</b>` },
+    { t: "Gồm các mã cửa hàng", f: r => `<span class="mono muted">${r.quays.join(" + ")}</span>` },
+    { t: "Doanh thu cụm", a: "r", f: r => vnd(r.dt) },
+    { t: "Quỹ toàn cụm", a: "r", f: r => `<b>${vnd(r.quy)}</b>` },
+    { t: "Tầng 1: Trưởng ca / PTC", a: "r", f: r => `${vnd(r.qlTn)} <span class="muted">(${r.nQl} người)</span>` },
+    { t: "Tầng 2: Nhân viên", a: "r", f: r => `${vnd(r.nvTn)} <span class="muted">(${r.nNv} người)</span>` },
+    { t: "VRS giữ", a: "r", f: r => vnd0(r.vrs) },
+  ], byCum, { "Cụm": "TỔNG", "Doanh thu cụm": vnd(sum(byCum, x => x.dt)), "Quỹ toàn cụm": vnd(sum(byCum, x => x.quy)),
+    "Tầng 1: Trưởng ca / PTC": vnd(sum(byCum, x => x.qlTn)), "Tầng 2: Nhân viên": vnd(sum(byCum, x => x.nvTn)),
+    "VRS giữ": vnd(sum(byCum, x => x.vrs)) });
+
+  const byQ = [...groupBy(D, r => r.ma_cua_hang)].map(([q, v]) => {
+    const rr = R.filter(x => x.ma_cua_hang === q);
+    const lastD = v.reduce((a, b) => (a.d > b.d ? a : b));
+    return { q, cum: v[0].cum, dt: sum(v, x => x.doanh_thu), quy: sum(v, x => x.quy_thuong), moc: lastD.moc, ht: lastD.ht_kpi,
+      ql: sum(rr.filter(x => QL2.includes(x.cv)), x => x.thuc_nhan), nv: sum(rr.filter(x => !QL2.includes(x.cv)), x => x.thuc_nhan),
+      nnv: new Set(rr.filter(x => x.cv !== "partime").map(x => x.ma_nv)).size };
+  }).sort((a, b) => a.cum.localeCompare(b.cum) || b.quy - a.quy);
+  tbl(document.getElementById("tStQ"), [
+    { t: "Mã cửa hàng", f: r => `<span class="mono">${r.q}</span>` },
+    { t: "Cụm", f: r => `<b class="mono">${r.cum}</b>` },
+    { t: "Doanh thu", a: "r", f: r => vnd(r.dt) },
+    { t: "Mốc KPI", a: "r", f: r => r.moc ? short(r.moc) : "—" },
+    { t: "% HT", a: "r", f: r => `<b style="color:${r.ht >= 1 ? "var(--ok)" : "var(--txt)"}">${pc(r.ht)}</b>` },
+    { t: "Quỹ đóng góp", a: "r", f: r => vnd(r.quy) },
+    { t: "Số NV", a: "r", f: r => r.nnv },
+    { t: "Trưởng ca nhận", a: "r", f: r => vnd0(r.ql) },
+    { t: "Nhân viên nhận", a: "r", f: r => `<span class="muted">${vnd0(r.nv)}</span>` },
+  ], byQ);
+  wireStoreClicks("tStQ", byQ, "Siêu thị");
+  renderNvList("tStNv", R, STORE_SEL["Siêu thị"], "Siêu thị", "empS");
+}
+
+/* Ngày công thực & giờ theo BQ ngày: NV làm nhiều quầy/ngày (Trưởng ca) tính 1 ngày công,
+   giờ ngày đó = bình quân các quầy, KHÔNG cộng dồn. */
+function aggNvNgay(rows) {
+  const byDay = groupBy(rows.filter(x => x.gio_lam > 0), x => x.ngay_key);
+  const dailyAvg = [...byDay.values()].map(rs => sum(rs, x => x.gio_lam) / rs.length);
+  const ngay = byDay.size, totGio = sum(dailyAvg, x => x);
+  return { ngay, gio: totGio, bq: ngay ? totGio / ngay : 0, max: Math.max(0, ...dailyAvg) };
+}
+/* ================== GIỜ LÀM ================== */
+/* ===== Bộ lọc chéo (facet) trang Tra cứu giờ — giá trị = GIỜ LÀM ===== */
+const G = { tram: "", diemtram: "", bo_phan: "", chuc_vu: "", quay: "", q: "" };
+function gioBase() {
+  return RES.rows.filter(r => inRange(r.ngay_key));
+}
+function gioFilt(rows, ex) {
+  return rows.filter(r =>
+    (ex === "tram" || !G.tram || r.tram === G.tram) &&
+    (ex === "diemtram" || !G.diemtram || diemTram(r.ma_cua_hang) === G.diemtram) &&
+    (ex === "bo_phan" || !G.bo_phan || r.bo_phan === G.bo_phan) &&
+    (ex === "quay" || !G.quay || r.ma_cua_hang === G.quay) &&
+    (ex === "chuc_vu" || !G.chuc_vu || r.chuc_vu === G.chuc_vu));
+}
+function gFacetCard(title, key, keyFn, labelFn, base) {
+  const m = new Map();
+  gioFilt(base, key).forEach(r => { const k = keyFn(r); if (k == null || k === "") return; m.set(k, (m.get(k) || 0) + (r.gio_lam || 0)); });
+  const arr = [...m.entries()].sort((a, b) => b[1] - a[1]), max = Math.max(1, ...arr.map(x => x[1])), sel = G[key];
+  const body = arr.map(([k, v]) => `<div class="facet-row ${sel === k ? "on" : ""}" data-gk="${key}" data-gv="${esc2(k)}">
+      <div class="facet-name">${labelFn ? labelFn(k) : esc2(k)}</div>
+      <div class="facet-bar"><i style="width:${v / max * 100}%;background:#2563eb"></i></div>
+      <div class="facet-val" style="color:#2563eb">${gio(v)}</div></div>`).join("") || `<div class="muted" style="padding:8px 4px">—</div>`;
+  return `<div class="facet-card"><div class="facet-head"><span>${title}${sel ? ` <button class="miniClr" data-gclr="${key}">×</button>` : ""}</span><span class="muted">Giờ làm</span></div><div class="facet-body">${body}</div></div>`;
+}
+function renderGio() {
+  const base = gioBase(), final = gioFilt(base, null);
+  document.getElementById("gioFacets").innerHTML =
+    gFacetCard("Trạm", "tram", r => r.tram, null, base) +
+    gFacetCard("Điểm trạm", "diemtram", r => diemTram(r.ma_cua_hang), diemTramLabel, base) +
+    gFacetCard("Bộ phận", "bo_phan", r => r.bo_phan, null, base) +
+    gFacetCard("Chức danh", "chuc_vu", r => r.chuc_vu, null, base);
+  document.querySelectorAll("#gioFacets .facet-row").forEach(el => el.onclick = () => {
+    const k = el.dataset.gk, v = el.dataset.gv; G[k] = G[k] === v ? "" : v; renderGio();
+  });
+  document.querySelectorAll("#gioFacets [data-gclr]").forEach(el => el.onclick = e => { e.stopPropagation(); G[el.dataset.gclr] = ""; renderGio(); });
+
+  const emps = empListOf(final);
+  if (F.empGio && !emps.some(e => e.ma === F.empGio)) F.empGio = "";
+  document.getElementById("fGio").innerHTML = empSelHtml("empGio", emps);
+  wireEmpSel("fGio", () => renderGio());
+  const R = final.filter(r => !F.empGio || r.ma_nv === F.empGio);
+  const byNv = [...groupBy(R, r => r.ma_nv + "|" + r.ma_cua_hang)].map(([, v]) => {
+    const a = aggNvNgay(v);
+    return { id: v[0].ma_nv, ten: v[0].ho_ten, cv: v[0].chuc_vu, q: v[0].ma_cua_hang, ...a };
+  }).sort((a, b) => b.gio - a.gio);
+  const co = R.filter(r => r.gio_lam > 0);
+  kpis(document.getElementById("kGio"), [
+    { lb: "Lượt khai báo", vl: R.length.toLocaleString("vi-VN") },
+    { lb: "Có giờ làm", vl: co.length.toLocaleString("vi-VN"), sb: R.length ? pc(co.length / R.length) : "" },
+    { lb: "Tổng giờ (BQ ngày)", vl: gio(sum(byNv, x => x.gio)) },
+    { lb: "Số bản ghi NV", vl: byNv.length },
+    { lb: "Ngày công", vl: sum(byNv, x => x.ngay) },
+  ]);
+  // nhãn lọc đang chọn
+  const chips = [["tram", G.tram], ["diemtram", G.diemtram && diemTramLabel(G.diemtram)], ["bo_phan", G.bo_phan], ["chuc_vu", G.chuc_vu], ["quay", G.quay]].filter(x => x[1]);
+  const gt = document.getElementById("gioTag");
+  if (chips.length) gt.innerHTML = `${chips.map(x => x[1]).join(" · ")} <button class="miniClr" id="gioClrAll">× xóa lọc</button>`;
+  else gt.textContent = "tất cả";
+  const gca = document.getElementById("gioClrAll");
+  if (gca) gca.onclick = () => { G.tram = G.diemtram = G.bo_phan = G.chuc_vu = G.quay = ""; renderGio(); };
+
+  const tab = F.gioTab || "ct";
+  document.querySelectorAll("#gioTab .chip").forEach(c => c.classList.toggle("on", c.dataset.g === tab));
+  document.getElementById("gioCtCard").style.display = tab === "ct" ? "" : "none";
+  document.getElementById("gioNvCard").style.display = tab === "nv" ? "" : "none";
+
+  const elCt = document.getElementById("tGioCt");
+  if (tab === "ct") { elCt.className = "pivot"; elCt.innerHTML = pivotHtml(R, r => r.gio_lam, "giờ làm", v => gio(v)); scrollPivotRight(elCt); }
+
+  tbl(document.getElementById("tGioNv"), [
+    { t: "Mã NV", f: r => `<span class="mono">${r.id}</span>` },
+    { t: "Họ tên", f: r => r.ten || "—" },
+    { t: "Chức danh", f: r => cvPill(r.cv) },
+    { t: "Cửa hàng", f: r => `<span class="mono muted">${r.q}</span>` },
+    { t: "Ngày công", a: "r", f: r => r.ngay },
+    { t: "Tổng giờ", a: "r", f: r => `<b>${gio(r.gio)}</b>` },
+    { t: "Giờ BQ/ngày", a: "r", f: r => gio(r.bq) },
+  ], byNv, { "Mã NV": "TỔNG", "Ngày công": sum(byNv, x => x.ngay), "Tổng giờ": gio(sum(byNv, x => x.gio)) });
+
+  // Xếp hạng quầy theo giờ (bấm để lọc)
+  const byQ = [...groupBy(gioFilt(base, "quay"), r => r.ma_cua_hang)].map(([q, v]) => ({ q, g: sum(v, r => r.gio_lam || 0) })).sort((a, b) => b.g - a.g).map((e, i) => ({ ...e, stt: i + 1 }));
+  const maxQ = Math.max(1, ...byQ.map(x => x.g));
+  document.getElementById("tGioRank").innerHTML = `<thead><tr><th class="r">#</th><th>Tên quầy</th><th class="r">Giờ</th></tr></thead><tbody>`
+    + byQ.map(e => `<tr class="rankrow ${G.quay === e.q ? "rowsel" : ""}" data-q="${e.q}"><td class="r muted">${e.stt}</td><td><span class="mono">${e.q}</span><div class="facet-bar" style="margin-top:3px"><i style="width:${e.g / maxQ * 100}%;background:#2563eb"></i></div></td><td class="r"><b>${gio(e.g)}</b></td></tr>`).join("")
+    + `</tbody><tfoot><tr class="tot"><td></td><td>Tổng cộng</td><td class="r">${gio(sum(byQ, x => x.g))}</td></tr></tfoot>`;
+  document.querySelectorAll("#tGioRank .rankrow").forEach(tr => tr.onclick = () => { G.quay = G.quay === tr.dataset.q ? "" : tr.dataset.q; renderGio(); });
+}
+
+/* ================== KIỂM TRA ================== */
+function renderCheck() {
+  // 2 bộ lọc lọc chéo: mỗi danh sách tính từ cảnh báo đã lọc bởi bộ lọc KIA (+ giữ lại mục đang chọn)
+  const cbBase = RES.canhBao;
+  const cbFilt = ex => cbBase.filter(c => (ex === "loai" || inSel(c.loai, F.cbLoai)) && (ex === "store" || inSel(c.ma_cua_hang, F.cbStore)));
+  const loaiOpts = uniq([...cbFilt("loai").map(c => c.loai), ...F.cbLoai]);
+  const storeOpts = uniq([...cbFilt("store").map(c => c.ma_cua_hang).filter(Boolean), ...F.cbStore]);
+  document.getElementById("fCheck").innerHTML =
+    mselHtml("cbLoai", "Loại cảnh báo", loaiOpts, 200)
+    + mselHtml("cbStore", "Mã cửa hàng", storeOpts, 170)
+    + ((F.cbLoai.length || F.cbStore.length) ? `<div class="f" style="align-self:flex-end"><button class="qbtn dreset" id="cbReset">↺ Đặt lại</button></div>` : "");
+  wireMSel("fCheck", (key, q) => { renderCheck(); reopenMSel("fCheck", key, q); });
+  const cbrb = document.getElementById("cbReset");
+  if (cbrb) cbrb.onclick = () => { F.cbLoai = []; F.cbStore = []; renderCheck(); };
+  const d = RES.doiSoat;
+  document.getElementById("doiSoat").innerHTML = `
+    <div class="alert ${d.dat ? "o" : "e"}">
+      <div><b>${d.dat ? "✓ ĐỐI SOÁT ĐẠT" : "✗ ĐỐI SOÁT SAI"}</b> — chênh lệch:
+      <b>${d.chenhLech.toFixed(2)} đ</b>${d.dat ? " (trong ngưỡng làm tròn)" : " — CÓ LỖI, không được chốt lương khi chưa xử lý"}</div>
+    </div>
+    <div class="kpis" style="margin-bottom:0">
+      <div class="kpi"><div class="lb">Quỹ thưởng phát sinh</div><div class="vl">${vnd(d.quyPhatSinh)}</div><div class="sb">toàn bộ doanh thu</div></div>
+      <div class="kpi"><div class="lb">Quỹ được chia</div><div class="vl">${vnd(d.quyDangChia)}</div><div class="sb">quầy/ngày có người khai giờ</div></div>
+      <div class="kpi ok"><div class="lb">Nhân viên thực nhận</div><div class="vl">${vnd(d.tongThucNhan)}</div></div>
+      <div class="kpi"><div class="lb">Công ty giữ lại</div><div class="vl">${vnd(d.tongVrs)}</div><div class="sb">70% phần Partime</div></div>
+      <div class="kpi ${d.quyTreo > 0 ? "err" : "ok"}"><div class="lb">Quỹ treo</div><div class="vl">${vnd(d.quyTreo)}</div><div class="sb">có doanh thu, không ai khai giờ</div></div>
+    </div>
+    ${d.quyTreo > 0 ? `<div class="alert w" style="margin-top:12px"><div><b>${vnd(d.quyTreo)} đang treo.</b> Các quầy này có doanh thu nhưng không một ai khai giờ làm, nên quỹ không có mẫu số để chia — không vào tay nhân viên, cũng không được ghi nhận là công ty giữ lại.<br>
+      ${d.treoChiTiet.slice(0, 8).map(t => `<span class="mono">${t.ma_cua_hang}</span>: ${t.so_ngay} ngày, ${vnd(t.quy)}`).join(" &nbsp;·&nbsp; ")}</div></div>` : ""}`;
+
+  renderSN();
+
+  const cb = RES.canhBao.filter(c => inSel(c.loai, F.cbLoai) && inSel(c.ma_cua_hang, F.cbStore));
+  const nErr = RES.canhBao.filter(c => c.muc !== "info").length;
+  document.getElementById("cbTag").textContent = `${nErr} cảnh báo · ${RES.canhBao.length - nErr} thông tin`;
+  const rank = { "Thiếu khai báo nhân sự": 0, "Trưởng quầy ở Siêu thị": 1, "Thiếu cơ chế khoán": 2, "Quỹ treo": 3, "Sáp nhập quầy": 9 };
+  tbl(document.getElementById("tCheck"), [
+    { t: "", f: c => c.muc === "info" ? `<span class="pill k">i</span>` : `<span class="pill" style="background:#fdecea;color:#8c2c22">!</span>` },
+    { t: "Loại", f: c => `<b>${c.loai}</b>` },
+    { t: "Ngày", f: c => c.ngay ? dmy(c.ngay) : "—" },
+    { t: "Mã NV", f: c => c.ma_nv ? `<span class="mono">${c.ma_nv}</span>` : "—" },
+    { t: "Mã cửa hàng", f: c => c.ma_cua_hang ? `<span class="mono">${c.ma_cua_hang}</span>` : "—" },
+    { t: "Chi tiết", f: c => c.chi_tiet },
+  ], cb.slice().sort((a, b) => (rank[a.loai] ?? 5) - (rank[b.loai] ?? 5) || String(a.ngay).localeCompare(String(b.ngay))));
+}
+function saveSN() {
+  setSN(RAW.sap_nhap.map(s => ({ quay_cu: s.quay_cu, quay_moi: s.quay_moi,
+    tu_ngay: s.tu_ngay instanceof Date && !isNaN(s.tu_ngay) ? s.tu_ngay.toISOString().slice(0, 10) : "" })));
+}
+/* ---- Block thông tin sáp nhập quầy (chỉ hiển thị; khai báo trực tiếp trong sheet data_sap_nhap) ---- */
+const snFmtDate = s => (s.tu_ngay instanceof Date && !isNaN(s.tu_ngay)) ? dmyD(s.tu_ngay) : (s.tu_ngay || "—");
+const snItemHtml = s => `<div class="sn-item"><span class="sn-old">${esc2(s.quay_cu) || "?"}</span><span class="sn-arrow">→</span><span class="sn-new">${esc2(s.quay_moi) || "?"}</span><span class="sn-date">từ ${snFmtDate(s)}</span></div>`;
+function renderSN() {
+  const sn = RAW.sap_nhap || [];
+  document.getElementById("snCount").textContent = `${sn.length} quầy`;
+  document.getElementById("snView").innerHTML = sn.length ? sn.map(snItemHtml).join("") : `<div class="muted">Chưa có khai báo sáp nhập nào.</div>`;
+}
+
+/* ================== EXPORT ================== */
+let _xl = null;
+function loadXlsx() {
+  if (typeof XLSX !== "undefined") return Promise.resolve();
+  if (_xl) return _xl;
+  _xl = new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"; s.onload = res; s.onerror = () => rej(new Error("Không tải được thư viện Excel (cần mạng).")); document.head.appendChild(s); });
+  return _xl;
+}
+const expSuffix = () => (F.thang ? F.thang.replace("/", "-") : "toan-bo");
+async function dlXlsx(sheets, filename) {
+  try { await loadXlsx(); } catch (e) { alert(e.message); return; }
+  const wb = XLSX.utils.book_new();
+  sheets.forEach(([name, rows]) => XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows.length ? rows : [{ "(trống)": "" }]), name.slice(0, 31)));
+  XLSX.writeFile(wb, filename);
+}
+const r1 = n => Math.round((n || 0) * 10) / 10;
+/* tổng hợp NV theo (mã NV + cửa hàng) — loại partime + theo tìm NV của trang */
+function nvSummaryRows(R, empKey) {
+  const emp = empKey ? F[empKey] : "";
+  const list = R.filter(r => r.cv !== "partime" && (!emp || r.ma_nv === emp));
+  const m = new Map();
+  list.forEach(r => { const k = r.ma_nv + "|" + r.ma_cua_hang; let e = m.get(k); if (!e) { e = { ma_nv: r.ma_nv, ho_ten: r.ho_ten, chuc_vu: r.chuc_vu, ma_cua_hang: r.ma_cua_hang, rows: [] }; m.set(k, e); } e.rows.push(r); });
+  return [...m.values()].map(e => { const a = aggNvNgay(e.rows); return { ma_nv: e.ma_nv, ho_ten: e.ho_ten, chuc_vu: e.chuc_vu, ma_cua_hang: e.ma_cua_hang, ngay_cong: a.ngay, tong_gio: r1(a.gio), thuc_nhan: Math.round(sum(e.rows, x => x.thuc_nhan)) }; }).sort((a, b) => b.thuc_nhan - a.thuc_nhan);
+}
+/* ---- Bảng tính thưởng ---- */
+function exportBang() {
+  const base = bangBase(), final = bangFilter(base, null).filter(r => !F.empBang || r.ma_nv === F.empBang);
+  const ct = final.slice().sort((a, b) => b.ngay_key.localeCompare(a.ngay_key) || b.thuc_nhan - a.thuc_nhan).map(r => ({
+    ngay: r.ngay_key, ma_nv: r.ma_nv, ho_ten: r.ho_ten, chuc_vu: r.chuc_vu, cua_hang: r.ma_cua_hang,
+    gio_lam: r.gio_lam, thuong_goc: Math.round(r.thuong_nv), thuong_30_partime: Math.round(r.thuong_pt30 || 0), thuc_nhan: Math.round(r.thuc_nhan),
+  }));
+  const m = new Map();
+  final.forEach(r => { const k = r.ma_nv + "|" + r.ma_cua_hang; let e = m.get(k); if (!e) { e = { ma_nv: r.ma_nv, ho_ten: r.ho_ten, chuc_vu: r.chuc_vu, cua_hang: r.ma_cua_hang, rows: [] }; m.set(k, e); } e.rows.push(r); });
+  const nv = [...m.values()].map(e => { const a = aggNvNgay(e.rows); return { ma_nv: e.ma_nv, ho_ten: e.ho_ten, chuc_vu: e.chuc_vu, cua_hang: e.cua_hang, ngay_cong: a.ngay, tong_gio: r1(a.gio), thuong_goc: Math.round(sum(e.rows, x => x.thuong_nv)), thuong_30_partime: Math.round(sum(e.rows, x => x.thuong_pt30 || 0)), thuc_nhan: Math.round(sum(e.rows, x => x.thuc_nhan)) }; }).sort((a, b) => b.thuc_nhan - a.thuc_nhan);
+  dlXlsx([["tong_hop_theo_nv", nv], ["chi_tiet_theo_ngay", ct]], `Bang tinh thuong ${expSuffix()}.xlsx`);
+}
+/* ---- Kiosk ---- */
+function exportKiosk() {
+  const R = fRowsKS(F.tramK, F.dtK, "Kiosk"), D = fDtKS(F.tramK, F.dtK, "Kiosk");
+  const byQ = [...groupBy(D, r => r.ma_cua_hang)].map(([q, v]) => {
+    const rr = R.filter(x => x.ma_cua_hang === q), rrNP = rr.filter(x => x.cv !== "partime"), lastD = v.reduce((a, b) => a.d > b.d ? a : b);
+    return { ma_cua_hang: q, ngay_co_dt: v.length, doanh_thu: Math.round(sum(v, x => x.doanh_thu)), moc_kpi: lastD.moc, ty_le_ht_kpi: lastD.ht_kpi, quy_thuong: Math.round(sum(v, x => x.quy_thuong)), so_nv: new Set(rrNP.map(x => x.ma_nv)).size, thuc_nhan: Math.round(sum(rr, x => x.thuc_nhan)), vrs_giu_lai: Math.round(sum(rr, x => x.quy_thuong_vrs)) };
+  }).sort((a, b) => b.quy_thuong - a.quy_thuong);
+  dlXlsx([["quy_theo_quay", byQ], ["danh_sach_nv", nvSummaryRows(R, "empK")]], `Kiosk ${expSuffix()}.xlsx`);
+}
+/* ---- Siêu thị ---- */
+function exportSt() {
+  const R = fRowsKS(F.tramS, F.dtS, "Siêu thị"), D = fDtKS(F.tramS, F.dtS, "Siêu thị"), QL2 = ["truong ca", "pho truong ca"];
+  const byCum = [...groupBy(D, r => r.cum)].map(([c, v]) => {
+    const rr = R.filter(x => x.cum === c), ql = rr.filter(x => QL2.includes(x.cv)), nv = rr.filter(x => !QL2.includes(x.cv));
+    return { cum: c, cac_ma_cua_hang: uniq(v.map(x => x.ma_cua_hang)).join(" + "), doanh_thu: Math.round(sum(v, x => x.doanh_thu)), quy_toan_cum: Math.round(sum(v, x => x.quy_thuong)), tang1_truong_ca_ptc: Math.round(sum(ql, x => x.thuc_nhan)), so_truong_ca: new Set(ql.map(x => x.ma_nv)).size, tang2_nhan_vien: Math.round(sum(nv, x => x.thuc_nhan)), so_nhan_vien: new Set(nv.filter(x => x.cv !== "partime").map(x => x.ma_nv)).size, vrs_giu_lai: Math.round(sum(rr, x => x.quy_thuong_vrs)) };
+  }).sort((a, b) => b.quy_toan_cum - a.quy_toan_cum);
+  const byQ = [...groupBy(D, r => r.ma_cua_hang)].map(([q, v]) => {
+    const rr = R.filter(x => x.ma_cua_hang === q), lastD = v.reduce((a, b) => a.d > b.d ? a : b);
+    return { ma_cua_hang: q, cum: v[0].cum, doanh_thu: Math.round(sum(v, x => x.doanh_thu)), moc_kpi: lastD.moc, ty_le_ht_kpi: lastD.ht_kpi, quy_thuong: Math.round(sum(v, x => x.quy_thuong)), truong_ca_nhan: Math.round(sum(rr.filter(x => QL2.includes(x.cv)), x => x.thuc_nhan)), nhan_vien_nhan: Math.round(sum(rr.filter(x => !QL2.includes(x.cv)), x => x.thuc_nhan)) };
+  }).sort((a, b) => a.cum.localeCompare(b.cum) || b.quy_thuong - a.quy_thuong);
+  dlXlsx([["quy_theo_cum", byCum], ["chi_tiet_cua_hang", byQ], ["danh_sach_nv", nvSummaryRows(R, "empS")]], `Sieu thi ${expSuffix()}.xlsx`);
+}
+/* ---- Tra cứu giờ làm ---- */
+function exportGio() {
+  const base = gioBase(), final = gioFilt(base, null).filter(r => !F.empGio || r.ma_nv === F.empGio);
+  const ct = final.slice().sort((a, b) => b.ngay_key.localeCompare(a.ngay_key) || a.ma_nv.localeCompare(b.ma_nv)).map(r => ({ ngay: r.ngay_key, ma_nv: r.ma_nv, ho_ten: r.ho_ten, chuc_vu: r.chuc_vu, ma_cua_hang: r.ma_cua_hang, gio_lam: r.gio_lam }));
+  const m = new Map();
+  final.forEach(r => { const k = r.ma_nv + "|" + r.ma_cua_hang; let e = m.get(k); if (!e) { e = { ma_nv: r.ma_nv, ho_ten: r.ho_ten, chuc_vu: r.chuc_vu, ma_cua_hang: r.ma_cua_hang, rows: [] }; m.set(k, e); } e.rows.push(r); });
+  const nv = [...m.values()].map(e => { const a = aggNvNgay(e.rows); return { ma_nv: e.ma_nv, ho_ten: e.ho_ten, chuc_vu: e.chuc_vu, ma_cua_hang: e.ma_cua_hang, ngay_cong: a.ngay, tong_gio: r1(a.gio), gio_bq_ngay: r1(a.bq) }; }).sort((a, b) => b.tong_gio - a.tong_gio);
+  dlXlsx([["tong_hop_theo_nv", nv], ["chi_tiet_theo_ngay", ct]], `Tra cuu gio lam ${expSuffix()}.xlsx`);
+}
+/* ---- Kiểm tra ---- */
+function exportCheck() {
+  const cb = RES.canhBao.filter(c => inSel(c.loai, F.cbLoai) && inSel(c.ma_cua_hang, F.cbStore));
+  const d = RES.doiSoat;
+  const ds = [
+    { chi_tieu: "Quỹ thưởng phát sinh", so_tien: Math.round(d.quyPhatSinh) },
+    { chi_tieu: "Quỹ được chia (quầy/ngày có người khai giờ)", so_tien: Math.round(d.quyDangChia) },
+    { chi_tieu: "Nhân viên thực nhận", so_tien: Math.round(d.tongThucNhan) },
+    { chi_tieu: "Công ty giữ lại (70% Partime)", so_tien: Math.round(d.tongVrs) },
+    { chi_tieu: "CHÊNH LỆCH (phải = 0)", so_tien: Math.round(d.chenhLech) },
+    { chi_tieu: "Quỹ treo (có DT, không ai khai giờ)", so_tien: Math.round(d.quyTreo) },
+  ];
+  const sn = (RAW.sap_nhap || []).map(s => ({ quay_cu: s.quay_cu, quay_moi: s.quay_moi, tu_ngay: s.tu_ngay instanceof Date ? isoTs(s.tu_ngay.getTime()) : (s.tu_ngay || "") }));
+  dlXlsx([["canh_bao", cb], ["doi_soat", ds], ["sap_nhap", sn]], `Kiem tra ${expSuffix()}.xlsx`);
+}
+
+/* ================== HELPER NGÀY/KỲ (Báo cáo + Thi đua) ================== */
+const DAY = 86400000;
+const tsOf = k => { const [y, m, d] = k.split("-").map(Number); return new Date(y, m - 1, d).getTime(); };
+const dmTs = ts => { const d = new Date(ts); return d.getDate() + "/" + (d.getMonth() + 1); };
+const dmyTs = ts => { const d = new Date(ts); return ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear(); };
+function mondayOf(ts) { const d = new Date(ts); const wd = (d.getDay() + 6) % 7; return new Date(d.getFullYear(), d.getMonth(), d.getDate() - wd).getTime(); }
+function prevMonthYM(ym) { let [y, m] = ym.split("/").map(Number); m--; if (m < 1) { m = 12; y--; } return y + "/" + ("0" + m).slice(-2); }
+function isoWeek(ts) { const d = new Date(ts); const t = new Date(d.getFullYear(), d.getMonth(), d.getDate()); const day = (t.getDay() + 6) % 7; t.setDate(t.getDate() - day + 3); const first = new Date(t.getFullYear(), 0, 4); return 1 + Math.round(((t - first) / DAY - 3 + ((first.getDay() + 6) % 7)) / 7); }
+/* ================== BÁO CÁO & THỐNG KÊ ================== */
+const maxDataTs = () => {
+  let mx = 0;
+  for (const r of REV) if (r.ts > mx) mx = r.ts;                       // doanh thu
+  if (RES && RES.rows) for (const r of RES.rows) { const t = r.d ? r.d.getTime() : 0; if (t > mx) mx = t; }  // giờ làm
+  return mx || Date.now();
+};
+const passDimRep = r => inSel(r.bp, F.rep_bp) && inSel(r.tram, F.rep_tram) && inSel(diemTram(r.store), F.rep_dt);
+function repLatestYM() { return [...new Set(REV.map(r => r.nam_thang))].sort().slice(-1)[0] || ""; }
+function repSum(from, to, metric) { let s = 0; for (const r of REV) { if (!passDimRep(r) || r.ts < from || r.ts > to) continue; s += metric === "quy" ? r.quy : r.dt; } return s; }
+function repPeriods() {
+  if (!REV.length) return null;
+  const mxAll = Math.max(...REV.map(r => r.ts));
+  const ym = repLatestYM(), ly = +ym.split("/")[0], lm = +ym.split("/")[1];
+  let curFrom, curTo;
+  if (F.rep_from && F.rep_to) {
+    curFrom = new Date(F.rep_from + "T00:00:00").getTime();
+    curTo = new Date(F.rep_to + "T00:00:00").getTime();
+  } else if (F.rep_mode === "week") {
+    curTo = mxAll; curFrom = mondayOf(mxAll);
+  } else if (F.rep_mode === "year") {
+    curFrom = new Date(ly, 0, 1).getTime(); curTo = mxAll;
+  } else {
+    curFrom = new Date(ly, lm - 1, 1).getTime();
+    const mrows = REV.filter(r => r.nam_thang === ym);
+    curTo = mrows.length ? Math.max(...mrows.map(r => r.ts)) : mxAll;
+  }
+  if (curTo < curFrom) { const t = curFrom; curFrom = curTo; curTo = t; }
+  const nDays = Math.round((curTo - curFrom) / DAY) + 1;
+  const backM = (t, k) => { const d = new Date(t); return new Date(d.getFullYear(), d.getMonth() - k, d.getDate()).getTime(); };
+  const backY = (t, k) => { const d = new Date(t); return new Date(d.getFullYear() - k, d.getMonth(), d.getDate()).getTime(); };
+  const comps = [];
+  if (F.rep_mode === "week") {
+    comps.push({ name: "tuần trước", label: "So tuần trước", from: curFrom - 7 * DAY, to: curTo - 7 * DAY });
+    comps.push({ name: "cùng kỳ tuần năm trước", label: "So cùng kỳ tuần năm trước", from: curFrom - 364 * DAY, to: curTo - 364 * DAY });
+  } else if (F.rep_mode === "year") {
+    comps.push({ name: "lũy kế năm trước", label: "So lũy kế năm trước", from: backY(curFrom, 1), to: backY(curTo, 1) });
+  } else {
+    comps.push({ name: "tháng trước", label: "So tháng trước", from: backM(curFrom, 1), to: backM(curTo, 1) });
+    comps.push({ name: "cùng kỳ năm trước", label: "So cùng kỳ năm trước", from: backY(curFrom, 1), to: backY(curTo, 1) });
+  }
+  return { curFrom, curTo, nDays, comps, ym, ly, lm, yearMode: F.rep_mode === "year" };
+}
+function renderRepBar() {
+  const P = repPeriods();
+  const ym = repLatestYM(), y = +ym.split("/")[0], m = +ym.split("/")[1];
+  const fromISO = P ? isoTs(P.curFrom) : "", toISO = P ? isoTs(P.curTo) : "";
+  const base = P ? REV.filter(r => r.ts >= P.curFrom && r.ts <= P.curTo) : [];
+  const opt = ex => base.filter(r => (ex === "bp" || inSel(r.bp, F.rep_bp)) && (ex === "tram" || inSel(r.tram, F.rep_tram)) && (ex === "dt" || inSel(diemTram(r.store), F.rep_dt)));
+  const bps = uniq(opt("bp").map(r => r.bp)), trams = uniq(opt("tram").map(r => r.tram)), dts = uniq(opt("dt").map(r => diemTram(r.store)));
+  document.getElementById("repBar").innerHTML =
+    `<div class="datebar-inner">
+      <span class="dlbl">Kỳ báo cáo</span>
+      <input type="date" id="repFrom" value="${fromISO}"><span class="darrow">→</span><input type="date" id="repTo" value="${toISO}">
+      <span class="dsep"></span>
+      <button class="qbtn ${F.rep_mode === "week" ? "on" : ""}" data-rp="week">Tuần này</button>
+      <button class="qbtn ${F.rep_mode === "month" ? "on" : ""}" data-rp="month">Tháng ${m}/${y}</button>
+      <button class="qbtn ${F.rep_mode === "year" ? "on" : ""}" data-rp="year">Năm ${y}</button>
+      <span class="dsep"></span>
+      ${mselHtml("rep_bp", "Bộ phận", bps, 150)}${mselHtml("rep_tram", "Trạm", trams, 140)}${mselHtml("rep_dt", "Điểm trạm", dts.map(d => ({ v: d, label: diemTramLabel(d) })), 160)}
+      <button class="qbtn dreset" id="repReset">↺ Đặt lại</button>
+      <button class="qbtn" id="repReload">⟳ Cập nhật dữ liệu</button>
+     </div>`;
+  document.querySelectorAll("#repBar [data-rp]").forEach(b => b.onclick = () => { F.rep_mode = b.dataset.rp; F.rep_from = F.rep_to = ""; renderReport(); });
+  const rf = document.getElementById("repFrom"), rt = document.getElementById("repTo");
+  if (rf) rf.onchange = () => { F.rep_from = rf.value; F.rep_to = rt.value; renderReport(); };
+  if (rt) rt.onchange = () => { F.rep_from = rf.value; F.rep_to = rt.value; renderReport(); };
+  const rr = document.getElementById("repReset");
+  if (rr) rr.onclick = () => { F.rep_mode = "month"; F.rep_from = F.rep_to = ""; F.rep_bp = []; F.rep_tram = []; F.rep_dt = []; renderReport(); };
+  const rl = document.getElementById("repReload");
+  if (rl) rl.onclick = () => tai(true);
+  wireMSel("repBar", (key, q) => { renderReport(); reopenMSel("repBar", key, q); });
+}
+function renderReport() {
+  renderRepBar();
+  const P = repPeriods();
+  if (!P) { document.getElementById("cmpCards").innerHTML = '<div class="empty" style="grid-column:1/-1">Không có dữ liệu</div>'; document.getElementById("repAnalysis").innerHTML = ""; document.getElementById("tCmp").innerHTML = ""; return; }
+  const curDt = repSum(P.curFrom, P.curTo, "dt"), curQuy = repSum(P.curFrom, P.curTo, "quy");
+  const nData = new Set(REV.filter(r => passDimRep(r) && r.ts >= P.curFrom && r.ts <= P.curTo).map(r => r.ts)).size;
+  const cmpCard = c => {
+    const prev = repSum(c.from, c.to, "quy");
+    const pct = prev > 0 ? (curQuy - prev) / prev * 100 : null, up = (curQuy - prev) >= 0;
+    const cls = pct == null ? "" : (up ? "ok" : "err");
+    const val = pct == null ? `— <span style="font-size:12px;font-weight:400">chưa có dữ liệu</span>` : `${up ? "▲ +" : "▼ "}${Math.abs(pct).toLocaleString("vi-VN", { maximumFractionDigits: 1 })}%`;
+    const sub = prev > 0 ? `${dmTs(c.from)}–${dmTs(c.to)}: ${short(prev)} · chênh ${short(curQuy - prev)}` : `${dmTs(c.from)}–${dmTs(c.to)}: không có dữ liệu`;
+    return `<div class="kpi ${cls}"><div class="lb">${c.label}</div><div class="vl">${val}</div><div class="sb">${sub}</div></div>`;
+  };
+  document.getElementById("cmpCards").innerHTML =
+    `<div class="kpi"><div class="lb">Quỹ thưởng kỳ (${dmTs(P.curFrom)}–${dmTs(P.curTo)})</div><div class="vl">${short(curQuy)}</div><div class="sb">${nData} ngày dữ liệu · ${vndFull(curQuy)} đ</div></div>`
+    + P.comps.map(cmpCard).join("")
+    + `<div class="kpi"><div class="lb">Doanh thu kỳ</div><div class="vl">${short(curDt)}</div><div class="sb">${vndFull(curDt)} đ</div></div>`;
+
+  // ---- Phân tích nhanh (theo QUỸ THƯỞNG) ----
+  const c0 = P.comps[0];
+  const aggR = (from, to) => { const m = new Map(); for (const r of REV) { if (!passDimRep(r) || r.ts < from || r.ts > to) continue; let e = m.get(r.store); if (!e) { e = { bp: r.bp, v: 0 }; m.set(r.store, e); } e.v += r.quy; } return m; };
+  const Acur = aggR(P.curFrom, P.curTo), Bprev = aggR(c0.from, c0.to);
+  const stores = [...new Set([...Acur.keys(), ...Bprev.keys()])].map(s => { const a = Acur.get(s), b = Bprev.get(s); return { store: s, bp: (a || b).bp, a: a ? a.v : 0, b: b ? b.v : 0, d: (a ? a.v : 0) - (b ? b.v : 0) }; });
+  const gainers = stores.filter(x => x.d > 0).sort((x, y) => y.d - x.d).slice(0, 2);
+  const losers = stores.filter(x => x.d < 0).sort((x, y) => x.d - y.d).slice(0, 2);
+  const topStore = [...Acur.entries()].map(([s, e]) => ({ s, v: e.v })).sort((a, b) => b.v - a.v)[0];
+  const parts = [`Kỳ <b>${dmTs(P.curFrom)}–${dmTs(P.curTo)}</b> đạt quỹ thưởng <b>${short(curQuy)}</b>`];
+  P.comps.forEach(c => { const pv = repSum(c.from, c.to, "quy"); if (pv > 0) { const pc2 = (curQuy - pv) / pv * 100, u = (curQuy - pv) >= 0; parts.push(`${u ? "tăng" : "giảm"} <b style="color:${u ? "var(--ok)" : "var(--err)"}">${u ? "+" : ""}${pc2.toLocaleString("vi-VN", { maximumFractionDigits: 1 })}%</b> ${c.name}`); } });
+  let txt = parts.join(" — ") + ".";
+  if (gainers.length) txt += ` Kéo tăng quỹ chủ yếu nhờ ${gainers.map(g => `<b>${g.store}</b> (+${short(g.d)})`).join(", ")}`;
+  if (losers.length) txt += `; trong khi ${losers.map(g => `<b>${g.store}</b> (${short(g.d)})`).join(", ")}`;
+  txt += ".";
+  if (topStore) txt += ` Điểm bán dẫn đầu quỹ thưởng: <b>${topStore.s}</b> (${short(topStore.v)}${curQuy > 0 ? ", " + (topStore.v / curQuy * 100).toLocaleString("vi-VN", { maximumFractionDigits: 0 }) + "% tổng" : ""}).`;
+  const dimSel = [F.rep_bp.join("/"), F.rep_tram.join("/"), F.rep_dt.map(diemTramLabel).join("/")].filter(Boolean).join(" · ");
+  document.getElementById("repAnalysis").innerHTML = `<div class="alert i"><div><b>✦ PHÂN TÍCH NHANH</b><br>${txt}${dimSel ? ` <span class="muted">(đang lọc: ${dimSel})</span>` : ""}</div></div>`;
+
+  // ---- Biểu đồ diễn biến: kỳ này vs kỳ so sánh gần nhất ----
+  document.getElementById("repCmpName").textContent = c0.name;
+  let labels = [], sA = [], sB = [];
+  if (P.yearMode) {
+    for (let mm = 0; mm < P.lm; mm++) {
+      labels.push("T" + (mm + 1)); let a = 0, b = 0;
+      for (const r of REV) { if (!passDimRep(r)) continue; const d = new Date(r.ts); if (d.getFullYear() === P.ly && d.getMonth() === mm) a += r.quy; else if (d.getFullYear() === P.ly - 1 && d.getMonth() === mm) b += r.quy; }
+      sA.push(a); sB.push(b);
+    }
+  } else {
+    const mAll = new Map();
+    for (const r of REV) { if (!passDimRep(r)) continue; mAll.set(r.ts, (mAll.get(r.ts) || 0) + r.quy); }
+    for (let i = 0; i < P.nDays; i++) {
+      const ta = P.curFrom + i * DAY, tb = c0.from + i * DAY;
+      labels.push(F.rep_mode === "week" ? (["T2", "T3", "T4", "T5", "T6", "T7", "CN"][i] || String(i + 1)) : String(new Date(ta).getDate()));
+      sA.push(ta <= P.curTo ? (mAll.get(ta) ?? 0) : null);
+      sB.push(tb <= c0.to ? (mAll.get(tb) ?? null) : null);
+    }
+  }
+  chart("cRepCmp", { type: "line",
+    data: { labels, datasets: [
+      { label: "Kỳ này", data: sA, borderColor: "#2563eb", backgroundColor: "#2563eb", borderWidth: 2.4, pointRadius: 2, tension: .25, spanGaps: true },
+      { label: c0.name, data: sB, borderColor: "#9aa5b6", backgroundColor: "#9aa5b6", borderWidth: 2, borderDash: [5, 4], pointRadius: 0, tension: .25, spanGaps: true } ] },
+    options: { maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
+      plugins: { legend: { labels: { boxWidth: 12, font: { size: 11 } } }, tooltip: { callbacks: { label: c => c.dataset.label + ": " + (c.parsed.y == null ? "—" : vnd(c.parsed.y)) } } },
+      scales: { x: { ticks: { font: { size: 10 } }, grid: { display: false } }, y: { ticks: { callback: short, font: { size: 10 } }, grid: { color: "#eef1f6" } } } } });
+
+  // ---- Biểu đồ theo ngày (hoặc theo tháng nếu chọn Năm) ----
+  const perBar = metric => {
+    if (P.yearMode) { const arr = []; for (let mm = 0; mm < P.lm; mm++) { let v = 0; for (const r of REV) { if (!passDimRep(r)) continue; const d = new Date(r.ts); if (d.getFullYear() === P.ly && d.getMonth() === mm) v += metric === "quy" ? r.quy : r.dt; } arr.push(["T" + (mm + 1), v]); } return arr; }
+    const m = new Map(); for (const r of REV) { if (!passDimRep(r) || r.ts < P.curFrom || r.ts > P.curTo) continue; m.set(r.ts, (m.get(r.ts) || 0) + (metric === "quy" ? r.quy : r.dt)); }
+    return [...m.entries()].sort((a, b) => a[0] - b[0]).map(([ts, v]) => [String(new Date(ts).getDate()), v]);
+  };
+  const barCfg = (data, color) => ({ type: "bar", data: { labels: data.map(x => x[0]), datasets: [{ data: data.map(x => x[1]), backgroundColor: color }] },
+    options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => vnd(c.parsed.y) } } }, scales: { x: { ticks: { font: { size: 9 }, maxRotation: 0, autoSkipPadding: 10 }, grid: { display: false } }, y: { ticks: { callback: short, font: { size: 10 } }, grid: { color: "#eef1f6" } } } } });
+  chart("cRepDt", barCfg(perBar("dt"), "#93b4f5"));
+  chart("cRepQuy", barCfg(perBar("quy"), "#e6a552"));
+
+  // ---- Bảng so sánh theo cửa hàng (kỳ này vs kỳ so sánh gần nhất) ----
+  const prev0 = repSum(c0.from, c0.to, "quy");
+  const rows = stores.slice().sort((x, y) => y.a - x.a);
+  document.getElementById("cmpTblSub").textContent = `Quỹ thưởng · kỳ này vs ${c0.name}`;
+  tbl(document.getElementById("tCmp"), [
+    { t: "Cửa hàng", f: r => `<span class="mono">${r.store}</span>` },
+    { t: "Bộ phận", f: r => `<span class="pill ${r.bp === "Kiosk" ? "k" : "s"}">${r.bp}</span>` },
+    { t: "Kỳ này", a: "r", f: r => `<b>${vnd(r.a)}</b>` },
+    { t: "Kỳ so sánh", a: "r", f: r => `<span class="muted">${vnd(r.b)}</span>` },
+    { t: "Chênh lệch", a: "r", f: r => `<span style="color:${r.d >= 0 ? "var(--ok)" : "var(--err)"}">${r.d >= 0 ? "+" : ""}${vnd(r.d)}</span>` },
+    { t: "%", a: "r", f: r => r.b > 0 ? `<span style="color:${r.d >= 0 ? "var(--ok)" : "var(--err)"}">${r.d >= 0 ? "▲ +" : "▼ "}${(r.d / r.b * 100).toLocaleString("vi-VN", { maximumFractionDigits: 1 })}%</span>` : "—" },
+  ], rows, { "Cửa hàng": "TỔNG", "Kỳ này": vnd(curQuy), "Kỳ so sánh": vnd(prev0), "Chênh lệch": (curQuy - prev0 >= 0 ? "+" : "") + vnd(curQuy - prev0), "%": prev0 > 0 ? ((curQuy - prev0) / prev0 * 100).toLocaleString("vi-VN", { maximumFractionDigits: 1 }) + "%" : "—" });
+}
+
+/* ================== BẢNG THI ĐUA (loại Partime) ================== */
+function empPeriod(from, to) {
+  const m = new Map();
+  for (const r of RES.rows) {
+    if (r.cv === "partime") continue;
+    if (TD.cv.length && !TD.cv.includes(r.chuc_vu)) continue;
+    const ts = r.d ? r.d.getTime() : tsOf(r.ngay_key);
+    if (ts < from || ts > to) continue;
+    let e = m.get(r.ma_nv);
+    if (!e) { e = { ma: r.ma_nv, ht: r.ho_ten, cv: r.chuc_vu, q: r.ma_cua_hang, tn: 0, gio: 0, days: new Set() }; m.set(r.ma_nv, e); }
+    e.tn += r.thuc_nhan; e.gio += r.gio_lam; if (r.gio_lam > 0) e.days.add(r.ngay_key); e.q = r.ma_cua_hang;
+  }
+  return [...m.values()].map(e => ({ ...e, ngay: e.days.size }));
+}
+function tdRange() {
+  if (TD.mode === "week") {
+    if (TD.weekStart == null) TD.weekStart = mondayOf(maxDataTs());
+    const from = TD.weekStart, to = from + 6 * DAY;
+    return { from, to, prevFrom: from - 7 * DAY, prevTo: to - 7 * DAY,
+      label: `Tuần ${isoWeek(from)} · ${dmyTs(from)} – ${dmyTs(to)}`, unit: "tuần" };
+  }
+  const ym = TD.month || [...new Set(RES.rows.map(r => r.nam_thang))].sort().slice(-1)[0];
+  TD.month = ym; const [y, m] = ym.split("/").map(Number);
+  const from = new Date(y, m - 1, 1).getTime(), to = new Date(y, m, 0).getTime();
+  const [py, pm] = prevMonthYM(ym).split("/").map(Number);
+  return { from, to, prevFrom: new Date(py, pm - 1, 1).getTime(), prevTo: new Date(py, pm, 0).getTime(),
+    label: `Tháng ${m}/${y}`, unit: "tháng" };
+}
+const TD_CHEERS = [
+  "Mỗi giờ làm là một bước tiến — bứt phá nào! 💪",
+  "Mỗi nỗ lực đều đáng trân trọng — dù đứng ở đâu, bạn cũng đang góp phần làm nên VRS. Cùng bứt phá nhé!",
+  "Hôm nay cố thêm một chút, ngày mai rực rỡ hơn! 🌟",
+  "Không ai bị bỏ lại phía sau — cả đội cùng tiến! 🚀",
+  "Tuần mới, cơ hội mới. Cùng nhau tỏa sáng trên bảng vàng! ✨",
+  "Chậm mà chắc, đều mà bền — VRS ghi nhận từng bước chân của bạn 💜",
+];
+function storePeriod(from, to) {
+  const m = new Map();
+  for (const r of RES.rows) { if (r.cv === "partime") continue; if (TD.cv.length && !TD.cv.includes(r.chuc_vu)) continue; const ts = r.d ? r.d.getTime() : tsOf(r.ngay_key); if (ts < from || ts > to) continue; m.set(r.ma_cua_hang, (m.get(r.ma_cua_hang) || 0) + r.thuc_nhan); }
+  return m;
+}
+function renderThidua() {
+  const rg = tdRange();
+  const money = n => vndFull(n) + " đ";
+  document.querySelectorAll("#tdMode .chip").forEach(c => c.classList.toggle("on", c.dataset.m === TD.mode));
+  // lọc chức danh MULTI-SELECT (loại Partime; chọn nhiều cấp cùng lúc để gửi riêng)
+  const cvOpts = uniq(RES.rows.filter(r => r.cv !== "partime" && r.chuc_vu).map(r => r.chuc_vu));
+  if (!Array.isArray(TD.cv)) TD.cv = TD.cv ? [TD.cv] : [];
+  TD.cv = TD.cv.filter(c => cvOpts.includes(c));
+  const cvChips = document.getElementById("tdCvChips");
+  if (cvChips) {
+    cvChips.innerHTML = `<button class="chip ${TD.cv.length ? "" : "on"}" data-cv="">Tất cả</button>` + cvOpts.map(c => `<button class="chip ${TD.cv.includes(c) ? "on" : ""}" data-cv="${esc2(c)}">${esc2(c)}</button>`).join("");
+    cvChips.querySelectorAll(".chip").forEach(b => b.onclick = () => {
+      const v = b.dataset.cv;
+      if (!v) TD.cv = [];
+      else { const i = TD.cv.indexOf(v); if (i >= 0) TD.cv.splice(i, 1); else TD.cv.push(v); }
+      renderThidua();
+    });
+  }
+  document.getElementById("tdNav").style.visibility = TD.mode === "week" ? "visible" : "hidden";
+  document.getElementById("tdPeriodLabel").textContent = rg.label;
+  document.getElementById("tdSubLabel").textContent = "KỲ THI ĐUA";
+  const cheer = document.getElementById("tdCheer"); if (cheer) cheer.textContent = "💜 " + TD_CHEERS[Math.floor(Math.random() * TD_CHEERS.length)];
+
+  const cur = empPeriod(rg.from, rg.to).filter(e => e.tn > 0).sort((a, b) => b.tn - a.tn);
+  const prev = empPeriod(rg.prevFrom, rg.prevTo).filter(e => e.tn > 0).sort((a, b) => b.tn - a.tn);
+  const prevRank = new Map(prev.map((e, i) => [e.ma, i + 1]));
+  cur.forEach((e, i) => { e.rank = i + 1; e.prevRank = prevRank.get(e.ma) || null; e.delta = e.prevRank ? e.prevRank - e.rank : null; });
+
+  const tong = sum(cur, e => e.tn), quan = cur[0];
+  const nQuay = new Set(cur.map(e => e.q)).size;
+  document.getElementById("tdStats").innerHTML = [
+    ["Thưởng quán quân " + rg.unit, quan ? money(quan.tn) : "—"],
+    ["Tổng thưởng toàn đội", money(tong)],
+    ["Nhân viên tranh tài", cur.length],
+    ["Quầy tham gia", nQuay],
+  ].map(([l, v]) => `<div class="td-stat"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+  const podium = [cur[1], cur[0], cur[2]], pRank = [2, 1, 3];
+  document.getElementById("tdPodium").innerHTML = podium.map((e, i) => {
+    if (!e) return `<div class="td-pod r${pRank[i]}"><div class="empty2">—</div></div>`;
+    return `<div class="td-pod r${pRank[i]}"><div class="medal-badge m${pRank[i]}">${pRank[i]}</div>
+      <div class="ava">${initials(e.ht || e.ma)}</div><div class="pname">${esc2(e.ht || e.ma)}</div>
+      <div class="prole">${esc2(e.cv)} · ${esc2(e.q)}</div><div class="pmoney">${money(e.tn)}</div>
+      <div class="prankbar">${pRank[i]}</div></div>`;
+  }).join("");
+
+  const champ = cur[0];
+  const bstar = cur.filter(e => e.delta != null && e.delta > 0).sort((a, b) => b.delta - a.delta)[0];
+  const worker = empPeriod(rg.from, rg.to).filter(e => e.cv !== "partime").sort((a, b) => b.gio - a.gio)[0];
+  document.getElementById("tdHonors").innerHTML = [
+    ["QUÁN QUÂN " + rg.unit.toUpperCase(), "👑", champ ? esc2(champ.ht) : "—", champ ? `${esc2(champ.cv)} · Quầy ${esc2(champ.q)}` : ""],
+    ["NGÔI SAO BỨT PHÁ", "🚀", bstar ? esc2(bstar.ht) : "—", bstar ? `▲${bstar.delta} bậc so với ${rg.unit} trước` : "chưa có so sánh"],
+    ["CHĂM CHỈ NHẤT", "🔥", worker ? esc2(worker.ht) : "—", worker ? `${gio(worker.gio)} giờ · ${worker.ngay} ngày công` : ""],
+  ].map(([l, ic, n, s]) => `<div class="td-honor"><div class="hi">${ic}</div><div><div class="hl">${l}</div><div class="hn">${n}</div><div class="hs">${s}</div></div></div>`).join("");
+
+  document.getElementById("tdRankBody").innerHTML = cur.map((e, i) => {
+    const med = i < 3 ? `<span class="rk-medal m${i + 1}">${i + 1}</span>` : `<span class="rk-num">${i + 1}</span>`;
+    const dl = e.delta == null ? `<span class="dl-new">✨ tân binh</span>`
+      : e.delta > 0 ? `<span class="dlu">▲${e.delta} bứt phá</span>`
+      : e.delta < 0 ? `<span class="dl-flat">🔥 sẵn sàng bứt tốc</span>`
+      : `<span class="dl-flat">💪 giữ nhịp</span>`;
+    return `<tr><td class="rk-c">${med}</td><td><div class="rk-name">${esc2(e.ht || e.ma)}</div><div class="rk-sub">${esc2(e.cv)} · Quầy ${esc2(e.q)}</div></td><td class="rk-d">${dl}</td><td class="rk-m">${money(e.tn)}</td></tr>`;
+  }).join("") || '<tr><td colspan="4" style="padding:24px;text-align:center;color:#c9b8f0">Chưa có dữ liệu kỳ này</td></tr>';
+
+  // ---- Tốp điểm bán dẫn đầu về thưởng (5) ----
+  const curStore = [...storePeriod(rg.from, rg.to)].map(([q, tn]) => ({ q, tn })).filter(x => x.tn > 0).sort((a, b) => b.tn - a.tn);
+  const maxS = Math.max(1, ...curStore.map(x => x.tn));
+  document.getElementById("tdTopStore").innerHTML = curStore.slice(0, 5).map((e, i) => `
+    <div class="td-srow"><span class="rk-medal ${i < 3 ? "m" + (i + 1) : "m0b"}">${i + 1}</span>
+      <span class="ts-name">${esc2(e.q)}</span>
+      <span class="ts-bar"><i style="width:${e.tn / maxS * 100}%"></i></span>
+      <span class="ts-val">${money(e.tn)}</span></div>`).join("") || '<div class="td-sempty">Chưa có dữ liệu kỳ này</div>';
+
+  // ---- Điểm bán đang bứt tốc (15) — quầy tăng hạng / tăng thưởng mạnh nhất ----
+  const prevStore = storePeriod(rg.prevFrom, rg.prevTo);
+  const prevSRank = new Map([...prevStore].sort((a, b) => b[1] - a[1]).map((x, i) => [x[0], i + 1]));
+  const curSRank = new Map(curStore.map((x, i) => [x.q, i + 1]));
+  const burst = curStore.map(e => {
+    const p = prevStore.get(e.q) || 0, pr = prevSRank.get(e.q) || null;
+    return { ...e, prevTn: p, delta: pr ? pr - curSRank.get(e.q) : null, growth: p > 0 ? (e.tn - p) / p : null };
+  }).filter(e => e.delta == null || e.delta > 0 || (e.growth != null && e.growth > 0.05))
+    .sort((a, b) => (b.delta ?? 60) - (a.delta ?? 60) || (b.growth ?? 0) - (a.growth ?? 0))
+    .slice(0, 15);
+  document.getElementById("tdBurstStore").innerHTML = burst.map(e => {
+    const tag = e.delta == null ? `<span class="ts-tag new">🆕 mới lên sàn</span>`
+      : e.delta > 0 ? `<span class="ts-tag up">▲${e.delta} bậc</span>`
+        : `<span class="ts-tag">🔥 đang tăng</span>`;
+    const gr = e.growth != null && e.growth > 0 ? `<span class="ts-gr">+${(e.growth * 100).toLocaleString("vi-VN", { maximumFractionDigits: 0 })}%</span>` : "";
+    return `<div class="td-srow"><span class="ts-rocket">🚀</span>
+      <span class="ts-name">${esc2(e.q)} ${gr}</span>
+      <span class="ts-bar"><i style="width:${e.tn / maxS * 100}%"></i></span>
+      <span class="ts-val">${tag} ${money(e.tn)}</span></div>`;
+  }).join("") || '<div class="td-sempty">Chưa có quầy nào bứt tốc kỳ này — tuần tới cùng cố gắng nhé! 💪</div>';
+
+  burstFx();
+}
+
+/* ================== PHÁO HOA (trang Thi đua) ================== */
+let fxRAF = null, fxP = [], fxCv = null, fxCtx = null, fxLast = 0;
+const FX_COLORS = ["#f5c542", "#ff6b9d", "#5fe39b", "#7fb2ff", "#c084fc", "#ffd166", "#ff9770"];
+function fxResize() { if (!fxCv) return; const w = fxCv.parentElement; fxCv.width = w.clientWidth; fxCv.height = w.clientHeight; }
+function burstFx(x, y) {
+  if (!fxCv) return;
+  x = x ?? Math.random() * fxCv.width; y = y ?? (Math.random() * fxCv.height * 0.5 + 30);
+  const n = 26 + Math.random() * 20, base = FX_COLORS[Math.floor(Math.random() * FX_COLORS.length)];
+  for (let i = 0; i < n; i++) { const a = Math.PI * 2 * i / n, sp = 1.4 + Math.random() * 3.4;
+    fxP.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 1, life: 1, col: Math.random() < .3 ? FX_COLORS[Math.floor(Math.random() * FX_COLORS.length)] : base }); }
+}
+function fxFrame(t) {
+  fxRAF = requestAnimationFrame(fxFrame);
+  if (!fxCtx) return;
+  fxCtx.clearRect(0, 0, fxCv.width, fxCv.height);
+  if (t - fxLast > 700) { fxLast = t; burstFx(); }
+  for (const p of fxP) { p.x += p.vx; p.y += p.vy; p.vy += 0.05; p.vx *= 0.99; p.life -= 0.011;
+    fxCtx.globalAlpha = Math.max(0, p.life); fxCtx.fillStyle = p.col; fxCtx.beginPath(); fxCtx.arc(p.x, p.y, 2.5, 0, 7); fxCtx.fill(); }
+  fxCtx.globalAlpha = 1; fxP = fxP.filter(p => p.life > 0);
+}
+function startFx() {
+  fxCv = document.getElementById("tdFx"); if (!fxCv || !fxCv.getContext) return;
+  fxCtx = fxCv.getContext("2d"); if (!fxCtx || typeof fxCtx.clearRect !== "function") { fxCtx = null; return; }
+  fxResize();
+  for (let i = 0; i < 3; i++) setTimeout(() => burstFx(), i * 200);
+  if (!fxRAF) fxRAF = requestAnimationFrame(fxFrame);
+}
+function stopFx() { if (fxRAF) { cancelAnimationFrame(fxRAF); fxRAF = null; } fxP = []; if (fxCtx && fxCv && typeof fxCtx.clearRect === "function") fxCtx.clearRect(0, 0, fxCv.width, fxCv.height); }
+window.addEventListener("resize", fxResize);
+const esc2 = s => String(s ?? "").replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+const initials = s => { const p = String(s || "").trim().split(/\s+/); return ((p[p.length - 2]?.[0] || "") + (p[p.length - 1]?.[0] || "")).toUpperCase() || "?"; };
+
+/* ================== DANH SÁCH NV (Kiosk / Siêu thị) ================== */
+function renderNvList(elId, R, selStore, bp, empKey) {
+  const emp = empKey ? F[empKey] : "";
+  const list = (selStore ? R.filter(r => r.ma_cua_hang === selStore) : R).filter(r => r.cv !== "partime" && (!emp || r.ma_nv === emp));
+  const tab = F.nvTab || "nv";
+  document.querySelectorAll("#" + elId + "Tab .chip").forEach(c => c.classList.toggle("on", c.dataset.n === tab));
+  const head = document.getElementById(elId + "Head");
+  if (head) head.innerHTML = selStore
+    ? `Danh sách NV — quầy <span class="mono">${selStore}</span> <button class="miniClr" id="${elId}Clear">× xem tất cả</button>`
+    : `Danh sách NV (${bp}) — bấm một quầy ở bảng trên để lọc`;
+  const elNv = document.getElementById(elId);
+  if (tab === "ct") {
+    elNv.className = "pivot";
+    elNv.innerHTML = pivotHtml(list, r => r.thuc_nhan, "thực nhận", short); scrollPivotRight(elNv);
+  } else {
+    elNv.className = "";
+    const m = new Map();
+    list.forEach(r => { const k = r.ma_nv + "|" + r.ma_cua_hang; let e = m.get(k); if (!e) { e = { ma: r.ma_nv, ht: r.ho_ten, cv: r.chuc_vu, q: r.ma_cua_hang, rows: [], tn: 0 }; m.set(k, e); } e.rows.push(r); e.tn += r.thuc_nhan; });
+    const nv = [...m.values()].map(e => ({ ...e, ...aggNvNgay(e.rows) })).sort((a, b) => b.tn - a.tn).map((e, i) => ({ ...e, stt: i + 1 }));
+    tbl(document.getElementById(elId), [
+      { t: "#", a: "r", f: r => `<span class="muted">${r.stt}</span>` },
+      { t: "Mã NV", f: r => `<span class="mono">${r.ma}</span>` },
+      { t: "Họ tên", f: r => `<b>${esc2(r.ht) || "—"}</b>` },
+      { t: "Chức danh", f: r => cvPill(r.cv) },
+      { t: "Cửa hàng", f: r => `<span class="mono">${r.q}</span>` },
+      { t: "Ngày công", a: "r", f: r => r.ngay },
+      { t: "Giờ", a: "r", f: r => gio(r.gio) },
+      { t: "THỰC NHẬN", a: "r", f: r => `<b>${vnd(r.tn)}</b>` },
+    ], nv);
+  }
+  const clr = document.getElementById(elId + "Clear");
+  if (clr) clr.onclick = () => { STORE_SEL[bp] = ""; renderAll(); };
+}
+const STORE_SEL = { Kiosk: "", "Siêu thị": "" };
+function wireStoreClicks(tableId, byQ, bp) {
+  const tb = document.getElementById(tableId).querySelector("tbody");
+  if (!tb) return;
+  [...tb.rows].forEach((tr, i) => {
+    if (!byQ[i]) return;
+    tr.style.cursor = "pointer";
+    if (byQ[i].q === STORE_SEL[bp]) tr.classList.add("rowsel");
+    tr.onclick = () => { STORE_SEL[bp] = STORE_SEL[bp] === byQ[i].q ? "" : byQ[i].q; renderAll(); };
+  });
+}
+
+/* ================== DANH SÁCH DATA (xem dữ liệu gốc) ================== */
+const dmyD = d => (d instanceof Date && !isNaN(d)) ? `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}` : "—";
+const DV_CFG = {
+  nv: {
+    label: "Nhân viên", rows: () => RAW.nhan_vien || [], emp: true,
+    sort: (a, b) => (a.ma_cua_hang || "").localeCompare(b.ma_cua_hang || "") || (a.ho_ten || "").localeCompare(b.ho_ten || "", "vi"),
+    filters: [["dv_tram", "Trạm", r => tram(r.ma_cua_hang)], ["dv_bp", "Bộ phận", r => boPhan(r.ma_cua_hang)], ["dv_ch", "Cửa hàng", r => r.ma_cua_hang], ["dv_cv", "Chức vụ", r => r.chuc_vu], ["dv_thang", "Tháng", r => String(r.thang)]],
+    cols: [
+      { t: "Mã NV", f: r => `<span class="mono">${esc2(r.ma_nv)}</span>` },
+      { t: "Họ tên", f: r => esc2(r.ho_ten) || "—" },
+      { t: "Chức vụ", f: r => cvPill(r.chuc_vu) },
+      { t: "Hệ số KPI", a: "r", f: r => r.he_so_kpi != null ? gio(r.he_so_kpi) : "—" },
+      { t: "Cửa hàng", f: r => `<span class="mono">${esc2(r.ma_cua_hang)}</span>` },
+      { t: "Trạm", f: r => `<span class="mono">${tram(r.ma_cua_hang)}</span>` },
+      { t: "Bộ phận", f: r => `<span class="pill ${boPhan(r.ma_cua_hang) === "Kiosk" ? "k" : "s"}">${boPhan(r.ma_cua_hang)}</span>` },
+      { t: "Tháng", a: "r", f: r => r.thang ?? "—" },
+    ],
+  },
+  cc: {
+    label: "Cơ chế khoán", rows: () => RAW.co_che || [],
+    sort: (a, b) => (a.ma_cua_hang || "").localeCompare(b.ma_cua_hang || "") || (a.thang - b.thang),
+    filters: [["dv_tram", "Trạm", r => tram(r.ma_cua_hang)], ["dv_bp", "Bộ phận", r => boPhan(r.ma_cua_hang)], ["dv_ch", "Cửa hàng", r => r.ma_cua_hang], ["dv_thang", "Tháng", r => String(r.thang)]],
+    cols: [
+      { t: "Cửa hàng", f: r => `<span class="mono">${esc2(r.ma_cua_hang)}</span>` },
+      { t: "Trạm", f: r => `<span class="mono">${tram(r.ma_cua_hang)}</span>` },
+      { t: "Bộ phận", f: r => `<span class="pill ${boPhan(r.ma_cua_hang) === "Kiosk" ? "k" : "s"}">${boPhan(r.ma_cua_hang)}</span>` },
+      { t: "Tháng", a: "r", f: r => r.thang ?? "—" },
+      { t: "Mốc DT KPI", a: "r", f: r => r.moc_dt_kpi ? vnd(r.moc_dt_kpi) : "—" },
+      { t: "% dưới mốc", a: "r", f: r => r.pct_duoi_moc != null ? pc(r.pct_duoi_moc) : "—" },
+      { t: "% vượt mốc", a: "r", f: r => r.pct_vuot_moc != null ? pc(r.pct_vuot_moc) : "—" },
+    ],
+  },
+  dt: {
+    label: "Doanh thu", rows: () => RAW.doanh_thu || [],
+    sort: (a, b) => (b.ngay_thang - a.ngay_thang) || (a.ma_cua_hang || "").localeCompare(b.ma_cua_hang || ""),
+    filters: [["dv_tram", "Trạm", r => tram(r.ma_cua_hang)], ["dv_bp", "Bộ phận", r => boPhan(r.ma_cua_hang)], ["dv_ch", "Cửa hàng", r => r.ma_cua_hang], ["dv_thang", "Tháng", r => String(r.ngay_thang instanceof Date ? r.ngay_thang.getMonth() + 1 : "")]],
+    cols: [
+      { t: "Ngày", f: r => dmyD(r.ngay_thang) },
+      { t: "Cửa hàng", f: r => `<span class="mono">${esc2(r.ma_cua_hang)}</span>` },
+      { t: "Trạm", f: r => `<span class="mono">${tram(r.ma_cua_hang)}</span>` },
+      { t: "Bộ phận", f: r => `<span class="pill ${boPhan(r.ma_cua_hang) === "Kiosk" ? "k" : "s"}">${boPhan(r.ma_cua_hang)}</span>` },
+      { t: "Doanh thu", a: "r", f: r => `<b>${vnd(r.doanh_thu)}</b>` },
+    ],
+  },
+  gl: {
+    label: "Giờ làm", rows: () => RAW.gio_lam || [], emp: true,
+    sort: (a, b) => (b.thang - a.thang) || (b.ngay - a.ngay) || (a.ma_cua_hang || "").localeCompare(b.ma_cua_hang || ""),
+    filters: [["dv_tram", "Trạm", r => tram(r.ma_cua_hang)], ["dv_bp", "Bộ phận", r => boPhan(r.ma_cua_hang)], ["dv_ch", "Cửa hàng", r => r.ma_cua_hang], ["dv_cv", "Chức vụ", r => r.chuc_vu], ["dv_thang", "Tháng", r => String(r.thang)]],
+    cols: [
+      { t: "Tháng", a: "r", f: r => r.thang ?? "—" },
+      { t: "Ngày", a: "r", f: r => r.ngay ?? "—" },
+      { t: "Mã NV", f: r => `<span class="mono">${esc2(r.ma_nv)}</span>` },
+      { t: "Họ tên", f: r => esc2(r.ho_ten) || "—" },
+      { t: "Chức vụ", f: r => cvPill(r.chuc_vu) },
+      { t: "Cửa hàng", f: r => `<span class="mono">${esc2(r.ma_cua_hang)}</span>` },
+      { t: "Trạm", f: r => `<span class="mono">${tram(r.ma_cua_hang)}</span>` },
+      { t: "Giờ làm", a: "r", f: r => r.gio_lam > 12 ? `<span class="neg"><b>${gio(r.gio_lam)}</b></span>` : gio(r.gio_lam) },
+    ],
+  },
+};
+const DV_FILTER_KEYS = ["dv_tram", "dv_bp", "dv_ch", "dv_cv", "dv_thang"];
+function dvNumOpts(opts) { return opts.slice().sort((a, b) => (isFinite(+a) && isFinite(+b)) ? (+a - +b) : String(a).localeCompare(String(b), "vi")); }
+function renderData() {
+  const cfg = DV_CFG[F.dv_ds] || DV_CFG.nv;
+  document.querySelectorAll("#dvTabs .chip").forEach(c => c.classList.toggle("on", c.dataset.d === F.dv_ds));
+  const all = cfg.rows();
+  // options cascade (mỗi filter tính từ dữ liệu đã lọc bởi các filter KHÁC)
+  const passExcept = (r, exceptKey) => cfg.filters.every(([k, , fn]) => k === exceptKey || inSel(fn(r), F[k]));
+  let bar = "";
+  // Tìm nhân viên (dropdown) — chỉ cho tab có nhân viên
+  if (cfg.emp) {
+    const emps = empListOf(all.filter(r => cfg.filters.every(([k, , fn]) => inSel(fn(r), F[k]))));
+    if (F.dv_emp && !emps.some(e => e.ma === F.dv_emp)) F.dv_emp = "";
+    bar += empSelHtml("dv_emp", emps, 250);
+  }
+  cfg.filters.forEach(([k, label, fn]) => {
+    const opts = dvNumOpts(uniq(all.filter(r => passExcept(r, k)).map(fn).filter(x => x !== "" && x != null)));
+    bar += mselHtml(k, label, opts.map(o => ({ v: o, label: o })), 130);
+  });
+  bar += `<div class="f" style="align-self:flex-end"><button class="qbtn dreset" id="dvReset">↺ Đặt lại lọc</button></div>`;
+  document.getElementById("dvBar").innerHTML = bar;
+  wireMSel("dvBar", (key, q) => { renderData(); reopenMSel("dvBar", key, q); });
+  if (cfg.emp) wireEmpSel("dvBar", () => renderData());
+  const rb = document.getElementById("dvReset");
+  if (rb) rb.onclick = () => { F.dv_emp = ""; DV_FILTER_KEYS.forEach(k => F[k] = []); renderData(); };
+  renderDataTable();
+}
+function renderDataTable() {
+  const cfg = DV_CFG[F.dv_ds] || DV_CFG.nv;
+  const all = cfg.rows();
+  let rows = all.filter(r => cfg.filters.every(([k, , fn]) => inSel(fn(r), F[k])) && (!cfg.emp || !F.dv_emp || r.ma_nv === F.dv_emp));
+  rows = rows.slice().sort(cfg.sort);
+  const MAX = 2000, shown = rows.slice(0, MAX);
+  document.getElementById("dvTag").textContent = `${cfg.label} · ${rows.length.toLocaleString("vi-VN")} dòng`;
+  tbl(document.getElementById("tData"), cfg.cols, shown);
+  document.getElementById("dvHint").innerHTML = rows.length > MAX
+    ? `Hiển thị ${MAX.toLocaleString("vi-VN")} / ${rows.length.toLocaleString("vi-VN")} dòng — hãy dùng bộ lọc để thu hẹp.`
+    : `Tổng ${rows.length.toLocaleString("vi-VN")} dòng.`;
+}
+
+/* ================== HƯỚNG DẪN ================== */
+function showGuide(id) {
+  document.querySelectorAll("#p-guide .g-sec").forEach(s => s.style.display = s.dataset.g === id ? "" : "none");
+  document.querySelectorAll("#guideNav button").forEach(b => b.classList.toggle("on", b.dataset.g === id));
+}
+function renderGuide() { /* nội dung tĩnh — không phụ thuộc dữ liệu */ }
+
+/* ================== NAV ================== */
+const RENDER = { dash: renderDash, report: renderReport, thidua: renderThidua, bang: renderBang, kiosk: renderKiosk, st: renderSt, gio: renderGio, data: renderData, check: renderCheck, guide: renderGuide };
+let CUR = "dash";
+function show(p) {
+  CUR = p;
+  document.querySelectorAll(".page").forEach(e => e.classList.remove("on"));
+  document.getElementById("p-" + p).classList.add("on");
+  document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("on", b.dataset.p === p));
+  // Thi đua có bộ chọn kỳ riêng; Kiểm tra không lọc theo ngày → ẩn thanh thời gian
+  const noDate = (p === "thidua" || p === "check" || p === "report" || p === "data" || p === "guide");
+  document.getElementById("dateBar").style.display = noDate ? "none" : "flex";
+  if (!noDate) { syncDate(p); buildDateBar(); }
+  RENDER[p]();
+  if (p === "thidua") startFx(); else stopFx();
+}
+function renderAll() { if (RES) RENDER[CUR](); }
+
+document.querySelectorAll("#nav button").forEach(b => b.addEventListener("click", () => show(b.dataset.p)));
+{ const b = document.getElementById("btnExpCheck"); if (b) b.addEventListener("click", exportCheck); }  // Kiểm tra không có date bar → nút xuất riêng
+document.getElementById("snToggle").addEventListener("click", () => {
+  const b = document.getElementById("snBody"), hidden = b.style.display === "none";
+  b.style.display = hidden ? "" : "none";
+  document.getElementById("snToggle").textContent = hidden ? "Ẩn ▴" : "Hiện ▾";
+});
+/* Báo cáo: chips tuần/tháng + doanh thu/quỹ */
+/* Thi đua: tuần/tháng + điều hướng tuần */
+document.querySelectorAll("#gioTab .chip").forEach(c => c.addEventListener("click", () => { F.gioTab = c.dataset.g; renderGio(); }));
+document.querySelectorAll("#dvTabs .chip").forEach(c => c.addEventListener("click", () => { F.dv_ds = c.dataset.d; F.dv_emp = ""; ["dv_tram", "dv_bp", "dv_ch", "dv_cv", "dv_thang"].forEach(k => F[k] = []); renderData(); }));
+document.querySelectorAll("#guideNav button").forEach(b => b.addEventListener("click", () => showGuide(b.dataset.g)));
+document.querySelectorAll("#tKioskNvTab .chip, #tStNvTab .chip").forEach(c => c.addEventListener("click", () => { F.nvTab = c.dataset.n; renderAll(); }));
+document.querySelectorAll("#bangDetailTab .chip").forEach(c => c.addEventListener("click", () => { B.tab = c.dataset.b; renderBang(); }));
+document.querySelectorAll("#tdMode .chip").forEach(c => c.addEventListener("click", () => { TD.mode = c.dataset.m; renderThidua(); }));
+document.getElementById("tdPrev").addEventListener("click", () => { if (TD.weekStart == null) TD.weekStart = mondayOf(maxDataTs()); TD.weekStart -= 7 * DAY; renderThidua(); });
+document.getElementById("tdNext").addEventListener("click", () => { if (TD.weekStart == null) TD.weekStart = mondayOf(maxDataTs()); TD.weekStart += 7 * DAY; renderThidua(); });
+
+document.addEventListener("click", e => {
+  document.querySelectorAll(".msel-panel.open").forEach(p => { const box = p.closest(".msel"); if (box && !box.contains(e.target)) p.classList.remove("open"); });
+  document.querySelectorAll(".empdd-panel.open").forEach(p => { const box = p.closest(".empdd"); if (box && !box.contains(e.target)) p.classList.remove("open"); });
+});
+document.getElementById("btnRefresh").addEventListener("click", () => tai(true));
+document.getElementById("sideCollapse").addEventListener("click", () => {
+  const sh = document.getElementById("shell"), c = sh.classList.toggle("collapsed");
+  document.getElementById("sideCollapse").textContent = c ? "" : "« Thu gọn";
+});
+window.addEventListener("error", ev => {
+  const boot = document.getElementById("boot"), err = document.getElementById("bootErr");
+  if (boot && boot.style.display !== "none") { boot.style.display = "none"; if (err) { err.style.display = ""; err.innerHTML = `<div class="alert e" style="max-width:760px;margin:40px auto"><b>Lỗi khởi động:</b> ${String(ev.message || "")}<br><small>${String(ev.filename||"")}:${ev.lineno||""}</small></div>`; } }
+});
+tai(false);
+
+</script>
+</body>
+</html>

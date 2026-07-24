@@ -87,9 +87,10 @@ try {
     [
       DASHBOARD_ID,
       "Thưởng khoán",
-      "Dựng lại trong app từ tool Cloudflare Worker của team kinh doanh, để so số " +
-        "và để có một khuôn dashboard chuẩn. Quỹ thưởng sinh từ doanh thu theo mốc " +
-        "KPI của từng quầy, chia cho nhân viên theo giờ làm × hệ số.",
+      "Bê nguyên tool thưởng khoán của team kinh doanh (Cloudflare Worker) vào " +
+        "app: giao diện giữ y hệt, số lấy từ mart.khoan_* qua /api/khoan/data. " +
+        "Quỹ thưởng sinh từ doanh thu theo mốc KPI của từng quầy, chia cho nhân " +
+        "viên theo giờ làm × hệ số.",
     ]
   );
   console.log(`dashboard ${DASHBOARD_ID}`);

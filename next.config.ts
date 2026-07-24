@@ -17,6 +17,10 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       { source: "/bang/doanh-thu-tu-doanh", destination: "/tu-doanh/index.html" },
+      // Dashboard "Thưởng khoán" cũng là app front-end tĩnh (bê nguyên từ tool
+      // Cloudflare Worker của team kinh doanh, xem public/khoan/). Số lấy từ
+      // /api/khoan/data (đọc mart.khoan_*), engine tính thưởng chạy ở client.
+      { source: "/bang/thuong-khoan", destination: "/khoan/index.html" },
     ];
   },
 };
