@@ -111,15 +111,27 @@ async function collectBigQuery(source: SourceFull): Promise<CollectedTable[]> {
     throw new Error("Service-account JSON không hợp lệ.");
   }
   const { BigQuery } = await import("@google-cloud/bigquery");
+  const location = cfg(source, "location");
   const bq = new BigQuery({ projectId: project, credentials });
+
+  // Chỉ lấy các bảng đã khai báo. Dataset thật thường lẫn hàng trăm bảng snapshot
+  // (Revenue-2023-06-10T10_50_48…) — kéo hết vào danh mục là biến nó thành bãi rác.
+  const chiLay = Array.isArray(source.config?.tables)
+    ? (source.config.tables as string[]).map((t) => String(t).trim()).filter(Boolean)
+    : [];
+  const loc = location ? { location } : {};
+
   const [rows] = await bq.query({
     query: `SELECT table_name, column_name, data_type
             FROM \`${project}.${dataset}.INFORMATION_SCHEMA.COLUMNS\`
+            ${chiLay.length ? "WHERE table_name IN UNNEST(@bang)" : ""}
             ORDER BY table_name, ordinal_position`,
+    ...(chiLay.length ? { params: { bang: chiLay } } : {}),
+    ...loc,
   });
   const est = new Map<string, number>();
   try {
-    const [t] = await bq.query({ query: `SELECT table_id, row_count FROM \`${project}.${dataset}.__TABLES__\`` });
+    const [t] = await bq.query({ query: `SELECT table_id, row_count FROM \`${project}.${dataset}.__TABLES__\``, ...loc });
     for (const r of t as Array<{ table_id: string; row_count: number }>) est.set(r.table_id, Number(r.row_count));
   } catch {
     /* view -> bỏ qua */

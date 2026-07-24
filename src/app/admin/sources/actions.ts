@@ -47,6 +47,8 @@ export async function saveSourceAction(
       dataset: String(formData.get("dataset") ?? "").trim(),
       // Bỏ trống thì để BigQuery tự đoán (mặc định US).
       location: String(formData.get("location") ?? "").trim(),
+      // Rỗng = lấy mọi bảng trong dataset.
+      tables: splitList(String(formData.get("tables") ?? "")),
     };
   else if (type === "sheets")
     config = { spreadsheetId: String(formData.get("spreadsheetId") ?? "").trim(), tabs: splitList(String(formData.get("tabs") ?? "")) };

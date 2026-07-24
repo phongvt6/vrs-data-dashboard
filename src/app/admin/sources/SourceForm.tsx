@@ -80,6 +80,16 @@ export default function SourceForm({ initial, isNew }: { initial?: SourceView; i
           </div>
         </div>
       )}
+      {type === "bigquery" && (
+        <div style={{ marginBottom: 14 }}>
+          <label style={lbl}>Bảng cần lấy (cách nhau dấu phẩy)</label>
+          <input name="tables" style={inp} defaultValue={arr(c.tables)} placeholder="doanh_thu_chi_tiet, map_nhom_hang_cu" />
+          <p style={hint}>
+            Để trống = lấy <strong>mọi</strong> bảng trong dataset. Dataset thật thường lẫn
+            hàng trăm bảng snapshot — nên liệt kê đúng bảng cần dùng.
+          </p>
+        </div>
+      )}
       {type === "sheets" && (
         <>
           <div style={{ marginBottom: 14 }}>
