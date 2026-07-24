@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hướng dẫn sử dụng · Doanh thu tự doanh</title>
+<style>
+  :root{
+    --blue:#6366f1; --blue-dk:#4f46e5; --blue-soft:#eef0ff; --blue-brd:#d7dbfb;
+    --nav:#1e1b4b; --nav2:#3730a3; --bg:#f4f5fb; --card:#fff; --ink:#1e2233; --muted:#8b93a7;
+    --line:#e4e8ef; --line2:#eef1f6; --head:#f6f8fc;
+    --green:#10b981; --green-soft:#e5f8f1; --red:#f43f5e; --red-soft:#feecef;
+    --amber:#f59e0b; --amber-soft:#fef4e3; --shadow:0 1px 2px rgba(30,27,75,.05),0 8px 24px rgba(30,27,75,.06);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+  a{color:var(--blue-dk);text-decoration:none}
+  /* Hero */
+  .hero{background:linear-gradient(120deg,var(--nav) 0%,var(--nav2) 100%);color:#fff;padding:30px 0 34px}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 22px}
+  .hero-top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:13px}
+  .brand .logo{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#818cf8,#6366f1);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;box-shadow:0 4px 14px rgba(99,102,241,.5)}
+  .brand h1{margin:0;font-size:19px;font-weight:800;letter-spacing:-.01em}
+  .brand .sub{font-size:12.5px;color:#bfc5ea}
+  .open-app{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--nav);font-weight:700;font-size:13px;padding:9px 16px;border-radius:10px;transition:.15s;box-shadow:0 3px 10px rgba(0,0,0,.15)}
+  .open-app:hover{transform:translateY(-1px)}
+  .hero h2{margin:26px 0 8px;font-size:30px;font-weight:800;letter-spacing:-.02em}
+  .hero p{margin:0;max-width:720px;font-size:14.5px;color:#d5d9f0}
+  .hero .meta{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:#e7e9f8;font-size:12px;font-weight:600;padding:5px 11px;border-radius:99px}
+  /* Layout */
+  .layout{max-width:1160px;margin:26px auto 60px;padding:0 22px;display:grid;grid-template-columns:236px 1fr;gap:30px;align-items:start}
+  /* TOC */
+  .toc{position:sticky;top:20px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+  .toc .toc-t{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:2px 6px 10px}
+  .toc a{display:block;padding:7px 11px;border-radius:8px;font-size:13px;font-weight:600;color:#4a5266;transition:.12s}
+  .toc a:hover{background:var(--blue-soft);color:var(--blue-dk)}
+  .toc a.on{background:var(--blue-soft);color:var(--blue-dk)}
+  .toc a .n{display:inline-block;width:20px;color:var(--muted);font-weight:700}
+  /* Content */
+  .content{min-width:0}
+  section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px 26px;margin-bottom:20px;box-shadow:var(--shadow);scroll-margin-top:18px}
+  section>h3{margin:0 0 4px;font-size:20px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+  section>h3 .ico{width:34px;height:34px;border-radius:9px;background:var(--blue-soft);color:var(--blue-dk);display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
+  section .lead{color:#5a6274;font-size:14px;margin:0 0 16px}
+  h4{margin:22px 0 8px;font-size:15px;font-weight:800;color:var(--ink)}
+  p{margin:10px 0}
+  ul,ol{margin:10px 0;padding-left:22px}
+  li{margin:6px 0}
+  b,strong{color:var(--ink);font-weight:700}
+  code{background:#eef0f6;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#4338ca}
+  .kbd{display:inline-block;background:#fff;border:1px solid #cfd5e2;border-bottom-width:2px;border-radius:6px;padding:1px 7px;font-size:12px;font-weight:700;color:#3a4258}
+  /* Steps */
+  .steps{counter-reset:st;margin:14px 0;padding:0;list-style:none}
+  .steps>li{position:relative;padding:2px 0 14px 42px;margin:0}
+  .steps>li::before{counter-increment:st;content:counter(st);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
+  .steps>li:not(:last-child)::after{content:"";position:absolute;left:13.5px;top:30px;bottom:0;width:2px;background:var(--line)}
+  /* Callouts */
+  .call{border-radius:11px;padding:12px 15px;margin:16px 0;font-size:13.5px;border:1px solid;display:flex;gap:11px;align-items:flex-start}
+  .call .ci{font-size:17px;line-height:1.3;flex:none}
+  .call.tip{background:var(--blue-soft);border-color:var(--blue-brd);color:#39406a}
+  .call.warn{background:var(--amber-soft);border-color:#f3d9a6;color:#7c5310}
+  .call.ok{background:var(--green-soft);border-color:#bce8d6;color:#0b6b4b}
+  .call b{color:inherit}
+  /* Feature cards */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+  .fcard{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fcfdff}
+  .fcard .ft{font-weight:800;font-size:14px;margin-bottom:5px;display:flex;align-items:center;gap:8px}
+  .fcard p{margin:6px 0 0;font-size:13px;color:#4a5266}
+  .pill{display:inline-block;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;padding:2px 8px;border-radius:99px;background:var(--blue-soft);color:var(--blue-dk)}
+  /* Table */
+  table{width:100%;border-collapse:collapse;font-size:13px;margin:14px 0}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line2);vertical-align:top}
+  th{background:var(--head);font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.02em;color:#5a6274}
+  tr:last-child td{border-bottom:none}
+  /* FAQ */
+  details{border:1px solid var(--line);border-radius:11px;padding:2px 16px;margin:10px 0;background:#fcfdff}
+  details[open]{background:#fff;box-shadow:var(--shadow)}
+  summary{cursor:pointer;font-weight:700;font-size:14px;padding:12px 0;list-style:none;display:flex;align-items:center;gap:9px}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"＋";color:var(--blue);font-weight:800;font-size:16px;transition:.15s}
+  details[open] summary::before{content:"−"}
+  details .fa{padding:0 0 14px 25px;font-size:13.5px;color:#4a5266}
+  .foot{text-align:center;color:var(--muted);font-size:12.5px;padding:8px 0 4px}
+  @media(max-width:900px){
+    .layout{grid-template-columns:1fr;gap:18px}
+    .toc{position:static;order:-1}
+    .grid2{grid-template-columns:1fr}
+    .hero h2{font-size:24px}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-top">
+      <div class="brand">
+        <div class="logo">V</div>
+        <div><h1>Doanh thu tự doanh</h1><div class="sub">VRS · Điều hành kinh doanh</div></div>
+      </div>
+      <a class="open-app" href="/bang/doanh-thu-tu-doanh">↗ Mở ứng dụng</a>
+    </div>
+    <h2>Hướng dẫn sử dụng</h2>
+    <p>Tài liệu này giúp quản lý khối làm chủ toàn bộ dashboard phân tích doanh thu tự doanh — từ đọc số liệu, lọc dữ liệu, đến phân tích chuyên sâu và ra quyết định. Đọc một lượt khoảng 10 phút là dùng thành thạo.</p>
+    <div class="meta">
+      <span class="chip">📊 Dữ liệu trực tiếp từ BigQuery</span>
+      <span class="chip">🔄 Cập nhật theo ngày</span>
+      <span class="chip">🗂️ 4 trang phân tích</span>
+      <span class="chip">🤖 Hỗ trợ phân tích AI</span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="toc" id="toc">
+    <div class="toc-t">Nội dung</div>
+    <a href="#gioi-thieu"><span class="n">1</span>Giới thiệu</a>
+    <a href="#giao-dien"><span class="n">2</span>Tổng quan giao diện</a>
+    <a href="#bo-loc"><span class="n">3</span>Bộ lọc & so sánh</a>
+    <a href="#tong-quan"><span class="n">4</span>Trang Tổng quan</a>
+    <a href="#so-sanh"><span class="n">5</span>So sánh thời gian</a>
+    <a href="#nhom-hang"><span class="n">6</span>Nhóm hàng</a>
+    <a href="#danh-sach"><span class="n">7</span>Danh sách hàng hóa</a>
+    <a href="#phan-tich"><span class="n">8</span>Phân tích & kiến nghị</a>
+    <a href="#ai"><span class="n">9</span>Phân tích bằng AI</a>
+    <a href="#quy-trinh"><span class="n">10</span>Quy trình đề xuất</a>
+    <a href="#thuat-ngu"><span class="n">11</span>Thuật ngữ</a>
+    <a href="#faq"><span class="n">12</span>Câu hỏi thường gặp</a>
+  </nav>
+
+  <main class="content">
+
+    <!-- 1 -->
+    <section id="gioi-thieu">
+      <h3><span class="ico">🎯</span> 1. Giới thiệu</h3>
+      <p class="lead">Dashboard <b>Doanh thu tự doanh</b> tổng hợp và phân tích doanh thu hàng hóa bán tại các điểm bán trong trạm (kiosk, siêu thị mini, nhà hàng) — giúp lãnh đạo & quản lý khối nắm nhanh tình hình và ra quyết định.</p>
+      <div class="grid2">
+        <div class="fcard"><div class="ft">📈 Xem gì được?</div><p>Doanh thu theo thời gian, theo trạm/điểm trạm/bộ phận/cửa hàng, theo nhóm hàng & từng mã hàng (SKU), có so sánh với kỳ trước.</p></div>
+        <div class="fcard"><div class="ft">🗄️ Dữ liệu từ đâu?</div><p>Kết nối trực tiếp <b>BigQuery</b> (kho dữ liệu của công ty), <b>cập nhật theo ngày</b>. Mọi con số là dữ liệu thật, không nhập tay.</p></div>
+        <div class="fcard"><div class="ft">🧭 Dùng để làm gì?</div><p>Theo dõi kết quả, phát hiện điểm bán/mặt hàng tăng–giảm bất thường, và nhận <b>kiến nghị hành động</b> để trình lãnh đạo.</p></div>
+        <div class="fcard"><div class="ft">🔐 Ai dùng được?</div><p>Quản lý khối và ban lãnh đạo. Chỉ cần mở đường link trên trình duyệt (máy tính hoặc điện thoại), không cần cài đặt.</p></div>
+      </div>
+      <div class="call tip"><span class="ci">💡</span><div>Mọi số tiền hiển thị dạng rút gọn: <b>M</b> = triệu, <b>B</b> = tỷ. Ví dụ <code>9.9B</code> = 9,9 tỷ đồng; <code>527.2M</code> = 527,2 triệu đồng.</div></div>
+    </section>
+
+    <!-- 2 -->
+    <section id="giao-dien">
+      <h3><span class="ico">🧭</span> 2. Tổng quan giao diện</h3>
+      <p class="lead">Màn hình gồm 3 phần: <b>thanh bên trái</b> (chuyển trang), <b>thanh lọc phía trên</b> (chọn thời gian & bộ lọc), và <b>vùng nội dung</b> ở giữa.</p>
+      <h4>Thanh bên trái — 4 trang phân tích</h4>
+      <table>
+        <tr><th>Trang</th><th>Dùng khi bạn muốn…</th></tr>
+        <tr><td>📊 <b>Tổng quan</b></td><td>Nhìn bức tranh chung: tổng doanh thu, so sánh kỳ, cơ cấu theo trạm/nhóm, xếp hạng điểm bán.</td></tr>
+        <tr><td>📈 <b>So sánh thời gian</b></td><td>So sánh doanh thu giữa các đơn vị (trạm/điểm/bộ phận/cửa hàng) và theo dõi từng điểm trạm chi tiết.</td></tr>
+        <tr><td>📦 <b>Nhóm hàng</b></td><td>Phân tích theo nhóm hàng & mặt hàng: nhóm nào bán chạy, mã nào nên đẩy mạnh / nên bỏ.</td></tr>
+        <tr><td>🗂️ <b>Danh sách hàng hóa</b></td><td>Tra cứu chi tiết từng mã hàng, lọc theo trạm/điểm/bộ phận/cửa hàng.</td></tr>
+      </table>
+      <div class="call tip"><span class="ci">🔽</span><div>Nút <b>Thu gọn</b> ở góc dưới thanh bên giúp thu nhỏ menu để có thêm chỗ xem biểu đồ.</div></div>
+      <h4>Thanh lọc phía trên</h4>
+      <ul>
+        <li><b>Khoảng ngày</b> — hai ô ngày <span class="kbd">Từ</span> → <span class="kbd">Đến</span>, kèm nút nhanh <b>Tuần này / Tháng .. / Năm ..</b>.</li>
+        <li><b>Bộ lọc</b> — Nhóm hàng, Trạm, Điểm trạm, Bộ phận, Cửa hàng (chọn nhiều được, <b>liên thông</b> với nhau).</li>
+        <li><b>↺ Đặt lại</b> — xóa mọi bộ lọc, về tháng hiện tại.</li>
+        <li><b>⟳ Cập nhật dữ liệu</b> — tải lại dữ liệu mới nhất từ kho.</li>
+      </ul>
+    </section>
+
+    <!-- 3 -->
+    <section id="bo-loc">
+      <h3><span class="ico">🔎</span> 3. Bộ lọc & cách so sánh</h3>
+      <p class="lead">Đây là phần quan trọng nhất — chọn đúng thời gian và bộ lọc thì mọi biểu đồ, bảng, phân tích bên dưới sẽ tự cập nhật theo.</p>
+
+      <h4>Chọn khoảng thời gian</h4>
+      <ol class="steps">
+        <li>Bấm nút nhanh <b>Tuần này</b>, <b>Tháng ..</b> hoặc <b>Năm ..</b> để chọn kỳ phổ biến.</li>
+        <li>Hoặc chọn tay ở 2 ô ngày <b>Từ → Đến</b> cho kỳ bất kỳ.</li>
+      </ol>
+
+      <h4>Bộ lọc liên thông (thông minh)</h4>
+      <p>Các bộ lọc <b>Trạm</b> và <b>Bộ phận</b> tự lọc theo nhau: khi bạn chọn một mục, mục kia chỉ còn hiển thị những giá trị thực sự có dữ liệu.</p>
+      <div class="call ok"><span class="ci">✅</span><div>Ví dụ: chọn Bộ phận <b>Nhà hàng</b> → danh sách Trạm tự rút gọn chỉ còn các trạm có nhà hàng. Nhờ vậy bạn không chọn nhầm tổ hợp không có dữ liệu.</div></div>
+      <p>Trong ô lọc, mỗi dòng có nút <b>ONLY</b> (hiện khi rê chuột) để nhanh chóng chỉ xem đúng một mục.</p>
+
+      <h4>Chọn mốc so sánh</h4>
+      <p>Ở các trang có thanh <b>“So sánh với:”</b>, bạn chọn mốc để đối chiếu:</p>
+      <table>
+        <tr><th>Mốc</th><th>Ý nghĩa</th></tr>
+        <tr><td>vs tuần trước</td><td>So với tuần liền trước.</td></tr>
+        <tr><td>vs tháng trước</td><td>So với cùng số ngày của tháng liền trước.</td></tr>
+        <tr><td>vs cùng kỳ năm trước</td><td>So với cùng khoảng thời gian năm ngoái.</td></tr>
+        <tr><td>Lũy kế năm</td><td>Cộng dồn từ đầu năm đến nay.</td></tr>
+      </table>
+      <div class="call tip"><span class="ci">⚖️</span><div><b>So sánh công bằng:</b> nếu tháng này mới có dữ liệu đến ngày 12, hệ thống chỉ lấy <b>ngày 1–12 của tháng trước</b> để so, chứ không lấy cả tháng. Dòng chú thích màu xám dưới tiêu đề luôn ghi rõ khoảng ngày đang đối chiếu.</div></div>
+
+      <h4>⚙️ Khai báo sáp nhập / đổi tên quầy</h4>
+      <p>Khi bạn <b>gộp nhiều quầy thành một</b> hoặc <b>đổi mã/tên quầy</b>, dữ liệu quá khứ vẫn mang mã cũ → so cùng kỳ sẽ khập khiễng (quầy mới "không có lịch sử", quầy cũ "biến mất"). Nút <b>⚙️ Khai báo quầy</b> trên thanh lọc giúp app hiểu và <b>tự quy doanh thu lịch sử của mã cũ về mã hiện tại</b>.</p>
+      <ol class="steps">
+        <li>Bấm <b>⚙️ Khai báo quầy</b> → chọn loại <b>Sáp nhập</b> (nhiều mã cũ → 1) hoặc <b>Đổi tên</b> (1→1).</li>
+        <li>Nhập <b>mã cũ</b> (nhiều mã cách nhau dấu phẩy) và <b>mã chuẩn hiện tại</b>, thêm ghi chú nếu cần, bấm <b>➕ Thêm</b>.</li>
+        <li>Bật <b>Áp dụng gộp lịch sử</b> rồi bấm <b>💾 Lưu & áp dụng</b> — app tự tải lại và gộp số liệu (doanh thu quầy + mã hàng/nhóm hàng) ở <b>mọi trang</b>.</li>
+      </ol>
+      <div class="call tip"><span class="ci">⏱️</span><div>Khai báo dùng chung cho mọi người. Sau khi lưu, số liệu áp dụng đầy đủ trên toàn hệ thống trong khoảng <b>1 phút</b>. Bỏ chọn "Áp dụng gộp lịch sử" để tạm xem số liệu gốc.</div></div>
+    </section>
+
+    <!-- 4 -->
+    <section id="tong-quan">
+      <h3><span class="ico">📊</span> 4. Trang Tổng quan</h3>
+      <p class="lead">Bức tranh tổng thể của kỳ đang chọn.</p>
+      <ul>
+        <li><b>Thẻ chỉ số (KPI)</b> — Doanh thu kỳ, mức tăng/giảm so với các mốc, và sản lượng. Màu <span style="color:var(--green);font-weight:700">xanh = tăng</span>, <span style="color:var(--red);font-weight:700">đỏ = giảm</span>.</li>
+        <li><b>✦ Phân tích nhanh</b> — đoạn tóm tắt tự động: kỳ này đạt bao nhiêu, tăng/giảm vì điểm bán nào.</li>
+        <li><b>Doanh thu theo tháng</b> — cột năm nay so với năm trước.</li>
+        <li><b>Cơ cấu theo Trạm / Điểm trạm / Nhóm hàng</b> — biểu đồ tròn tỷ trọng.</li>
+        <li><b>Doanh thu theo điểm bán</b> & <b>Chi tiết theo cửa hàng</b> — xếp hạng và bảng chi tiết từng cửa hàng.</li>
+        <li><b>Tiến độ KPI theo trạm</b> — thanh tiến độ (vạch đen = tiến độ thời gian trong kỳ).</li>
+      </ul>
+      <div class="call tip"><span class="ci">👁️</span><div>Các cửa hàng có doanh thu = 0 được tự động ẩn để bảng gọn gàng.</div></div>
+    </section>
+
+    <!-- 5 -->
+    <section id="so-sanh">
+      <h3><span class="ico">📈</span> 5. Trang So sánh thời gian</h3>
+      <p class="lead">So sánh doanh thu kỳ này với mốc trước cho từng đơn vị.</p>
+      <ul>
+        <li><b>Biểu đồ “So sánh doanh thu theo đơn vị”</b> — cột kỳ trước & kỳ này, kèm đường <b>% tăng/giảm</b>.</li>
+        <li>Đổi cách xem bằng thanh <b>Theo trạm / Theo điểm trạm / Theo bộ phận / Theo cửa hàng</b>.</li>
+        <li>Khi xem <b>theo cửa hàng</b>, các mã được sắp xếp theo thứ tự Trạm → Điểm trạm → Mã cửa hàng để dễ dò.</li>
+        <li>Phía dưới là <b>chi tiết từng điểm trạm</b>: doanh thu theo bộ phận và top 10 cửa hàng.</li>
+      </ul>
+      <div class="call tip"><span class="ci">🔁</span><div>Chỉ những đơn vị <b>có dữ liệu</b> trong bộ lọc hiện tại mới hiện trên biểu đồ.</div></div>
+    </section>
+
+    <!-- 6 -->
+    <section id="nhom-hang">
+      <h3><span class="ico">📦</span> 6. Trang Nhóm hàng</h3>
+      <p class="lead">Phân tích sâu theo nhóm hàng và từng mặt hàng (SKU) — trang đắc lực nhất để quyết định phát triển hay cắt giảm hàng hóa.</p>
+      <ul>
+        <li><b>Cơ cấu nhóm hàng</b> (biểu đồ tròn) — hiển thị Top nhóm lớn nhất, phần còn lại gộp thành “Nhóm khác”.</li>
+        <li><b>Xếp hạng nhóm hàng</b> — bảng doanh thu, tỷ trọng, sản lượng, so mốc. <b>Bấm vào một nhóm</b> để xem chi tiết mã hàng bên phải.</li>
+        <li><b>Doanh thu nhóm hàng theo tháng</b> — biểu đồ cột chồng 12 tháng gần nhất.</li>
+      </ul>
+      <h4>Chi tiết SKU — 2 tab</h4>
+      <div class="grid2">
+        <div class="fcard"><div class="ft"><span class="pill">Mặc định</span> Top 80% doanh thu</div><p>Các mã <b>chủ lực</b> (quy tắc Pareto) — số ít mã tạo ra ~80% doanh thu của nhóm. Đây là nhóm cần tập trung bảo vệ & khai thác.</p></div>
+        <div class="fcard"><div class="ft">20% còn lại</div><p>Các mã <b>đuôi dài</b> — nhiều mã nhưng cộng lại chỉ ~20% doanh thu. Nhóm cần rà soát tinh gọn.</p></div>
+      </div>
+      <div class="call ok"><span class="ci">🧠</span><div>Ngay dưới 2 tab là ô phân tích gợi ý: <b>🚀 Nên phát triển</b> (mã đang tăng, đóng góp lớn) và <b>✂️ Cân nhắc bỏ/gộp</b> (mã doanh thu thấp / đang giảm). Đây là gợi ý để bạn ra quyết định danh mục.</div></div>
+    </section>
+
+    <!-- 7 -->
+    <section id="danh-sach">
+      <h3><span class="ico">🗂️</span> 7. Trang Danh sách hàng hóa</h3>
+      <p class="lead">Tra cứu chi tiết mọi mã hàng, lọc linh hoạt.</p>
+      <ul>
+        <li><b>Bộ lọc Trạm / Điểm trạm / Bộ phận</b> (dạng ô bấm) — <b>liên thông</b> với nhau: chọn Trạm thì Điểm trạm & Bộ phận tự lọc theo.</li>
+        <li><b>Panel Danh sách cửa hàng</b> bên phải — có ô tìm nhanh; nút <b>Ẩn/Hiện</b> để mở rộng bảng.</li>
+        <li><b>Ô tìm mã / tên hàng hóa</b> ngay trên bảng.</li>
+        <li>Bảng có dòng <b>Grand total</b> tổng cộng ở chân bảng.</li>
+      </ul>
+      <div class="call tip"><span class="ci">↺</span><div>Nút <b>Đặt lại</b> áp dụng cho <b>tất cả</b> bộ lọc trong trang.</div></div>
+    </section>
+
+    <!-- 8 -->
+    <section id="phan-tich">
+      <h3><span class="ico">🎯</span> 8. Phân tích chuyên sâu & Kiến nghị</h3>
+      <p class="lead">Mỗi trang chính có khối <b>“Phân tích chuyên sâu &amp; Kiến nghị”</b> — không chỉ hiển thị số mà đưa ra nhận định và việc cần làm.</p>
+      <div class="grid2">
+        <div class="fcard"><div class="ft" style="color:var(--green)">📈 Điểm sáng</div><p>Đơn vị/nhóm đang tăng tốt, đầu kéo tăng trưởng.</p></div>
+        <div class="fcard"><div class="ft" style="color:var(--red)">⚠️ Cảnh báo & rủi ro</div><p>Đơn vị/nhóm đang giảm mạnh, rủi ro tập trung, cần rà soát.</p></div>
+        <div class="fcard"><div class="ft" style="color:var(--blue-dk)">✅ Kiến nghị hành động</div><p>Việc cụ thể nên làm, để trình lãnh đạo.</p></div>
+        <div class="fcard"><div class="ft" style="color:var(--amber)">📌 Bối cảnh áp dụng</div><p>Ghi chú thực tế của bạn được đưa vào phân tích.</p></div>
+      </div>
+      <h4>📝 Ghi chú bối cảnh (dùng chung)</h4>
+      <p>Thêm bối cảnh thực tế để phân tích sát hơn — ví dụ: <i>“Tuần này mưa lớn, lượng xe vào trạm V52 giảm; có khuyến mãi đồ uống từ 05/07”</i>.</p>
+      <ol class="steps">
+        <li>Gõ ghi chú vào ô cuối khối, bấm <b>➕ Thêm ghi chú</b> (thêm được <b>nhiều</b> ghi chú).</li>
+        <li>Ghi chú <b>hiện ngay</b> trong khối phân tích, và hệ thống tự lồng gợi ý theo từ khóa (thời tiết, lượng xe, khuyến mãi…).</li>
+        <li>Ghi chú được <b>lưu chung</b> — ai mở link cùng kỳ đó đều thấy; xóa từng ghi chú bằng nút ✕.</li>
+      </ol>
+      <div class="call tip"><span class="ci">📋</span><div>Nút <b>Sao chép báo cáo</b> xuất toàn bộ phân tích + ghi chú ra dạng văn bản gọn để dán vào email/báo cáo trình lãnh đạo.</div></div>
+    </section>
+
+    <!-- 9 -->
+    <section id="ai">
+      <h3><span class="ico">🤖</span> 9. Phân tích bằng AI</h3>
+      <p class="lead">Cần một bản phân tích sâu, mượt để trình lãnh đạo? Dùng nút <b>“🤖 Tạo prompt phân tích AI”</b>.</p>
+      <ol class="steps">
+        <li>Chọn kỳ & bộ lọc mong muốn, mở trang bất kỳ (Tổng quan / So sánh / Nhóm hàng / Danh sách).</li>
+        <li>Bấm <b>🤖 Tạo prompt phân tích AI</b> — hệ thống tự tạo sẵn một đoạn yêu cầu, <b>kèm bộ lọc hiện tại + bảng số liệu + ghi chú</b> của bạn.</li>
+        <li>Bấm <b>Sao chép prompt</b>, mở <a href="https://claude.ai" target="_blank" rel="noopener">Claude (claude.ai)</a> hoặc ChatGPT, dán vào và gửi.</li>
+        <li>AI trả về phân tích + kiến nghị chi tiết. Bản hay có thể dán ngược lại vào ô <b>Thêm ghi chú</b> để lưu chung.</li>
+      </ol>
+      <div class="call ok"><span class="ci">🆓</span><div>Cách này <b>miễn phí</b> và không cần cài gì thêm. Số liệu trong prompt do hệ thống tính sẵn nên luôn chính xác — AI chỉ diễn giải & khuyến nghị.</div></div>
+    </section>
+
+    <!-- 10 -->
+    <section id="quy-trinh">
+      <h3><span class="ico">🗓️</span> 10. Quy trình đề xuất (dùng hằng tuần)</h3>
+      <ol class="steps">
+        <li><b>Xem Tổng quan</b> kỳ tuần/tháng — nắm doanh thu & mức tăng giảm so mốc.</li>
+        <li><b>Đọc Phân tích chuyên sâu</b> — ghi nhận điểm sáng, cảnh báo.</li>
+        <li><b>Bổ sung bối cảnh</b> (thời tiết, lượng xe, sự kiện, khuyến mãi) vào ô ghi chú.</li>
+        <li>Vào <b>Nhóm hàng</b> — xét nhóm/mã <b>nên phát triển</b> và <b>nên bỏ/gộp</b>.</li>
+        <li>Bấm <b>Tạo prompt phân tích AI</b> để có bản phân tích sâu (nếu cần), hoặc <b>Sao chép báo cáo</b>.</li>
+        <li>Chốt <b>quyết định hành động</b> và trình lãnh đạo.</li>
+      </ol>
+    </section>
+
+    <!-- 11 -->
+    <section id="thuat-ngu">
+      <h3><span class="ico">📖</span> 11. Thuật ngữ nhanh</h3>
+      <table>
+        <tr><th>Thuật ngữ</th><th>Nghĩa</th></tr>
+        <tr><td><b>Trạm</b></td><td>Trạm dừng nghỉ (ví dụ V52 Hải Dương, V23 Hưng Yên).</td></tr>
+        <tr><td><b>Điểm trạm</b></td><td>Khu vực bán trong một trạm (ví dụ V52-SA1).</td></tr>
+        <tr><td><b>Bộ phận</b></td><td>Loại hình điểm bán: Kiosk, Siêu thị, Nhà hàng.</td></tr>
+        <tr><td><b>Cửa hàng (mã)</b></td><td>Một điểm bán cụ thể, có mã riêng (ví dụ V52SA1S01).</td></tr>
+        <tr><td><b>SKU / Mã hàng</b></td><td>Một mặt hàng cụ thể.</td></tr>
+        <tr><td><b>Nhóm hàng</b></td><td>Nhóm các mặt hàng cùng loại (ví dụ Đồ ăn nhanh).</td></tr>
+        <tr><td><b>Pareto (80/20)</b></td><td>Số ít mã tạo phần lớn doanh thu — nhóm mã chủ lực cần tập trung.</td></tr>
+        <tr><td><b>Nhóm/đuôi dài</b></td><td>Nhiều mã/nhóm nhỏ, mỗi cái đóng góp rất ít doanh thu.</td></tr>
+        <tr><td><b>Mốc so sánh</b></td><td>Kỳ dùng để đối chiếu (tuần/tháng/năm trước, lũy kế năm).</td></tr>
+      </table>
+    </section>
+
+    <!-- 12 -->
+    <section id="faq">
+      <h3><span class="ico">❓</span> 12. Câu hỏi thường gặp</h3>
+      <details><summary>Dữ liệu cập nhật khi nào?</summary><div class="fa">Dữ liệu lấy trực tiếp từ kho BigQuery của công ty và cập nhật theo ngày. Bấm <b>⟳ Cập nhật dữ liệu</b> để tải bản mới nhất nếu cần.</div></details>
+      <details><summary>Vì sao lần đầu xem cả năm hơi lâu?</summary><div class="fa">Kỳ dài (cả năm) phải quét nhiều dữ liệu hơn nên mất vài giây. Lần xem lại sẽ gần như tức thì (có bộ nhớ đệm trong ~10 phút).</div></details>
+      <details><summary>Ghi chú tôi nhập thì ai xem được?</summary><div class="fa">Ghi chú được lưu chung: bất kỳ ai mở link và xem đúng kỳ/bộ lọc đó đều thấy. Phù hợp để cả nhóm cùng ghi bối cảnh.</div></details>
+      <details><summary>Vì sao các trang cho con số hơi khác nhau?</summary><div class="fa">Mỗi trang có phạm vi khác nhau (toàn công ty vs theo nhóm/cửa hàng) và phụ thuộc bộ lọc đang chọn. Luôn kiểm tra thanh lọc & mốc so sánh phía trên.</div></details>
+      <details><summary>Phân tích do máy tính hay AI tạo ra?</summary><div class="fa">Phần “Phân tích chuyên sâu” trong app do hệ thống tính bằng công thức cố định (luôn chính xác & nhất quán). Nút “Tạo prompt phân tích AI” là để bạn đưa số liệu sang Claude/ChatGPT nếu muốn phân tích sâu bằng AI.</div></details>
+      <details><summary>Xem trên điện thoại được không?</summary><div class="fa">Được. Giao diện tự co theo màn hình; tuy nhiên xem trên máy tính sẽ thoải mái hơn với các bảng và biểu đồ lớn.</div></details>
+    </section>
+
+    <div class="foot">Doanh thu tự doanh · VRS — Hướng dẫn sử dụng · <a href="/bang/doanh-thu-tu-doanh">Mở ứng dụng ↗</a></div>
+  </main>
+</div>
+
+<script>
+  // Đánh dấu mục đang xem trong mục lục
+  const links=[...document.querySelectorAll('#toc a')];
+  const map={}; links.forEach(a=>{ const id=a.getAttribute('href').slice(1); map[id]=a; });
+  const obs=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting){ links.forEach(l=>l.classList.remove('on')); const a=map[e.target.id]; if(a)a.classList.add('on'); } }); },{rootMargin:'-20% 0px -70% 0px'});
+  document.querySelectorAll('section[id]').forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>

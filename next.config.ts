@@ -11,6 +11,14 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["pg", "@google-cloud/bigquery", "google-auth-library"],
   // Có nhiều lockfile (repo cha + app) — chỉ định root là thư mục app này.
   turbopack: { root: dirname(fileURLToPath(import.meta.url)) },
+  // Dashboard "Doanh thu tự doanh" là app front-end tĩnh (bê nguyên từ app nhân
+  // viên, xem public/tu-doanh/). Giữ URL sạch /bang/doanh-thu-tu-doanh nhưng phục
+  // vụ file tĩnh — không đi qua cây React của /bang (nó tự có chrome riêng).
+  async rewrites() {
+    return [
+      { source: "/bang/doanh-thu-tu-doanh", destination: "/tu-doanh/index.html" },
+    ];
+  },
 };
 
 export default nextConfig;
