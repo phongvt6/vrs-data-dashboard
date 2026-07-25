@@ -1,6 +1,57 @@
 # Việc còn lại
 
-Cập nhật 2026-07-23. Xếp theo thứ tự nên làm.
+Cập nhật 2026-07-25. Xếp theo thứ tự nên làm.
+
+---
+
+## ★ BÀN GIAO — đọc trước khi làm tiếp trên máy khác (2026-07-25)
+
+Đang ở nhánh **`dashboard-thuong-khoan`** (PR #1), HEAD đã push. `main` chưa merge.
+
+### Lấy môi trường trên máy mới
+- `git clone` + `git checkout dashboard-thuong-khoan` + `npm install`.
+- **`.env.local` KHÔNG nằm trong git** (gitignore). Phải tạo lại: `DATABASE_URL`
+  (Session pooler Supabase), `APP_PASSWORD`, `AUTH_SECRET`, và `AUTH_DISABLED=1`
+  nếu muốn bỏ đăng nhập lúc dev. Xem `.env.example`.
+- Chạy: `npm run server` không có — đây là Next: `npm run dev` (port 3002 mặc
+  định, nhưng launch.json dùng 3004). Dữ liệu khoán đã ở `mart.khoan_*` trên
+  Supabase (dùng chung), không phải seed lại.
+
+### Đang làm dở: dựng lại 2 port thành NATIVE (đồng bộ design system)
+Đã chốt: mẫu = native (`/bang/doanh-thu`); port giữ tới khi native xong rồi mới
+chuyển route + gỡ.
+
+- [x] **Khoán native XONG** ở route tạm **`/bang/khoan-native`** — 9 trang
+  (Dashboard, Báo cáo, Bảng tính thưởng, Kiosk, Siêu thị, Tra cứu giờ làm, Kiểm
+  tra, Danh sách data, Hướng dẫn) + sidebar thu gọn kiểu Looker + Bảng thi đua
+  để **link ↗** ra bản gốc (không dựng native). Engine `src/lib/khoan.ts`, data
+  `src/lib/khoan-data.ts` (`docKhoanRaw` → client tính). Verify khớp số.
+- [ ] **Chuyển route khoán sang native**: đổi `/bang/khoan-native` → thành
+  `/bang/thuong-khoan`; gỡ rewrite trong `next.config.ts`, gỡ `public/khoan/`,
+  gỡ `src/app/api/khoan/data/`. (Chưa làm — đợi xem native ổn hẳn.)
+- [ ] **Tự doanh native (5 trang)**: Tổng quan, So sánh thời gian, Nhóm hàng,
+  Danh sách hàng hóa, Hướng dẫn. Khác khoán: đọc BigQuery LIVE qua
+  `src/lib/tu-doanh/core.ts` (không có engine tính). Dựng client app tương tự
+  `KhoanApp.tsx`, dùng `dien-giai.ts` cho phần diễn giải. Rồi chuyển route + gỡ
+  `public/tu-doanh/` + `src/app/api/tu-doanh/`.
+
+### ⚠️ Lỗi build Vercel — CHẶN deploy (chưa sửa)
+Build fail khi prerender `/bang/doanh-thu`: `Chưa cấu hình DATABASE_URL`.
+- **Nguyên nhân**: `duLieu()` (`src/lib/nguon.ts`) có `"use cache"` → Next chạy
+  SQL **lúc BUILD** để nạp cache → build cần `DATABASE_URL` sẵn.
+- **Cách sửa nhanh (user)**: trên Vercel, `DATABASE_URL` phải có tick
+  **Production** (không chỉ Preview), dùng chuỗi **Session pooler**, rồi Redeploy.
+- **Cách sửa bền (code, tuỳ chọn)**: cho `duLieu`/`query` KHÔNG làm chết build khi
+  DB không nối được lúc build — trả rỗng, để runtime nạp lại. Deploy sẽ không phụ
+  thuộc DB sống. Chưa làm.
+- Trang khoán native KHÔNG dính lỗi này (đọc DB không qua `use cache` → dynamic).
+
+### Bối cảnh đã xong trước đó (để khỏi lặp)
+- Port khoán (`public/khoan/` + `/api/khoan/data` + rewrite) + tự doanh (remote
+  làm) đang chạy ở `/bang/thuong-khoan` và `/bang/doanh-thu-tu-doanh`.
+- Nguồn `sheets_pub` + fix đọc số kiểu Mỹ (`scripts/lib/mart.mjs`).
+- Kit token dùng chung `public/_kit/` (sinh từ `theme.ts` bằng `npm run kit`, tự
+  chạy ở prebuild) — 2 port đã đồng bộ màu + định dạng số.
 
 ---
 
