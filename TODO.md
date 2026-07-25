@@ -32,11 +32,16 @@ chuyển route + gỡ.
   (rewrite → `public/khoan/`), `src/app/api/khoan/data/` vẫn cần. Danh mục có 2
   entry: `db_thuong_khoan` (native) + `db_thuong_khoan_cu` (bản gốc). Đừng gỡ
   `public/khoan/` nữa. Commit 4fb81e9.
-- [ ] **Tự doanh native (5 trang)**: Tổng quan, So sánh thời gian, Nhóm hàng,
-  Danh sách hàng hóa, Hướng dẫn. Khác khoán: đọc BigQuery LIVE qua
-  `src/lib/tu-doanh/core.ts` (không có engine tính). Dựng client app tương tự
-  `KhoanApp.tsx`, dùng `dien-giai.ts` cho phần diễn giải. Rồi chuyển route + gỡ
-  `public/tu-doanh/` + `src/app/api/tu-doanh/`.
+- [x] **Tự doanh native (5 trang) — XONG (2026-07-25, commit 13eda15)**: Tổng quan,
+  So sánh thời gian, Nhóm hàng (drill Pareto), Danh sách hàng hóa (facet liên thông),
+  Hướng dẫn. App client `src/app/bang/doanh-thu-tu-doanh/` (TuDoanhApp + views/ +
+  charts.tsx ECharts + ui.tsx + filter.tsx + lib/), **fetch /api/tu-doanh/*** (không
+  gọi core.ts trực tiếp — giữ client interactivity) → số khớp port tuyệt đối.
+  **QUYẾT ĐỊNH: KHÔNG gỡ port.** Native chiếm `/bang/doanh-thu-tu-doanh`; port gốc
+  giữ ở `/bang/doanh-thu-tu-doanh-cu` (rewrite → `public/tu-doanh/`, `src/app/api/
+  tu-doanh/` vẫn cần cho CẢ hai). Danh mục có 2 entry. Đừng gỡ `public/tu-doanh/`.
+  Còn thiếu so với port (công cụ phụ, còn ở bản gốc): nút Tạo prompt AI, ghi chú
+  KV dùng chung, modal khai báo quầy. Xem [[vrs-build-doc-db-connection]].
 
 ### ⚠️ Lỗi build Vercel — CHẶN deploy (chưa sửa)
 Build fail khi prerender `/bang/doanh-thu`: `Chưa cấu hình DATABASE_URL`.
