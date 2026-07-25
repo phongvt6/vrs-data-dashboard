@@ -4,7 +4,7 @@
 // thẻ KPI, thẻ số nhỏ. Mọi màu/chữ đọc từ biến `--ds-*` (xem tokens.ts) nên đồng
 // bộ tuyệt đối với biểu đồ. Không app nào tự vẽ thẻ nữa.
 
-import type { CSSProperties, ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { chartType } from "@/chart/types";
 import { RADIUS, GAP } from "./tokens";
 
@@ -88,37 +88,144 @@ export function Card({
 }
 
 /**
- * Badge "mẫu chart" — chỉ ra ô này đang dùng loại nào trong thư viện, link tới
- * trang /charts để đọc hướng dẫn của loại đó. Đây là cách "truy xuất mẫu".
+ * Badge "mẫu chart" — chỉ ra ô này đang dùng loại nào trong thư viện. Bấm ⓘ mở
+ * một popover nhẹ ngay tại chỗ (tên + mô tả + nên dùng / tránh + dữ liệu cần);
+ * trong popover, bấm TÊN chart mới mở trang Thư viện chart /charts#<id>.
  */
 export function MauBadge({ mau }: { mau: string }) {
   const t = chartType(mau);
   const ten = t?.ten ?? mau;
+  const [mo, setMo] = useState(false);
+  const wrapRef = useRef<HTMLSpanElement>(null);
+
+  // Đóng khi bấm ra ngoài hoặc nhấn Esc.
+  useEffect(() => {
+    if (!mo) return;
+    const onDown = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setMo(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMo(false);
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [mo]);
+
   return (
-    <a
-      href={`/charts#${mau}`}
-      target="_blank"
-      rel="noopener"
-      title={`Mẫu: ${ten} (${mau}) — bấm để xem hướng dẫn trong Thư viện chart`}
-      aria-label={`Mẫu chart: ${ten}`}
+    <span ref={wrapRef} style={{ position: "relative", display: "inline-flex", flexShrink: 0 }}>
+      <button
+        type="button"
+        onClick={() => setMo((v) => !v)}
+        title={`Mẫu: ${ten} — bấm xem thông tin`}
+        aria-label={`Mẫu chart: ${ten}`}
+        aria-expanded={mo}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 18,
+          height: 18,
+          borderRadius: RADIUS.pill,
+          border: "1px solid var(--ds-line-strong)",
+          background: mo ? "var(--ds-accent)" : "transparent",
+          color: mo ? "var(--ds-accent-ink)" : "var(--ds-ink-muted)",
+          fontSize: 11,
+          fontWeight: 700,
+          lineHeight: 1,
+          cursor: "pointer",
+          padding: 0,
+        }}
+      >
+        i
+      </button>
+      {mo && t && <MauPopover t={t} onClose={() => setMo(false)} />}
+    </span>
+  );
+}
+
+function MauPopover({
+  t,
+  onClose,
+}: {
+  t: NonNullable<ReturnType<typeof chartType>>;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      role="dialog"
+      aria-label={`Thông tin mẫu ${t.ten}`}
       style={{
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width: 18,
-        height: 18,
-        borderRadius: RADIUS.pill,
+        position: "absolute",
+        top: "calc(100% + 6px)",
+        right: 0,
+        zIndex: 60,
+        width: 320,
+        maxWidth: "min(320px, 80vw)",
+        background: "var(--ds-panel)",
         border: "1px solid var(--ds-line-strong)",
-        color: "var(--ds-ink-muted)",
-        fontSize: 11,
-        fontWeight: 700,
-        lineHeight: 1,
-        textDecoration: "none",
-        flexShrink: 0,
+        borderRadius: RADIUS.card,
+        boxShadow: "0 10px 30px rgba(0,0,0,.16)",
+        padding: "12px 14px",
+        textAlign: "left",
+        cursor: "default",
+        whiteSpace: "normal",
       }}
     >
-      i
-    </a>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8 }}>
+        <a
+          href={`/charts#${t.id}`}
+          target="_blank"
+          rel="noopener"
+          title="Mở trang Thư viện chart"
+          style={{ fontSize: 14, fontWeight: 700, color: "var(--ds-accent)", textDecoration: "none" }}
+        >
+          {t.ten} ↗
+        </a>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Đóng"
+          style={{ border: "none", background: "none", cursor: "pointer", color: "var(--ds-ink-muted)", fontSize: 15, lineHeight: 1, padding: 2 }}
+        >
+          ✕
+        </button>
+      </div>
+      <div style={{ fontSize: 11, color: "var(--ds-ink-muted)", fontFamily: "var(--mono, ui-monospace, monospace)", marginTop: 1 }}>{t.id}</div>
+      <p style={{ margin: "8px 0 0", fontSize: 12.5, color: "var(--ds-ink-2)", lineHeight: 1.5 }}>{t.mo_ta}</p>
+
+      <PopMuc tieu_de="Nên dùng khi" mau="var(--ds-accent)" items={t.nen_dung} />
+      <PopMuc tieu_de="Tránh khi" mau="var(--ds-bad)" items={t.tranh} />
+
+      <p style={{ margin: "10px 0 0", fontSize: 11.5, color: "var(--ds-ink-muted)", lineHeight: 1.5 }}>
+        <b style={{ color: "var(--ds-ink-2)" }}>Dữ liệu cần:</b> {t.dang_du_lieu}
+      </p>
+      <a
+        href={`/charts#${t.id}`}
+        target="_blank"
+        rel="noopener"
+        style={{ display: "inline-block", marginTop: 10, fontSize: 12, fontWeight: 600, color: "var(--ds-accent)", textDecoration: "none" }}
+      >
+        Xem trong Thư viện chart →
+      </a>
+    </div>
+  );
+}
+
+function PopMuc({ tieu_de, mau, items }: { tieu_de: string; mau: string; items: string[] }) {
+  if (!items?.length) return null;
+  return (
+    <div style={{ marginTop: 10 }}>
+      <div style={{ fontSize: 10.5, fontWeight: 700, color: mau, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+        {tieu_de}
+      </div>
+      <ul style={{ margin: 0, paddingLeft: 15, display: "grid", gap: 3 }}>
+        {items.map((s) => (
+          <li key={s} style={{ fontSize: 11.5, color: "var(--ds-ink-2)", lineHeight: 1.4 }}>{s}</li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
