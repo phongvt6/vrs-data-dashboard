@@ -16,7 +16,11 @@ const nextConfig: NextConfig = {
   // vụ file tĩnh — không đi qua cây React của /bang (nó tự có chrome riêng).
   async rewrites() {
     return [
-      { source: "/bang/doanh-thu-tu-doanh", destination: "/tu-doanh/index.html" },
+      // Bản GỐC "Doanh thu tự doanh" của team kinh doanh — SPA tĩnh (public/tu-doanh/).
+      // Route sạch /bang/doanh-thu-tu-doanh nay là bản NATIVE (trang React ở
+      // src/app/bang/doanh-thu-tu-doanh/ — filesystem thắng rewrite). Bản gốc giữ
+      // song song ở /bang/doanh-thu-tu-doanh-cu để đối chiếu.
+      { source: "/bang/doanh-thu-tu-doanh-cu", destination: "/tu-doanh/index.html" },
       // Bản GỐC "Thưởng khoán" của team kinh doanh — app front-end tĩnh (port từ
       // tool Cloudflare Worker, xem public/khoan/). Số lấy từ /api/khoan/data
       // (đọc mart.khoan_*), engine tính thưởng chạy ở client. Giữ song song ở
