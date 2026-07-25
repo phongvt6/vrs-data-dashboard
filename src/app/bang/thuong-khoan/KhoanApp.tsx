@@ -97,9 +97,9 @@ export default function KhoanApp({ raw }: { raw: DuLieuTho }) {
           );
         })}
 
-        {/* Bảng thi đua là trang cổ vũ, không phải phân tích — để link ra bản gốc,
-            sau này trỏ sang chỗ nhẹ hơn. */}
-        <a href="/bang/thuong-khoan" target="_blank" rel="noopener" title="Bảng thi đua (bản gốc)" style={{
+        {/* Bảng thi đua là trang cổ vũ, không phải phân tích — link ra bản gốc
+            (port của team kinh doanh) ở /bang/thuong-khoan-cu. */}
+        <a href="/bang/thuong-khoan-cu" target="_blank" rel="noopener" title="Bảng thi đua (bản gốc)" style={{
           display: "flex", alignItems: "center", gap: 9, padding: "8px 11px", borderRadius: 8,
           textDecoration: "none", fontSize: 13.5, whiteSpace: "nowrap", color: "var(--ink-soft)",
           justifyContent: thuGon ? "center" : "flex-start",

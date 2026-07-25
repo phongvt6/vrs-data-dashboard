@@ -17,10 +17,12 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       { source: "/bang/doanh-thu-tu-doanh", destination: "/tu-doanh/index.html" },
-      // Dashboard "Thưởng khoán" cũng là app front-end tĩnh (bê nguyên từ tool
-      // Cloudflare Worker của team kinh doanh, xem public/khoan/). Số lấy từ
-      // /api/khoan/data (đọc mart.khoan_*), engine tính thưởng chạy ở client.
-      { source: "/bang/thuong-khoan", destination: "/khoan/index.html" },
+      // Bản GỐC "Thưởng khoán" của team kinh doanh — app front-end tĩnh (port từ
+      // tool Cloudflare Worker, xem public/khoan/). Số lấy từ /api/khoan/data
+      // (đọc mart.khoan_*), engine tính thưởng chạy ở client. Giữ song song ở
+      // /bang/thuong-khoan-cu; route sạch /bang/thuong-khoan nay là bản NATIVE
+      // (trang React ở src/app/bang/thuong-khoan/ — filesystem thắng rewrite).
+      { source: "/bang/thuong-khoan-cu", destination: "/khoan/index.html" },
     ];
   },
 };

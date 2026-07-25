@@ -1,8 +1,10 @@
 // Dashboard Thưởng khoán — bản NATIVE (dựng lại trên design system của app:
-// ECharts <ChartTile> + theme.ts + lưới <Luoi>/<O>), thay cho bản port tĩnh.
+// ECharts <ChartTile> + theme.ts + lưới <Luoi>/<O>). Đây là bản chính thức ở
+// route /bang/thuong-khoan.
 //
-// Đang dựng ở route tạm /bang/khoan-native để bản port ở /bang/thuong-khoan vẫn
-// chạy trong lúc làm. Khi đủ 10 trang + verify xong sẽ chuyển route và gỡ port.
+// Bản gốc do team kinh doanh xây (SPA tĩnh port từ Cloudflare Worker) vẫn giữ
+// song song ở /bang/thuong-khoan-cu để đối chiếu — xem rewrite trong next.config.ts
+// và mục "Bảng thi đua (bản gốc)" trỏ sang đó trong KhoanApp.
 //
 // Kiến trúc: server tính KetQua MỘT LẦN (engine khoan.ts, mọi ngày đều ISO string
 // nên serialize được), truyền sang client app; client lọc theo kỳ/chiều và vẽ.
@@ -14,7 +16,7 @@ import { moiNhat } from "@/lib/mart";
 import BangKhung, { Luoi, OTrong } from "../_components/BangKhung";
 import KhoanApp from "./KhoanApp";
 
-export const metadata = { title: "Thưởng khoán (native) — VRS" };
+export const metadata = { title: "Thưởng khoán — VRS" };
 
 export default function KhoanNativePage() {
   return (
