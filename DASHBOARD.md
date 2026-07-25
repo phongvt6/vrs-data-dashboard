@@ -52,6 +52,22 @@ primitive dùng chung, đừng fork.
   `Card`. Card hiện **badge ⓘ** ở góc + gắn `data-chart-type` vào DOM. Bấm ⓘ mở
   `/charts#<id>` — thư viện chart, đọc hướng dẫn loại đó.
 
+## 4b. Taxonomy chart sync từ `ui-chart-catalog`
+
+Danh mục loại chart + hướng dẫn ("nên dùng / tránh") **không maintain tay ở đây** —
+nó là bản sinh tự động từ app **ui-chart-catalog** (nguồn sự thật, nơi thêm chart mới):
+
+- `src/chart/catalog.generated.ts` (JOBS + CHART_TYPES) — **TỰ SINH, đừng sửa tay**.
+- `src/chart/types.ts` chỉ giữ kiểu + helper, re-export dữ liệu đã sinh.
+- Quy trình: bên catalog chạy `npm run emit-meta` → `chart-catalog.meta.json`; bên này
+  chạy `npm run sync-charts` (đọc từ `../ui-chart-catalog`) → sinh lại + **cảnh báo**
+  loại catalog có mà vrs chưa có renderer.
+- vrs chỉ RENDER một tập con (14/56) — mỗi loại cần một `case` trong `options.ts`.
+  Muốn thêm: viết renderer + sample, thêm id vào `SUPPORTED` trong
+  `scripts/sync-chart-catalog.mjs`, chạy lại `npm run sync-charts`.
+- **Không** đưa `sync-charts` vào prebuild (Vercel không có repo catalog cạnh bên);
+  file sinh đã commit nên build dùng bản đó.
+
 ## 5. Thư viện sống: `/charts`
 
 - `src/app/_components/ChartLibrary.tsx` render **chính component thật** (không demo

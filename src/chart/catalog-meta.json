@@ -1,0 +1,1809 @@
+{
+  "_generatedFrom": "ui-chart-catalog/scripts/emit-chart-meta.mjs",
+  "_note": "Metadata thuần của thư viện chart. Bản vẽ (demo/code) KHÔNG nằm ở đây.",
+  "jobCount": 15,
+  "chartCount": 56,
+  "jobs": [
+    {
+      "id": "single-value",
+      "nameVi": "Một con số",
+      "nameEn": "Single value",
+      "question": "Hôm nay con số đó là bao nhiêu, hơn kém kỳ trước thế nào?"
+    },
+    {
+      "id": "compare",
+      "nameVi": "So sánh",
+      "nameEn": "Comparison",
+      "question": "Ai nhiều hơn ai, hơn bao nhiêu?"
+    },
+    {
+      "id": "versus",
+      "nameVi": "So sánh hai bên",
+      "nameEn": "Head-to-head comparison",
+      "question": "Đặt A cạnh B thì hơn kém nhau ở chỗ nào?"
+    },
+    {
+      "id": "composition",
+      "nameVi": "Cơ cấu",
+      "nameEn": "Composition",
+      "question": "Cái tổng đó gồm những phần nào, mỗi phần chiếm bao nhiêu?"
+    },
+    {
+      "id": "trend",
+      "nameVi": "Xu hướng",
+      "nameEn": "Trend over time",
+      "question": "Đang tăng hay giảm, từ lúc nào?"
+    },
+    {
+      "id": "pattern",
+      "nameVi": "Quy luật theo lưới",
+      "nameEn": "Pattern / intensity",
+      "question": "Cao điểm rơi vào khung giờ nào, ngày nào?"
+    },
+    {
+      "id": "table",
+      "nameVi": "Bảng phân tích",
+      "nameEn": "Analytical tables",
+      "question": "Cần con số chính xác, nhiều chiều cùng lúc — bày ra thế nào?"
+    },
+    {
+      "id": "correlation",
+      "nameVi": "Tương quan",
+      "nameEn": "Correlation",
+      "question": "X tăng thì Y có tăng theo không?"
+    },
+    {
+      "id": "distribution",
+      "nameVi": "Phân bố",
+      "nameEn": "Distribution",
+      "question": "Dữ liệu trải ra sao, đâu là giá trị bất thường?"
+    },
+    {
+      "id": "flow",
+      "nameVi": "Luồng & biến động",
+      "nameEn": "Flow & change",
+      "question": "Từ đâu chảy đến đâu, cộng trừ những gì ra số cuối?"
+    },
+    {
+      "id": "hierarchy",
+      "nameVi": "Thứ bậc",
+      "nameEn": "Hierarchy",
+      "question": "Cấu trúc lồng nhau nhiều cấp trông thế nào?"
+    },
+    {
+      "id": "cross-filter",
+      "nameVi": "Lọc chéo & liên kết",
+      "nameEn": "Cross-filtering & linked views",
+      "question": "Click vào một chỗ, những khối còn lại đổi theo thế nào?"
+    },
+    {
+      "id": "composite",
+      "nameVi": "Mẫu ghép phức tạp",
+      "nameEn": "Composite patterns",
+      "question": "Nhiều khối, nhiều tầng thông tin — ghép lại thế nào cho vẫn đọc được?"
+    },
+    {
+      "id": "foundation",
+      "nameVi": "Nền tảng dashboard",
+      "nameEn": "Dashboard foundations",
+      "question": "Những thứ quanh biểu đồ mà thiếu là mất niềm tin."
+    },
+    {
+      "id": "geo",
+      "nameVi": "Địa lý",
+      "nameEn": "Geospatial",
+      "question": "Chuyện đó xảy ra ở đâu trên bản đồ?"
+    }
+  ],
+  "charts": [
+    {
+      "id": "stat-tile",
+      "nameVi": "Ô chỉ số (KPI)",
+      "nameEn": "Stat tile / KPI row",
+      "aliases": [
+        "KPI card",
+        "scorecard",
+        "big number",
+        "metric card",
+        "thẻ chỉ số"
+      ],
+      "job": "single-value",
+      "status": "ready",
+      "description": "Một con số hiện tại, kèm mức chênh so với kỳ trước và (tuỳ chọn) một sparkline nhỏ cho biết nó đang đi hướng nào. Xếp 3–5 ô thành một hàng ở đầu dashboard.",
+      "useWhen": [
+        "Người xem chỉ cần biết “hôm nay bao nhiêu, hơn kém hôm qua thế nào”.",
+        "Đầu dashboard, trước khi vào các biểu đồ chi tiết.",
+        "Con số quan trọng đến mức không được để nó lẫn trong một biểu đồ."
+      ],
+      "avoidWhen": [
+        "Có hơn 5–6 chỉ số → thành bức tường số, không ai đọc. Cắt còn 3–5 cái thật sự dẫn dắt quyết định.",
+        "Chỉ số cần ngữ cảnh mới hiểu (ví dụ “tỷ lệ chuyển đổi 3,2%” mà không có mốc so sánh) → thêm delta hoặc dùng meter.",
+        "Đừng thay một ô chỉ số bằng biểu đồ cột có đúng một cột — đó là lãng phí không gian."
+      ],
+      "dataShape": "Một giá trị hiện tại + một giá trị kỳ trước (để tính delta) + tuỳ chọn một chuỗi ~12 điểm cho sparkline.",
+      "variants": [
+        "Hero figure: đúng MỘT con số cỡ ≥48px cho toàn view, không có ô nào khác to bằng.",
+        "Có/không sparkline — sparkline chỉ để cảm nhận hướng đi, không đọc giá trị.",
+        "Delta đảo màu với chỉ số “tăng là xấu” (chi phí, thời gian chờ, tỷ lệ lỗi)."
+      ],
+      "seriesCap": "3–5 ô một hàng."
+    },
+    {
+      "id": "meter",
+      "nameVi": "Thanh tiến độ (meter)",
+      "nameEn": "Meter / progress bar",
+      "aliases": [
+        "gauge",
+        "progress",
+        "đồng hồ đo",
+        "tiến độ"
+      ],
+      "job": "single-value",
+      "status": "ready",
+      "description": "Một tỷ lệ so với hạn mức 100%. Phần chưa đạt dùng bậc NHẠT HƠN của cùng một hue, để trạng thái đọc được trên toàn thanh chứ không chỉ ở phần đã tô.",
+      "useWhen": [
+        "Có một mốc trần rõ ràng: chỉ tiêu tháng, dung lượng kho, % hoàn thành.",
+        "Người xem chỉ cần biết “đã tới đâu so với đích”, không cần con số tuyệt đối."
+      ],
+      "avoidWhen": [
+        "Không có trần tự nhiên → tỷ lệ so với cái gì? Dùng stat tile.",
+        "Cần so sánh nhiều đối tượng cùng lúc → dùng bullet chart, đọc nhanh hơn nhiều thanh rời rạc.",
+        "Đừng dùng gauge hình bán nguyệt (kim đồng hồ): tốn gấp 3 diện tích để chở đúng một con số."
+      ],
+      "dataShape": "Một giá trị thực hiện + một giá trị trần.",
+      "variants": [
+        "Thanh ngang (mặc định).",
+        "Đổi màu fill theo ngưỡng cảnh báo khi vượt hạn mức."
+      ],
+      "seriesCap": null
+    },
+    {
+      "id": "bullet",
+      "nameVi": "Thực hiện vs chỉ tiêu (bullet)",
+      "nameEn": "Bullet chart",
+      "aliases": [
+        "target vs actual",
+        "progress bar chart",
+        "so với kế hoạch"
+      ],
+      "job": "single-value",
+      "status": "ready",
+      "description": "Biến thể gọn của thanh tiến độ cho NHIỀU đối tượng: mỗi dòng là một thanh thực hiện, cộng một vạch dọc đánh dấu chỉ tiêu. Đọc được cả “bao nhiêu” lẫn “đạt hay chưa” trong một lần liếc.",
+      "useWhen": [
+        "So sánh thực hiện với kế hoạch cho 3–10 đối tượng (chi nhánh, phòng ban, nhân viên).",
+        "Thay cho gauge khi cần nhiều hơn một chỉ số."
+      ],
+      "avoidWhen": [
+        "Không có chỉ tiêu để so → chỉ là bar chart thường, bỏ vạch mốc đi.",
+        "Quá 10 dòng → chuyển sang bảng có cột % hoàn thành, sắp xếp được."
+      ],
+      "dataShape": "Mỗi dòng: nhãn + giá trị thực hiện + giá trị chỉ tiêu (cùng đơn vị).",
+      "variants": [
+        "Thêm dải nền phân vùng kém/đạt/tốt (bullet chuẩn Few) — chỉ khi ngưỡng thật sự có nghĩa.",
+        "Tô màu số % theo đạt/không đạt, nhưng LUÔN kèm chữ, không để màu tự gánh nghĩa."
+      ],
+      "seriesCap": "3–10 dòng."
+    },
+    {
+      "id": "dashboard-patterns",
+      "nameVi": "Mẫu bố cục dashboard",
+      "nameEn": "Dashboard layout patterns",
+      "aliases": [
+        "layout",
+        "bố cục",
+        "khung dashboard",
+        "template"
+      ],
+      "job": "single-value",
+      "status": "ready",
+      "description": "Không phải một biểu đồ, mà là cách XẾP nhiều biểu đồ. Thứ tự đọc: bộ lọc → hàng KPI (câu trả lời) → một biểu đồ dẫn chuyện → biểu đồ phụ → bảng chi tiết. Người xem trả lời được câu hỏi của mình ở tầng nào thì dừng ở tầng đó.",
+      "useWhen": [
+        "Bất cứ trang nào có nhiều hơn 2 biểu đồ.",
+        "Nhiều nhóm người xem khác nhau: lãnh đạo dừng ở hàng KPI, chuyên viên xuống tới bảng."
+      ],
+      "avoidWhen": [
+        "Chỉ có một biểu đồ → không cần khung, đừng bịa thêm KPI cho “đầy trang”.",
+        "Đừng rải bộ lọc khắp nơi cạnh từng biểu đồ — người xem sẽ không biết lọc nào áp cho cái gì.",
+        "Đừng đặt hai biểu đồ quan trọng ngang nhau cùng kích thước: nếu mọi thứ đều nổi bật thì không gì nổi bật."
+      ],
+      "dataShape": "—",
+      "variants": [
+        "Trang một cột trên mobile: KPI xếp dọc, bảng cho cuộn ngang trong khung riêng.",
+        "Drill-down: click một cột → lọc toàn trang theo cột đó.",
+        "Chọn một chi nhánh ở bộ lọc → biểu đồ chính chuyển sang dạng “nhấn mạnh một đường”."
+      ],
+      "seriesCap": "3–5 ô KPI; 2–4 biểu đồ mỗi trang."
+    },
+    {
+      "id": "column",
+      "nameVi": "Biểu đồ cột",
+      "nameEn": "Column chart (vertical bar)",
+      "aliases": [
+        "bar chart dọc",
+        "vertical bar",
+        "cột đứng"
+      ],
+      "job": "compare",
+      "status": "ready",
+      "description": "Cột mọc từ một đường gốc chung, chiều cao chở giá trị. Dạng so sánh chính xác nhất mà mắt người đọc được — độ dài là kênh mã hoá mạnh nhất.",
+      "useWhen": [
+        "So sánh 3–12 hạng mục có tên ngắn.",
+        "Trục giá trị bắt đầu từ 0 (bắt buộc — cắt gốc là bóp méo).",
+        "Thứ tự hạng mục tự nhiên (thời gian) hoặc sắp xếp theo giá trị."
+      ],
+      "avoidWhen": [
+        "Tên hạng mục dài → xoay nhãn 45° là dấu hiệu bạn nên dùng thanh ngang.",
+        "Hơn ~12 hạng mục → thanh ngang hoặc bảng.",
+        "KHÔNG BAO GIỜ cắt gốc trục để “nhìn cho rõ chênh lệch”. Cần soi chênh lệch nhỏ thì vẽ đường, hoặc vẽ chính phần chênh lệch."
+      ],
+      "dataShape": "Một cột danh mục + một cột giá trị số. Mỗi hạng mục đúng một dòng.",
+      "variants": [
+        "Sắp xếp giảm dần (mặc định nên dùng) hoặc theo thứ tự tự nhiên.",
+        "Emphasis: tô đậm một cột, các cột còn lại xám — khi câu chuyện là về một hạng mục.",
+        "Gắn nhãn hết mọi cột → bỏ luôn trục giá trị (như demo này)."
+      ],
+      "seriesCap": "1 series. Nhiều series → grouped bar."
+    },
+    {
+      "id": "bar",
+      "nameVi": "Thanh ngang",
+      "nameEn": "Bar chart (horizontal)",
+      "aliases": [
+        "horizontal bar",
+        "thanh nằm",
+        "ranking chart"
+      ],
+      "job": "compare",
+      "status": "ready",
+      "description": "Cột nằm ngang. Cùng sức mạnh mã hoá như cột đứng, nhưng nhãn hạng mục chạy ngang nên đọc thoải mái dù tên dài.",
+      "useWhen": [
+        "Tên hạng mục dài (tên chi nhánh, tên sản phẩm, câu trả lời khảo sát).",
+        "Bảng xếp hạng — sắp xếp giảm dần, top-N.",
+        "Nhiều hạng mục (10–25) — cuộn dọc tự nhiên hơn cuộn ngang."
+      ],
+      "avoidWhen": [
+        "Trục là thời gian → thời gian phải chạy ngang, dùng cột đứng hoặc đường.",
+        "Chỉ có 2–3 hạng mục tên ngắn → cột đứng gọn hơn."
+      ],
+      "dataShape": "Giống cột đứng: một cột danh mục + một cột giá trị.",
+      "variants": [
+        "Top-N + dòng “Khác” gộp phần đuôi.",
+        "Nhãn giá trị đặt ở đầu thanh; nếu thanh quá ngắn thì đặt ra ngoài, không bao giờ cắt chữ."
+      ],
+      "seriesCap": "1 series."
+    },
+    {
+      "id": "grouped-bar",
+      "nameVi": "Cột nhóm",
+      "nameEn": "Grouped bar chart",
+      "aliases": [
+        "clustered bar",
+        "cột ghép",
+        "side-by-side bar"
+      ],
+      "job": "compare",
+      "status": "ready",
+      "description": "Nhiều series đứng cạnh nhau trong từng nhóm. Dùng khi phải so sánh CẢ hai chiều: giữa các nhóm và giữa các series trong một nhóm.",
+      "useWhen": [
+        "2–3 series, 3–8 nhóm. Vượt mức đó là rừng cột.",
+        "Người xem cần so sánh series-với-series trong cùng một nhóm (ví dụ kỳ này vs kỳ trước)."
+      ],
+      "avoidWhen": [
+        "Câu hỏi là “tổng bao nhiêu và cơ cấu ra sao” → stacked bar, vì cột nhóm không cho thấy tổng.",
+        "Từ 4 series trở lên: vàng và cam bắt đầu đứng cạnh nhau, phải có nhãn trực tiếp — thường small multiples là lựa chọn đúng hơn.",
+        "Số nhóm × số series > ~24 cột → tách thành small multiples."
+      ],
+      "dataShape": "Ma trận nhóm × series. Mỗi series là một mảng cùng độ dài với danh sách nhóm.",
+      "variants": [
+        "Small multiples: mỗi series một khung nhỏ riêng, dùng chung trục — đọc tốt hơn hẳn khi nhiều series.",
+        "Cột nhóm 2 series “kỳ này vs kỳ trước” — biến thể phổ biến nhất."
+      ],
+      "seriesCap": "2–3 thoải mái, 4 phải có nhãn trực tiếp, quá 4 thì tách khung."
+    },
+    {
+      "id": "table-sparkline",
+      "nameVi": "Bảng có sparkline",
+      "nameEn": "Table with sparklines",
+      "aliases": [
+        "data table",
+        "bảng số liệu",
+        "small multiples table"
+      ],
+      "job": "compare",
+      "status": "ready",
+      "description": "Bảng số chính xác, mỗi dòng kèm một đường nhỏ cho biết xu hướng. Là lựa chọn ĐÚNG khi có quá nhiều hạng mục để vẽ, hoặc khi người xem cần con số chính xác chứ không phải hình dạng.",
+      "useWhen": [
+        "Nhiều hơn ~7 hạng mục mà hạng mục nào cũng có nghĩa.",
+        "Người xem sẽ copy số ra Excel, hoặc cần đối chiếu chính xác.",
+        "Cần nhiều chỉ số cho cùng một đối tượng (doanh thu, %, tiến độ) — bảng chở nhiều cột dễ hơn biểu đồ."
+      ],
+      "avoidWhen": [
+        "Chỉ có 3–5 dòng và một chỉ số → biểu đồ đọc nhanh hơn.",
+        "Đừng để mỗi dòng một sparkline có thang đo riêng rồi so sánh chúng với nhau — hình dạng so được, độ cao thì không."
+      ],
+      "dataShape": "Mỗi dòng: khoá + các chỉ số + một mảng ~12–14 điểm cho sparkline.",
+      "variants": [
+        "Thêm thanh nền trong ô (bar-in-cell) thay cho sparkline khi cần so độ lớn.",
+        "Cho phép sắp xếp theo cột — bảng nào cũng nên sắp xếp được."
+      ],
+      "seriesCap": null
+    },
+    {
+      "id": "dot-plot",
+      "nameVi": "Dot plot / lollipop",
+      "nameEn": "Dot plot / lollipop chart",
+      "aliases": [
+        "cleveland dot plot",
+        "kẹo mút",
+        "chấm"
+      ],
+      "job": "compare",
+      "status": "ready",
+      "description": "Một chấm thay cho cả thanh, kèm một sợi cuống mảnh dẫn từ nhãn tới chấm. Ít mực hơn bar chart rất nhiều nên chở được nhiều hạng mục hơn trên cùng diện tích, mà vẫn đọc chính xác vì chấm vẫn nằm trên một thang chung.",
+      "useWhen": [
+        "12–40 hạng mục — nhiều hơn mức bar chart còn thoáng.",
+        "Chênh lệch giữa các hạng mục nhỏ: rừng thanh dài gần bằng nhau nhìn rất nhàm, chấm thì vẫn rõ.",
+        "Cần kèm thêm chiều thứ hai sau này (thành dumbbell) mà không phải vẽ lại từ đầu."
+      ],
+      "avoidWhen": [
+        "Người xem hoàn toàn quen bar chart và đây là báo cáo dùng một lần → đừng bắt họ học dạng mới.",
+        "Thông điệp chính là “gấp mấy lần” — độ dài của thanh diễn đạt tỷ lệ tốt hơn vị trí của chấm.",
+        "Dưới ~8 hạng mục → thanh ngang gọn và quen mắt hơn."
+      ],
+      "dataShape": "Giống bar chart: một cột danh mục + một cột giá trị.",
+      "variants": [
+        "Bỏ cuống → dot plot thuần (ít mực nhất).",
+        "Giữ cuống → lollipop, mắt lần từ nhãn sang chấm dễ hơn khi danh sách dài.",
+        "Sắp xếp giảm dần gần như luôn đúng."
+      ],
+      "seriesCap": "1 series. Hai thời điểm → dumbbell."
+    },
+    {
+      "id": "dumbbell",
+      "nameVi": "Dumbbell (trước → sau)",
+      "nameEn": "Dumbbell / range plot",
+      "aliases": [
+        "before after",
+        "connected dot plot",
+        "tạ đôi",
+        "so sánh 2 kỳ"
+      ],
+      "job": "compare",
+      "status": "ready",
+      "description": "Hai chấm nối bằng một đoạn: giá trị kỳ đầu và kỳ cuối cho từng hạng mục. Độ dài đoạn nối chính là mức thay đổi — đọc “ai thay đổi nhiều nhất” nhanh hơn hẳn hai cột đứng cạnh nhau.",
+      "useWhen": [
+        "So sánh đúng HAI thời điểm (hoặc hai kịch bản) cho nhiều hạng mục.",
+        "Thông điệp là mức thay đổi, không phải giá trị tuyệt đối.",
+        "Sắp xếp theo mức thay đổi để đoạn dài nhất nằm ở một đầu."
+      ],
+      "avoidWhen": [
+        "Có từ 3 thời điểm trở lên → slope chart hoặc biểu đồ đường.",
+        "Các đoạn nối cắt chéo nhau nhiều (thứ hạng đảo lộn) → dùng slope chart, nó vẽ đúng chuyện đó.",
+        "Người xem cần con số cả hai kỳ → thêm bảng, vì chấm không mang nhãn."
+      ],
+      "dataShape": "Mỗi dòng: nhãn + giá trị đầu + giá trị cuối (cùng đơn vị).",
+      "variants": [
+        "Đổi màu đoạn nối theo hướng tăng/giảm — nhưng phải kèm icon hoặc nhãn, không để màu tự gánh.",
+        "Range plot: hai đầu là min–max thay vì hai thời điểm."
+      ],
+      "seriesCap": "Hai đầu mút. Ba đầu trở lên là biểu đồ khác."
+    },
+    {
+      "id": "small-multiples",
+      "nameVi": "Small multiples",
+      "nameEn": "Small multiples / faceting",
+      "aliases": [
+        "trellis",
+        "facet grid",
+        "lưới biểu đồ nhỏ",
+        "panel chart"
+      ],
+      "job": "compare",
+      "status": "ready",
+      "description": "Cùng một biểu đồ lặp lại nhiều lần, mỗi khung một nhóm, DÙNG CHUNG THANG ĐO. Đây là câu trả lời chuẩn cho “quá nhiều series” — và gần như luôn tốt hơn việc nhồi 8 đường vào một khung.",
+      "useWhen": [
+        "Từ 5 nhóm trở lên mà nhóm nào cũng đáng xem.",
+        "Cần so sánh HÌNH DẠNG (nhịp tăng giảm) giữa các nhóm.",
+        "Các đường chồng chéo đến mức không lần ra được đường nào của ai."
+      ],
+      "avoidWhen": [
+        "Mỗi khung một thang đo riêng — đây là lỗi nặng nhất của dạng này: các khung trông giống nhau nhưng không so được với nhau. Luôn dùng chung trục.",
+        "Chỉ có 2–3 nhóm → vẽ chung một khung, so sánh trực tiếp dễ hơn.",
+        "Cần đọc giá trị chính xác từng điểm → khung quá nhỏ, dùng bảng."
+      ],
+      "dataShape": "Dữ liệu dài (long format): nhóm + trục + giá trị.",
+      "variants": [
+        "Xếp hàng ngang (như demo) hoặc lưới nhiều dòng khi có > 6 nhóm.",
+        "Vẽ mờ toàn bộ các nhóm khác làm nền trong từng khung — thấy ngay khung nào lệch khỏi đám đông.",
+        "Sắp thứ tự khung theo giá trị, không theo bảng chữ cái."
+      ],
+      "seriesCap": "5–20 khung."
+    },
+    {
+      "id": "side-by-side",
+      "nameVi": "Bố cục đối chiếu 2 cột",
+      "nameEn": "Side-by-side comparison layout",
+      "aliases": [
+        "so sánh 2 bên",
+        "A/B",
+        "head to head",
+        "đối chiếu",
+        "versus"
+      ],
+      "job": "versus",
+      "status": "ready",
+      "description": "Hai cột đối xứng, mỗi bên một đối tượng: cùng bộ chỉ số, cùng loại biểu đồ, và quan trọng nhất là CÙNG THANG ĐO. Người xem quét ngang từng hàng để so, không phải nhớ số từ trang trước.",
+      "useWhen": [
+        "So đúng HAI đối tượng ở nhiều khía cạnh cùng lúc: hai chi nhánh, hai kỳ, hai kịch bản.",
+        "Bộ chỉ số giống hệt nhau ở cả hai bên.",
+        "Người xem cần kết luận “bên nào tốt hơn, ở chỗ nào”."
+      ],
+      "avoidWhen": [
+        "Mỗi bên tự co giãn thang đo — lỗi nặng nhất của bố cục này: hai biểu đồ trông y hệt trong khi quy mô chênh gấp đôi. Luôn tính thang chung từ cả hai bên.",
+        "Từ 3 đối tượng trở lên → chuyển sang bảng hoặc small multiples; 3 cột đối chiếu bắt đầu chật.",
+        "Hai đối tượng khác bản chất (một chi nhánh mới mở vs một chi nhánh lâu năm) → so trực tiếp là khập khiễng; thêm chỉ số chuẩn hoá."
+      ],
+      "dataShape": "Cùng một cấu trúc chỉ số cho hai đối tượng + một thang đo chung tính từ cả hai.",
+      "variants": [
+        "Thêm cột giữa hiện thẳng phần chênh lệch — bớt việc trừ nhẩm cho người xem.",
+        "Tô nhẹ nền bên thắng ở từng hàng, kèm nhãn chữ chứ không chỉ màu.",
+        "Trên mobile: xếp dọc theo từng chỉ số (A rồi B), không xếp hết A rồi mới tới B."
+      ],
+      "seriesCap": "2 bên."
+    },
+    {
+      "id": "tornado",
+      "nameVi": "Tornado (hai nhánh)",
+      "nameEn": "Tornado / butterfly chart",
+      "aliases": [
+        "butterfly chart",
+        "tháp dân số",
+        "population pyramid",
+        "hai nhánh",
+        "đối xứng"
+      ],
+      "job": "versus",
+      "status": "ready",
+      "description": "Hai bộ thanh mọc ngược chiều từ một trục giữa chung. Đọc được ngay hạng mục nào lệch nhiều nhất giữa hai bên — thứ mà hai biểu đồ đặt cạnh nhau không cho thấy.",
+      "useWhen": [
+        "So hai nhóm trên cùng một bộ hạng mục (nam/nữ, kỳ này/kỳ trước, hai chi nhánh).",
+        "Số hạng mục vừa phải (4–12) và có tên ngắn.",
+        "Thông điệp là “ở đâu lệch nhất”."
+      ],
+      "avoidWhen": [
+        "Hai bên có quy mô rất chênh lệch → nhánh nhỏ teo lại, không đọc được. Chuẩn hoá về % trước, và ghi rõ.",
+        "Hơn 2 nhóm → tornado chỉ có đúng hai chiều; dùng cột nhóm.",
+        "Người xem cần đọc giá trị chính xác — trục âm dễ gây hiểu nhầm dấu. Luôn hiện trị tuyệt đối ở nhãn và tooltip."
+      ],
+      "dataShape": "Mỗi hạng mục: giá trị bên trái + giá trị bên phải. Nhánh trái mang dấu âm khi vẽ.",
+      "variants": [
+        "Tháp dân số — biến thể kinh điển, hạng mục là nhóm tuổi.",
+        "Chuẩn hoá về % của mỗi bên khi hai bên khác quy mô.",
+        "Thêm một vạch mốc dọc cho giá trị trung bình từng bên."
+      ],
+      "seriesCap": "Đúng 2 nhánh."
+    },
+    {
+      "id": "slope-chart",
+      "nameVi": "Slope chart",
+      "nameEn": "Slope chart",
+      "aliases": [
+        "slope graph",
+        "đường dốc",
+        "trước sau",
+        "bump chart"
+      ],
+      "job": "versus",
+      "status": "ready",
+      "description": "Hai cột giá trị nối bằng các đoạn thẳng: độ dốc chính là mức thay đổi, và các đoạn cắt nhau cho thấy thứ hạng bị đảo. Đọc “ai vượt ai” nhanh hơn hẳn bảng hoặc cột nhóm.",
+      "useWhen": [
+        "Đúng HAI thời điểm, nhiều đối tượng (5–15).",
+        "Thông điệp là thay đổi và đảo hạng, không phải giá trị tuyệt đối.",
+        "Muốn cùng lúc thấy cả mức và chiều thay đổi."
+      ],
+      "avoidWhen": [
+        "Giá trị các đối tượng quá sát nhau → nhãn hai đầu dính chùm. Gắn nhãn có chọn lọc hoặc dùng dumbbell.",
+        "Từ 3 thời điểm trở lên → dùng biểu đồ đường bình thường.",
+        "Trên 15 đối tượng → thành búi chỉ."
+      ],
+      "dataShape": "Mỗi đối tượng: nhãn + giá trị đầu + giá trị cuối.",
+      "variants": [
+        "Bump chart — trục dọc là THỨ HẠNG thay vì giá trị, chỉ quan tâm vị trí.",
+        "Chỉ nhấn vài đối tượng đáng chú ý, phần còn lại để xám.",
+        "Ghi giá trị ngay cạnh nhãn ở đầu cuối (như demo)."
+      ],
+      "seriesCap": "5–15 đối tượng."
+    },
+    {
+      "id": "delta-bar",
+      "nameVi": "Biểu đồ chênh lệch",
+      "nameEn": "Delta / diverging bar",
+      "aliases": [
+        "variance chart",
+        "chênh lệch",
+        "diverging bar",
+        "so kế hoạch"
+      ],
+      "job": "versus",
+      "status": "ready",
+      "description": "Vẽ thẳng phần CHÊNH LỆCH thay vì đặt hai cột cạnh nhau. Người xem không phải trừ nhẩm, và mức lệch — vốn là thông điệp — được đưa lên thành chiều dài thanh.",
+      "useWhen": [
+        "Câu hỏi là “lệch bao nhiêu so với mốc” (kế hoạch, cùng kỳ, trung bình).",
+        "Chênh lệch nhỏ so với giá trị gốc — hai cột cạnh nhau sẽ trông gần bằng nhau, còn biểu đồ chênh lệch thì phóng đúng phần cần nhìn.",
+        "Có cả vượt lẫn hụt, cần thấy hai chiều."
+      ],
+      "avoidWhen": [
+        "Người xem cũng cần biết giá trị gốc — biểu đồ này giấu mất. Ghép thêm cột số, hoặc dùng bullet.",
+        "Mốc so sánh không đáng tin (kế hoạch đặt tuỳ tiện) → mọi kết luận rút ra đều lung lay.",
+        "Dùng hai hue bất kỳ cho vượt/hụt — phải là cặp diverging thật, và luôn kèm dấu +/−."
+      ],
+      "dataShape": "Mỗi hàng: nhãn + chênh lệch (có dấu). Sắp xếp theo chênh lệch để đọc thành một dải liên tục.",
+      "variants": [
+        "Chênh lệch tương đối (%) thay vì tuyệt đối — hợp khi các đối tượng khác quy mô.",
+        "Thêm dải nền cho ngưỡng chấp nhận được (±5%).",
+        "Kết hợp với bảng chênh lệch: biểu đồ để nhìn, bảng để đọc số."
+      ],
+      "seriesCap": null
+    },
+    {
+      "id": "pivot-table",
+      "nameVi": "Bảng chéo (pivot)",
+      "nameEn": "Pivot / cross-tab table",
+      "aliases": [
+        "pivot table",
+        "cross tab",
+        "bảng chéo",
+        "bảng tổng hợp",
+        "ma trận"
+      ],
+      "job": "table",
+      "status": "ready",
+      "description": "Một chiều chạy theo hàng, một chiều chạy theo cột, ô là giá trị đo lường — cộng tổng phụ ở rìa. Đây là xương sống của báo cáo quản trị: đọc được cả chi tiết lẫn tổng ở cùng một chỗ.",
+      "useWhen": [
+        "Hai chiều phân tích rõ ràng và người xem cần con số CHÍNH XÁC.",
+        "Người nhận sẽ copy sang Excel hoặc đối chiếu với hệ thống khác.",
+        "Cần tổng phụ theo cả hàng lẫn cột — biểu đồ không làm được việc này."
+      ],
+      "avoidWhen": [
+        "Thông điệp là hình dạng hoặc thứ hạng → biểu đồ đọc nhanh hơn nhiều.",
+        "Chiều cột có quá nhiều giá trị (12 tháng × 8 danh mục) → bảng tràn ngang, không ai đọc. Gộp bớt hoặc tách nhiều bảng.",
+        "Ô rỗng chiếm phần lớn → ma trận thưa nên chuyển về dạng danh sách."
+      ],
+      "dataShape": "Dữ liệu dài (long): chiều hàng + chiều cột + đo lường. Tổng phụ tính sẵn ở tầng dữ liệu, đừng tính trong JSX.",
+      "variants": [
+        "Thêm cột “% theo hàng” bên cạnh số tuyệt đối.",
+        "Ghim hàng tổng ở đáy khi bảng dài (`position: sticky`).",
+        "Kết hợp tô nền theo giá trị → thành bảng heatmap."
+      ],
+      "seriesCap": "Chiều cột nên ≤ 8 giá trị."
+    },
+    {
+      "id": "tree-table",
+      "nameVi": "Bảng phân cấp có tổng phụ",
+      "nameEn": "Tree table / grouped rows",
+      "aliases": [
+        "grouped table",
+        "drill-down",
+        "rollup",
+        "bảng nhóm",
+        "tổng phụ",
+        "thu gọn"
+      ],
+      "job": "table",
+      "status": "ready",
+      "description": "Hàng cha là tổng phụ của cả nhóm, bấm để mở ra các hàng con. Cho phép xem toàn cảnh trước, rồi đào xuống đúng nhánh cần — thay vì đổ hết vài trăm dòng ra một lượt.",
+      "useWhen": [
+        "Dữ liệu có cấu trúc phân cấp thật: vùng → chi nhánh → nhân viên.",
+        "Người xem bắt đầu từ tổng thể rồi mới cần chi tiết một nhánh.",
+        "Số dòng khi mở hết quá nhiều để đọc một lần."
+      ],
+      "avoidWhen": [
+        "Cấu trúc phẳng → gập mở chỉ tạo thêm thao tác thừa.",
+        "Người xem cần so sánh các hàng con thuộc các nhóm KHÁC nhau — chúng bị giấu sau các nhóm khác nhau; khi đó dùng bảng phẳng có cột nhóm và cho lọc.",
+        "Mặc định gập hết tất cả → người xem mở trang thấy gần như trống. Nên mở sẵn nhóm quan trọng nhất."
+      ],
+      "dataShape": "Cây `{ nhóm, children[], tổng phụ }`. Tổng phụ tính sẵn ở tầng dữ liệu.",
+      "variants": [
+        "Nhiều hơn 2 cấp — thụt lề tăng dần theo cấp.",
+        "Hiện số lượng con ngay cạnh tên nhóm (như demo).",
+        "Nút “mở tất cả / gập tất cả” khi có nhiều nhóm."
+      ],
+      "seriesCap": "2–3 cấp."
+    },
+    {
+      "id": "bar-in-cell",
+      "nameVi": "Thanh trong ô",
+      "nameEn": "Bar-in-cell / data bars",
+      "aliases": [
+        "data bar",
+        "in-cell bar",
+        "thanh trong bảng",
+        "conditional bar"
+      ],
+      "job": "table",
+      "status": "ready",
+      "description": "Một thanh nhỏ ngay trong ô bảng, mọc từ đường gốc chung ở mép trái. Cho phép so độ lớn bằng mắt mà không phải rời sang biểu đồ riêng — con số chính xác vẫn nằm ngay bên cạnh.",
+      "useWhen": [
+        "Bảng đã có sẵn và bạn chỉ muốn thêm một tầng cảm nhận về độ lớn.",
+        "Người xem vừa cần số chính xác vừa cần biết “ai lớn hơn ai”.",
+        "Giá trị không âm và có một mốc so sánh rõ ràng (lớn nhất, hoặc tổng)."
+      ],
+      "avoidWhen": [
+        "Mỗi hàng một thang đo riêng — thanh sẽ dài bằng nhau dù giá trị khác hẳn. Luôn dùng CHUNG một mốc cho cả cột.",
+        "Có giá trị âm → cần thanh hai chiều quanh trục giữa, không phải thanh thường.",
+        "Đã có sparkline ở cột khác → hai loại mark nhỏ cạnh nhau gây nhiễu, chọn một."
+      ],
+      "dataShape": "Giá trị của hàng + một mốc chuẩn hoá dùng chung cho cả cột.",
+      "variants": [
+        "Chuẩn hoá theo giá trị lớn nhất (như demo) hoặc theo tổng.",
+        "Thanh hai chiều quanh trục giữa cho giá trị có dấu.",
+        "Đặt số chồng lên thanh khi cột hẹp — nhớ chọn màu chữ theo độ sáng của thanh."
+      ],
+      "seriesCap": null
+    },
+    {
+      "id": "heatmap-table",
+      "nameVi": "Bảng tô nền theo giá trị",
+      "nameEn": "Heatmap table / conditional formatting",
+      "aliases": [
+        "conditional formatting",
+        "bảng nhiệt",
+        "tô màu ô",
+        "color scale"
+      ],
+      "job": "table",
+      "status": "ready",
+      "description": "Bảng chéo có nền ô tô theo giá trị. Giữ nguyên con số chính xác nhưng thêm một tầng đọc nhanh — mắt tìm ra vùng nóng trước, rồi mới đọc số.",
+      "useWhen": [
+        "Ma trận đủ đặc và người xem cần cả “vùng nào cao” lẫn con số cụ thể.",
+        "Muốn ưu điểm của heatmap mà không mất khả năng đọc chính xác."
+      ],
+      "avoidWhen": [
+        "Không kiểm soát màu chữ theo độ sáng nền → chữ trắng trên ô nhạt sẽ biến mất. Phải tính tương phản cho từng ô.",
+        "Tô cả bảng kể cả hàng tổng → hàng tổng luôn đậm nhất và át hết phần còn lại. Loại hàng/cột tổng ra khỏi thang màu.",
+        "Thang cầu vồng — cấm, như mọi thang sequential khác. Có dấu (+/−) thì dùng diverging với xám ở giữa."
+      ],
+      "dataShape": "Giống bảng chéo, cộng min/max để chuẩn hoá giá trị về [0, 1].",
+      "variants": [
+        "Chuẩn hoá toàn bảng (như demo) hoặc theo từng hàng — nói rõ đang dùng cách nào.",
+        "Thang diverging khi ô là chênh lệch so với trung bình.",
+        "Chỉ tô ô vượt ngưỡng, phần còn lại để trắng — nhẹ mắt hơn nhiều."
+      ],
+      "seriesCap": null
+    },
+    {
+      "id": "variance-table",
+      "nameVi": "Bảng chênh lệch",
+      "nameEn": "Variance table",
+      "aliases": [
+        "thực hiện kế hoạch",
+        "actual vs plan",
+        "so cùng kỳ",
+        "bảng biến động",
+        "TH/KH"
+      ],
+      "job": "table",
+      "status": "ready",
+      "description": "Thực hiện đặt cạnh kế hoạch và cùng kỳ, cộng cột chênh lệch tuyệt đối và phần trăm. Điểm mấu chốt: **tính sẵn cột Δ**, đừng bắt người xem tự trừ hai cột trong đầu.",
+      "useWhen": [
+        "Báo cáo định kỳ có mốc so sánh cố định (kế hoạch, cùng kỳ, dự báo).",
+        "Người xem cần biết chênh bao nhiêu, không chỉ là cao hay thấp."
+      ],
+      "avoidWhen": [
+        "Chỉ để hai cột số cạnh nhau mà không có cột Δ — đó là bắt người đọc làm toán, và họ sẽ không làm.",
+        "Dùng riêng màu đỏ/xanh để báo tốt xấu → người mù màu không đọc được. Luôn kèm dấu +/− hoặc ▲▼.",
+        "Mẫu số quá nhỏ → % nhảy loạn; khi đó chỉ nên hiện chênh lệch tuyệt đối."
+      ],
+      "dataShape": "Mỗi hàng: giá trị kỳ này + các mốc so sánh. Cột Δ và Δ% tính ở tầng dữ liệu.",
+      "variants": [
+        "Thêm cột thanh trong ô cho Δ để thấy ngay ai lệch nhiều nhất.",
+        "Chỉ tô màu khi vượt ngưỡng (ví dụ lệch > 5%), còn lại để mực thường.",
+        "Với chỉ số “tăng là xấu” (chi phí) phải đảo chiều màu — và ghi rõ ở chú giải."
+      ],
+      "seriesCap": null
+    },
+    {
+      "id": "rank-table",
+      "nameVi": "Bảng xếp hạng",
+      "nameEn": "Leaderboard / ranking table",
+      "aliases": [
+        "leaderboard",
+        "top n",
+        "bảng xếp hạng",
+        "thứ hạng"
+      ],
+      "job": "table",
+      "status": "ready",
+      "description": "Danh sách sắp theo thứ hạng, kèm cột thay đổi hạng so với kỳ trước. Cột thay đổi mới là phần có giá trị — thứ hạng tuyệt đối thường khá tĩnh và ít tin tức.",
+      "useWhen": [
+        "Có yếu tố thi đua giữa các đơn vị và người xem quan tâm vị trí.",
+        "Cần chỉ ra ai đang lên hoặc xuống nhanh.",
+        "Top-N là đủ, không cần toàn bộ danh sách."
+      ],
+      "avoidWhen": [
+        "Chênh lệch giữa các hạng rất nhỏ → thứ hạng gây cảm giác khác biệt lớn hơn thực tế. Luôn hiện kèm giá trị thật.",
+        "Số đối tượng thay đổi giữa hai kỳ → “thay đổi hạng” mất ý nghĩa; nói rõ hoặc bỏ cột đó.",
+        "Xếp hạng cá nhân công khai khi dữ liệu nhạy cảm — cân nhắc yếu tố con người."
+      ],
+      "dataShape": "Mỗi hàng: đối tượng + giá trị + hạng kỳ này + hạng kỳ trước.",
+      "variants": [
+        "Top-N + dòng “còn lại” gộp phần đuôi.",
+        "Ghim hàng của chính người đang xem, kể cả khi nằm ngoài top.",
+        "Thêm sparkline diễn biến hạng theo thời gian."
+      ],
+      "seriesCap": null
+    },
+    {
+      "id": "stacked-bar",
+      "nameVi": "Cột chồng",
+      "nameEn": "Stacked bar chart",
+      "aliases": [
+        "stacked column",
+        "cột xếp chồng",
+        "part-to-whole"
+      ],
+      "job": "composition",
+      "status": "ready",
+      "description": "Mỗi cột là một tổng, chia thành các phần theo một chiều thứ hai. Đọc được TỔNG và phần ĐÁY chính xác; các phần ở giữa chỉ ước lượng được vì chúng không chung đường gốc.",
+      "useWhen": [
+        "Câu hỏi là “tổng bao nhiêu VÀ gồm những gì” — cần cả hai.",
+        "2–5 thành phần. Đặt thành phần quan trọng nhất xuống ĐÁY để nó có đường gốc chung."
+      ],
+      "avoidWhen": [
+        "Người xem cần so sánh chính xác một thành phần ở GIỮA giữa các cột → tách thành small multiples hoặc line riêng.",
+        "Hơn 5–6 thành phần → gộp đuôi thành “Khác”.",
+        "Thành phần có giá trị âm → cột chồng vỡ nghĩa, dùng waterfall hoặc diverging bar."
+      ],
+      "dataShape": "Ma trận nhóm × thành phần, các thành phần cộng lại ra tổng của nhóm.",
+      "variants": [
+        "Ngang (khi tên nhóm dài) hoặc dọc.",
+        "Stacked area cho trục thời gian liên tục.",
+        "Sắp thứ tự thành phần CỐ ĐỊNH giữa mọi cột, không sắp lại theo từng cột."
+      ],
+      "seriesCap": "2–5 thành phần."
+    },
+    {
+      "id": "stacked-100",
+      "nameVi": "Cột chồng 100%",
+      "nameEn": "100% stacked bar",
+      "aliases": [
+        "tỷ trọng",
+        "share chart",
+        "proportional stacked bar",
+        "cơ cấu %"
+      ],
+      "job": "composition",
+      "status": "ready",
+      "description": "Mọi cột kéo dài bằng nhau; chỉ TỶ TRỌNG được so sánh. Trả lời “cơ cấu có khác nhau không”, và cố tình vứt bỏ thông tin về quy mô.",
+      "useWhen": [
+        "So sánh cơ cấu giữa các đối tượng có quy mô rất chênh lệch.",
+        "Câu hỏi thuần về tỷ lệ: “chi nhánh nào phụ thuộc nhóm Thiết bị nhiều nhất?”"
+      ],
+      "avoidWhen": [
+        "Người xem cũng cần biết quy mô — biểu đồ này giấu mất. Ghép thêm một cột số tổng, hoặc dùng cột chồng thường.",
+        "Cơ cấu gần như giống nhau ở mọi nhóm → chẳng có gì để kể, dùng bảng."
+      ],
+      "dataShape": "Giống cột chồng, nhưng chuẩn hoá mỗi nhóm về 100%.",
+      "variants": [
+        "Diverging stacked bar cho thang có thứ tự (rất không hài lòng ↔ rất hài lòng), căn giữa ở mức trung lập.",
+        "Ghi kèm tổng tuyệt đối ở cuối mỗi dòng để bù lại thông tin bị mất."
+      ],
+      "seriesCap": "2–5 thành phần."
+    },
+    {
+      "id": "donut",
+      "nameVi": "Biểu đồ vành khuyên",
+      "nameEn": "Donut / pie chart",
+      "aliases": [
+        "pie",
+        "bánh",
+        "tròn",
+        "cơ cấu tròn"
+      ],
+      "job": "composition",
+      "status": "ready",
+      "description": "Cơ cấu của MỘT tổng duy nhất. Mắt người so góc kém hơn so độ dài rất nhiều — nên đây là dạng yếu, chỉ dùng khi số lát ít và thông điệp là “một lát chiếm phần lớn”.",
+      "useWhen": [
+        "2–4 lát, chênh lệch rõ ràng.",
+        "Chỉ có MỘT tổng để mổ xẻ (không so giữa nhiều nhóm).",
+        "Lỗ giữa donut là chỗ đặt con số tổng — tận dụng nó."
+      ],
+      "avoidWhen": [
+        "Trên 5 lát → dùng thanh ngang, đọc nhanh và chính xác hơn hẳn.",
+        "Các lát xấp xỉ nhau → không ai phân biệt được góc 24% với 26%.",
+        "So sánh cơ cấu giữa nhiều nhóm → tuyệt đối không dùng nhiều pie cạnh nhau; dùng cột chồng 100%.",
+        "Không bao giờ tách lát (exploded), không bao giờ 3D."
+      ],
+      "dataShape": "Danh sách {tên, giá trị} không âm, cộng lại ra một tổng có nghĩa.",
+      "variants": [
+        "Donut (có lỗ, đặt số tổng vào giữa) — gần như luôn tốt hơn pie đặc.",
+        "Waffle 10×10 ô — đọc tỷ lệ chính xác hơn góc."
+      ],
+      "seriesCap": "2–5 lát; quá thì gộp “Khác”."
+    },
+    {
+      "id": "treemap",
+      "nameVi": "Treemap",
+      "nameEn": "Treemap",
+      "aliases": [
+        "ô vuông lồng",
+        "bản đồ cây",
+        "mosaic"
+      ],
+      "job": "hierarchy",
+      "status": "ready",
+      "description": "Diện tích ô chở giá trị, ô lồng nhau chở cấp bậc. Nhồi được rất nhiều hạng mục vào một khung chữ nhật — đổi lại độ chính xác khi đọc: mắt người so diện tích còn tệ hơn so góc.",
+      "useWhen": [
+        "Nhiều hạng mục (20–200) nằm trong một cấu trúc phân cấp.",
+        "Thông điệp là “cái nào chiếm phần lớn, cái nào không đáng kể”.",
+        "Không gian bị bó hẹp mà vẫn phải trình bày cả cây."
+      ],
+      "avoidWhen": [
+        "Cần so sánh chính xác hai hạng mục — dùng bar chart, độ dài đọc chính xác hơn diện tích rất nhiều.",
+        "Cấu trúc phẳng, dưới ~15 hạng mục → thanh ngang.",
+        "Có giá trị âm hoặc bằng 0 → treemap không biểu diễn được.",
+        "Quá 3 cấp → nhãn không còn chỗ, ô nhỏ như hạt vừng."
+      ],
+      "dataShape": "Cây `{ name, value }` hoặc `{ name, children: [...] }`. Giá trị phải không âm.",
+      "variants": [
+        "Ô cấp 2 dùng cùng hue với cha, chỉ đổi độ bão hoà — đó là cách giữ đúng trần 8 màu dù có 20 ô.",
+        "Tô màu theo một chỉ số THỨ HAI (tăng trưởng) trong khi diện tích chở doanh thu — mạnh, nhưng phải ghi rõ ở chú giải.",
+        "Cho click để đi sâu (drill-down) khi cây nhiều cấp."
+      ],
+      "seriesCap": "Cấp 1 tối đa 8 hạng mục (bằng số slot màu); cấp 2 tuỳ ý."
+    },
+    {
+      "id": "waffle",
+      "nameVi": "Waffle chart",
+      "nameEn": "Waffle / unit chart",
+      "aliases": [
+        "lưới 100 ô",
+        "unit chart",
+        "pictogram",
+        "square pie"
+      ],
+      "job": "composition",
+      "status": "ready",
+      "description": "Lưới 10×10, mỗi ô bằng 1%. Người xem đếm ô thay vì ước lượng góc, nên đọc tỷ lệ chính xác hơn hẳn pie — đặc biệt với người không quen đọc biểu đồ.",
+      "useWhen": [
+        "Trình bày một cơ cấu cho khán giả rộng (báo cáo nội bộ, slide họp).",
+        "2–4 nhóm, và con số phần trăm chính là thông điệp.",
+        "Muốn nhấn “cứ 100 đồng doanh thu thì 58 đồng đến từ nhóm Thiết bị”."
+      ],
+      "avoidWhen": [
+        "Nhiều hơn 4–5 nhóm → lưới thành khảm màu, hết đếm nổi.",
+        "Tỷ lệ rất nhỏ (0,3%) → không có ô nào để biểu diễn; làm tròn sẽ nói dối.",
+        "Cần so sánh cơ cấu giữa nhiều nhóm → cột chồng 100%."
+      ],
+      "dataShape": "Danh sách `{ tên, tỷ lệ % }` cộng lại bằng 100.",
+      "variants": [
+        "Đổi ô vuông thành icon (hình người, hình xe) → pictogram, hợp khi đơn vị là “người”.",
+        "Lưới 5×20 hoặc 20×5 nếu bố cục cần ngang/dọc."
+      ],
+      "seriesCap": "2–4 nhóm."
+    },
+    {
+      "id": "sunburst",
+      "nameVi": "Sunburst",
+      "nameEn": "Sunburst / icicle",
+      "aliases": [
+        "pie nhiều lớp",
+        "radial treemap",
+        "vòng đồng tâm"
+      ],
+      "job": "hierarchy",
+      "status": "ready",
+      "description": "Pie nhiều vòng đồng tâm: vòng trong là cấp cha, vòng ngoài là cấp con nằm đúng trong cung của cha. Thấy được cả tổng thể lẫn đường đi xuống từng nhánh.",
+      "useWhen": [
+        "Cấu trúc 2–3 cấp, và quan hệ cha–con là thông điệp chính.",
+        "Số nhánh mỗi cấp ít (≤ 8 ở cấp 1).",
+        "Trình bày, giới thiệu — sunburst gây ấn tượng tốt hơn là để đọc số."
+      ],
+      "avoidWhen": [
+        "Quá 3 cấp → vòng ngoài mỏng như sợi chỉ, nhãn không nhét được. Dùng icicle (chính nó nhưng duỗi thẳng thành thanh) — dễ đọc hơn nhiều.",
+        "Cần đọc giá trị → góc là kênh yếu; kèm bảng.",
+        "Nhánh có giá trị rất chênh lệch → nhánh nhỏ biến mất."
+      ],
+      "dataShape": "Cây `{ name, value, children }`, giống treemap.",
+      "variants": [
+        "Icicle / partition: cùng dữ liệu, vẽ thành thanh xếp tầng — luôn dễ đọc hơn khi từ 3 cấp trở lên.",
+        "Cho click để zoom vào một nhánh."
+      ],
+      "seriesCap": "Cấp 1 tối đa 8; cấp 2 dùng sắc độ của cha."
+    },
+    {
+      "id": "line",
+      "nameVi": "Biểu đồ đường",
+      "nameEn": "Line chart",
+      "aliases": [
+        "time series",
+        "chuỗi thời gian",
+        "xu hướng"
+      ],
+      "job": "trend",
+      "status": "ready",
+      "description": "Nối các điểm theo thời gian. Độ dốc chở thông tin “đang tăng/giảm nhanh chậm ra sao” — thứ mà biểu đồ cột không diễn đạt được.",
+      "useWhen": [
+        "Trục hoành là thời gian liên tục, khoảng cách đều nhau.",
+        "Từ ~8 điểm trở lên (ít hơn thì cột đọc rõ hơn).",
+        "Cần so sánh hình dạng giữa 2–4 đối tượng."
+      ],
+      "avoidWhen": [
+        "Trục hoành là danh mục rời rạc (tên chi nhánh, tên sản phẩm) — nối chúng bằng đường là bịa ra một sự liên tục không có thật.",
+        "Quá 4–5 đường hội tụ vào nhau → nhãn cuối dính chùm; tách small multiples.",
+        "Dữ liệu có lỗ hổng → phải để đứt đoạn, đừng nối thẳng qua chỗ thiếu."
+      ],
+      "dataShape": "Mỗi series là một mảng giá trị theo cùng một trục thời gian.",
+      "variants": [
+        "Có/không điểm đánh dấu — chỉ hiện điểm khi dữ liệu thưa (< 20 điểm).",
+        "Đường mượt (smooth) — tránh dùng: nó bịa ra giá trị giữa hai mốc.",
+        "Thêm đường trung bình động khi dữ liệu ngày nhiễu mạnh."
+      ],
+      "seriesCap": "1–4. Quá 4 → small multiples."
+    },
+    {
+      "id": "area",
+      "nameVi": "Biểu đồ miền",
+      "nameEn": "Area chart",
+      "aliases": [
+        "area",
+        "miền",
+        "filled line"
+      ],
+      "job": "trend",
+      "status": "ready",
+      "description": "Đường có tô nền xuống trục gốc. Phần tô gợi ý “khối lượng tích luỹ”, hợp khi giá trị là một lượng cộng dồn được.",
+      "useWhen": [
+        "MỘT series duy nhất, và bạn muốn nhấn cảm giác khối lượng.",
+        "Trục giá trị bắt đầu từ 0 (bắt buộc — phần tô vô nghĩa nếu cắt gốc)."
+      ],
+      "avoidWhen": [
+        "Nhiều series chồng lấn → miền này che miền kia. Dùng đường thường.",
+        "Giá trị là tỷ lệ, chỉ số, nhiệt độ — những thứ không “cộng dồn” được thì phần tô nói dối.",
+        "Đừng tô đậm (opacity cao). 10% là đủ; đậm hơn thì phần tô át mất chính đường."
+      ],
+      "dataShape": "Một mảng giá trị không âm theo trục thời gian.",
+      "variants": [
+        "Stacked area — cơ cấu theo thời gian; chỉ dùng khi các phần thật sự cộng lại thành tổng có nghĩa.",
+        "Streamgraph — đẹp nhưng khó đọc giá trị; chỉ hợp trình bày, không hợp báo cáo."
+      ],
+      "seriesCap": "1 (chồng lấn) hoặc 2–4 (stacked)."
+    },
+    {
+      "id": "emphasis-line",
+      "nameVi": "Nhấn mạnh một đường",
+      "nameEn": "Emphasis (highlight one series)",
+      "aliases": [
+        "highlight",
+        "focus chart",
+        "gray-out",
+        "làm nổi một series"
+      ],
+      "job": "trend",
+      "status": "ready",
+      "description": "Một đường mặc màu nhấn, tất cả các đường còn lại lùi về xám làm nền so sánh. Đây là dạng bị bỏ quên nhiều nhất — và thường là câu trả lời đúng cho “làm sao cho biểu đồ này dễ hiểu hơn”.",
+      "useWhen": [
+        "Câu chuyện là về MỘT đối tượng, các đối tượng khác chỉ để làm ngữ cảnh.",
+        "Có 5–15 series — quá nhiều cho màu danh tính, nhưng vẫn muốn thấy toàn cảnh.",
+        "Dashboard có bộ lọc “chọn chi nhánh” — chi nhánh được chọn nhấn màu, phần còn lại xám."
+      ],
+      "avoidWhen": [
+        "Mọi series đều quan trọng ngang nhau → dùng màu categorical, hoặc small multiples.",
+        "Đừng nhấn nhiều hơn 2 series — nhấn tất cả nghĩa là không nhấn gì."
+      ],
+      "dataShape": "Giống biểu đồ đường, thêm một biến “series nào đang được chọn”.",
+      "variants": [
+        "Nhấn 1 vs so với đường trung bình toàn chuỗi (vẽ nét đứt màu mực).",
+        "Áp dụng được cho cả cột, thanh ngang, scatter — không riêng gì đường."
+      ],
+      "seriesCap": "Nền tuỳ ý; nhấn tối đa 2."
+    },
+    {
+      "id": "scatter",
+      "nameVi": "Biểu đồ phân tán",
+      "nameEn": "Scatter plot",
+      "aliases": [
+        "scatter",
+        "XY plot",
+        "tương quan",
+        "correlation chart"
+      ],
+      "job": "correlation",
+      "status": "ready",
+      "description": "Mỗi điểm là một quan sát, đặt theo hai chỉ số. Dạng duy nhất trả lời trực tiếp “X tăng thì Y có tăng theo không, và ngoại lệ nằm ở đâu”.",
+      "useWhen": [
+        "Cần kiểm tra quan hệ giữa hai đại lượng liên tục.",
+        "Cần soi ngoại lệ — điểm lạc ra khỏi đám mây chính.",
+        "Có từ ~20 quan sát trở lên (ít hơn thì bảng là đủ)."
+      ],
+      "avoidWhen": [
+        "Một trong hai trục là danh mục → không phải scatter, đó là dot plot.",
+        "Quá nhiều điểm chồng lên nhau → giảm opacity, hoặc chuyển sang heatmap mật độ.",
+        "Đừng vẽ đường xu hướng rồi kết luận nhân quả — tương quan không phải nhân quả.",
+        "Đây là dạng “mọi cặp màu cùng xuất hiện”: trần 3 màu. Nhiều nhóm hơn thì tách small multiples."
+      ],
+      "dataShape": "Danh sách quan sát, mỗi quan sát có [x, y] và (tuỳ chọn) nhóm.",
+      "variants": [
+        "Bubble chart — thêm chiều thứ ba bằng kích thước điểm (diện tích tỷ lệ với giá trị, KHÔNG phải bán kính).",
+        "Thêm đường hồi quy — chỉ khi có ý nghĩa thống kê thật.",
+        "Chia ô 4 phần theo hai đường trung vị để phân loại nhanh."
+      ],
+      "seriesCap": "1–3 nhóm màu."
+    },
+    {
+      "id": "heatmap",
+      "nameVi": "Bản đồ nhiệt",
+      "nameEn": "Heatmap (matrix)",
+      "aliases": [
+        "heatmap",
+        "ma trận nhiệt",
+        "calendar heatmap",
+        "cường độ"
+      ],
+      "job": "pattern",
+      "status": "ready",
+      "description": "Một lưới hai chiều, độ đậm của ô chở giá trị. Tìm QUY LUẬT theo lưới — cao điểm rơi vào khung giờ nào, ngày nào — thứ mà 56 cột trong một biểu đồ cột không bao giờ cho thấy.",
+      "useWhen": [
+        "Hai chiều danh mục rõ ràng (giờ × thứ, tuần × tháng, sản phẩm × vùng).",
+        "Cần thấy “vùng nóng” chứ không cần đọc số chính xác.",
+        "Lưới đủ đặc — hầu hết ô đều có dữ liệu."
+      ],
+      "avoidWhen": [
+        "Cần so sánh giá trị chính xác → mắt người ước lượng độ đậm rất tệ. Kèm thêm bảng, hoặc gắn số vào ô.",
+        "Lưới thưa, nhiều ô rỗng → nhìn như nhiễu.",
+        "Thang màu cầu vồng — cấm tuyệt đối. Sequential phải là MỘT hue, nhạt → đậm."
+      ],
+      "dataShape": "Bộ ba [chỉ số cột, chỉ số dòng, giá trị] cho từng ô của lưới.",
+      "variants": [
+        "Calendar heatmap — lưới ngày trong năm (kiểu contribution graph của GitHub).",
+        "Ma trận tương quan — dùng thang DIVERGING (2 hue + xám ở giữa) vì giá trị có dấu.",
+        "Gắn số vào ô khi lưới nhỏ (< ~40 ô)."
+      ],
+      "seriesCap": null
+    },
+    {
+      "id": "histogram",
+      "nameVi": "Histogram",
+      "nameEn": "Histogram",
+      "aliases": [
+        "phân phối",
+        "distribution",
+        "tần suất",
+        "biểu đồ tần số"
+      ],
+      "job": "distribution",
+      "status": "ready",
+      "description": "Chia giá trị thành các khoảng đều nhau rồi đếm số quan sát rơi vào mỗi khoảng. Cho thấy dữ liệu tụ ở đâu, có mấy đỉnh, lệch về phía nào — những thứ mà một con số trung bình che giấu hoàn toàn.",
+      "useWhen": [
+        "Trước khi báo cáo bằng số trung bình — luôn nhìn phân bố trước.",
+        "Cần biết dữ liệu có một đỉnh hay hai đỉnh (hai nhóm khác nhau bị trộn vào nhau).",
+        "Có từ ~30 quan sát trở lên."
+      ],
+      "avoidWhen": [
+        "Dưới ~30 quan sát → mỗi cột chỉ 1–2 quan sát, hình dạng là nhiễu. Dùng dot plot hoặc beeswarm.",
+        "Trục hoành là danh mục rời rạc — đó là bar chart, không phải histogram (và các cột phải TÁCH nhau).",
+        "So sánh phân bố giữa nhiều nhóm → box plot hoặc small multiples; nhiều histogram chồng lên nhau không đọc được."
+      ],
+      "dataShape": "Một mảng giá trị số THÔ (chưa tổng hợp). Việc chia bin do biểu đồ làm.",
+      "variants": [
+        "Đổi độ rộng bin — luôn thử vài mức trước khi chốt.",
+        "Thêm đường mật độ (KDE) chồng lên.",
+        "Vạch mốc trung vị / trung bình bằng nét đứt màu mực (như demo)."
+      ],
+      "seriesCap": "1 phân bố mỗi khung."
+    },
+    {
+      "id": "boxplot",
+      "nameVi": "Box plot",
+      "nameEn": "Box plot / violin",
+      "aliases": [
+        "hộp râu",
+        "quartile chart",
+        "violin plot",
+        "box and whisker"
+      ],
+      "job": "distribution",
+      "status": "ready",
+      "description": "Tóm tắt phân bố bằng năm số: nhỏ nhất, Q1, trung vị, Q3, lớn nhất — cộng các điểm ngoại lệ vẽ riêng. Nén cả một phân bố vào một cột hẹp, nên so được nhiều nhóm cạnh nhau.",
+      "useWhen": [
+        "So sánh phân bố giữa 3–15 nhóm trên cùng một khung.",
+        "Ngoại lệ là thứ cần thấy (ngày lễ, sự cố, gian lận).",
+        "Người xem có nền thống kê, hoặc bạn có chỗ để giải thích."
+      ],
+      "avoidWhen": [
+        "Đưa cho lãnh đạo trên dashboard mà không giải thích — box plot cần được dạy cách đọc; phần lớn người xem sẽ hiểu sai.",
+        "Phân bố hai đỉnh → box plot giấu mất hoàn toàn. Dùng violin, beeswarm, hoặc histogram small multiples.",
+        "Ít hơn ~10 quan sát mỗi nhóm → vẽ thẳng từng điểm, đừng tóm tắt."
+      ],
+      "dataShape": "Mỗi nhóm một mảng giá trị thô. Năm số và ngoại lệ do mình tính (1,5 × IQR).",
+      "variants": [
+        "Violin plot: thay hộp bằng hình dạng mật độ — thấy được đa đỉnh.",
+        "Beeswarm: vẽ hết các điểm, xô lệch nhau để không chồng — trung thực nhất khi n nhỏ.",
+        "Chồng các điểm thô mờ lên trên hộp — vừa tóm tắt vừa không giấu gì."
+      ],
+      "seriesCap": "3–15 nhóm."
+    },
+    {
+      "id": "waterfall",
+      "nameVi": "Waterfall (thác nước)",
+      "nameEn": "Waterfall chart",
+      "aliases": [
+        "bridge chart",
+        "cầu nối",
+        "biến động",
+        "phân rã"
+      ],
+      "job": "flow",
+      "status": "ready",
+      "description": "Đi từ số đầu kỳ đến số cuối kỳ, mỗi cột là một khoản cộng hoặc trừ. Trả lời câu hỏi mà không biểu đồ nào khác trả lời gọn được: “vì sao từ đây thành ra kia”.",
+      "useWhen": [
+        "Phân rã một mức chênh lệch: doanh thu → lợi nhuận, kế hoạch → thực hiện, kỳ trước → kỳ này.",
+        "Các khoản cộng lại ĐÚNG bằng số cuối — nếu không thì biểu đồ đang nói dối.",
+        "4–10 bước."
+      ],
+      "avoidWhen": [
+        "Quá 10 bước → cột nào cũng bé xíu; gộp các khoản nhỏ thành “Khác”.",
+        "Thứ tự các bước không có ý nghĩa → waterfall ngụ ý một trình tự; nếu không có thì dùng bar chart.",
+        "Các khoản chồng lấn nhau (một khoản đã bao gồm khoản kia) → tổng sai, phải làm sạch số trước."
+      ],
+      "dataShape": "Chuỗi CÓ THỨ TỰ: nhãn + delta (dương/âm), cộng một mốc đầu và một mốc cuối. Chân đế mỗi cột do mình tính tích luỹ.",
+      "variants": [
+        "Ngang khi nhãn dài (rất hay gặp với khoản mục kế toán).",
+        "Thêm mốc trung gian (ví dụ “Lợi nhuận gộp”) — vẽ như cột mốc mọc từ 0.",
+        "Nối các cột bằng đường mảnh để mắt lần được mạch tích luỹ."
+      ],
+      "seriesCap": "4–10 bước."
+    },
+    {
+      "id": "sankey",
+      "nameVi": "Sankey",
+      "nameEn": "Sankey diagram",
+      "aliases": [
+        "luồng",
+        "flow diagram",
+        "alluvial",
+        "dòng chảy"
+      ],
+      "job": "flow",
+      "status": "ready",
+      "description": "Dòng chảy có độ dày tỷ lệ với lượng, từ tập nút này sang tập nút khác. Thấy được cả cơ cấu hai đầu lẫn cách chúng nối với nhau — thứ mà hai biểu đồ tròn cạnh nhau không bao giờ cho thấy.",
+      "useWhen": [
+        "Chuyển dịch giữa hai (hoặc vài) trạng thái: kênh → sản phẩm, nguồn → đích, kỳ trước → kỳ này.",
+        "Lượng được BẢO TOÀN: vào bao nhiêu ra bấy nhiêu.",
+        "Mỗi bên dưới ~8 nút."
+      ],
+      "avoidWhen": [
+        "Quá nhiều nút → thành mớ mì, không lần ra dòng nào. Gộp đuôi thành “Khác”.",
+        "Lượng không bảo toàn (có hao hụt không mô hình hoá) → người xem sẽ hiểu sai.",
+        "Chỉ cần biết cơ cấu một đầu → cột chồng hoặc thanh ngang, gọn hơn nhiều."
+      ],
+      "dataShape": "Danh sách nút + danh sách cạnh `{ source, target, value }`.",
+      "variants": [
+        "Nhiều tầng (3+ cột nút) cho hành trình nhiều bước.",
+        "Alluvial: cùng dạng nhưng trục ngang là thời gian, cho thấy thứ hạng thay đổi."
+      ],
+      "seriesCap": "Mỗi tầng ≤ 8 nút mang màu."
+    },
+    {
+      "id": "funnel",
+      "nameVi": "Phễu",
+      "nameEn": "Funnel chart",
+      "aliases": [
+        "conversion funnel",
+        "phễu chuyển đổi",
+        "tỷ lệ rơi rụng"
+      ],
+      "job": "flow",
+      "status": "ready",
+      "description": "Các bậc thu hẹp dần theo một quy trình có thứ tự. Giá trị nằm ở tỷ lệ RƠI RỤNG giữa hai bậc liền kề — đó mới là con số cần đọc, không phải chiều rộng của bậc.",
+      "useWhen": [
+        "Quy trình tuyến tính, và bậc sau là TẬP CON của bậc trước.",
+        "Cần chỉ ra bước nào mất khách nhiều nhất.",
+        "3–7 bậc."
+      ],
+      "avoidWhen": [
+        "Các bậc không phải tập con của nhau → đó chỉ là bar chart đội lốt phễu, và hình dạng thu hẹp là bịa.",
+        "Người dùng có thể quay lại bậc trước, hoặc nhảy cóc → phễu che mất điều đó; dùng sankey.",
+        "Cần so sánh phễu giữa nhiều nhóm → dùng bảng tỷ lệ chuyển đổi, phễu không xếp cạnh nhau được."
+      ],
+      "dataShape": "Chuỗi bậc CÓ THỨ TỰ + số lượng mỗi bậc, giảm dần đơn điệu.",
+      "variants": [
+        "Ghi tỷ lệ so với bậc trước ngay trên mỗi bậc — thường hữu ích hơn tỷ lệ so với bậc đầu.",
+        "Phễu ngang khi tên bậc dài.",
+        "Bar chart ngang có ghi % rơi rụng — kém đẹp hơn nhưng đọc chính xác hơn."
+      ],
+      "seriesCap": "3–7 bậc."
+    },
+    {
+      "id": "bubble-map",
+      "nameVi": "Bản đồ điểm (bubble map)",
+      "nameEn": "Bubble / symbol map",
+      "aliases": [
+        "proportional symbol map",
+        "bản đồ bong bóng",
+        "điểm trên bản đồ"
+      ],
+      "job": "geo",
+      "status": "ready",
+      "description": "Mỗi địa điểm một chấm, diện tích chấm chở giá trị. Không cần file bản đồ nền: chỉ cần kinh độ/vĩ độ là vẽ được — và nó tránh được lỗi lớn nhất của choropleth (tỉnh to trông “nhiều” hơn).",
+      "useWhen": [
+        "Dữ liệu gắn với ĐIỂM cụ thể: cửa hàng, chi nhánh, kho, dự án.",
+        "Giá trị là số tuyệt đối (doanh thu, số lượng) — bubble map không bị lỗi diện tích như choropleth.",
+        "Dưới ~50 điểm."
+      ],
+      "avoidWhen": [
+        "Cho bán kính tỷ lệ thẳng với giá trị — đó là bóp méo kinh điển: giá trị gấp đôi sẽ trông gấp BỐN. Luôn cho DIỆN TÍCH tỷ lệ, tức bán kính theo căn bậc hai.",
+        "Các điểm quá gần nhau → bong bóng chồng lấn; gộp theo cụm hoặc dùng bản đồ nền tô màu.",
+        "Câu hỏi thật ra chỉ là xếp hạng → thanh ngang chính xác hơn bản đồ rất nhiều. Chỉ dùng bản đồ khi VỊ TRÍ là một phần câu chuyện."
+      ],
+      "dataShape": "Mỗi điểm: `[kinh độ, vĩ độ, giá trị]` + tên.",
+      "variants": [
+        "Có bản đồ nền: đăng ký GeoJSON rồi đổi sang `coordinateSystem: \"geo\"` — phần còn lại giữ nguyên.",
+        "Không có bản đồ nền (như demo): vẽ trên trục kinh/vĩ độ thường; đủ dùng khi các điểm nằm dọc một trục.",
+        "Thêm màu để chở chiều thứ hai (tăng trưởng) trong khi kích thước chở quy mô."
+      ],
+      "seriesCap": "1 nhóm màu; nhiều nhóm thì tối đa 3 (dạng “mọi cặp cùng xuất hiện”)."
+    },
+    {
+      "id": "choropleth-vn",
+      "nameVi": "Bản đồ nền tô màu (choropleth)",
+      "nameEn": "Choropleth map",
+      "aliases": [
+        "bản đồ nhiệt tỉnh thành",
+        "map",
+        "geo",
+        "tô màu theo tỉnh"
+      ],
+      "job": "geo",
+      "status": "planned",
+      "description": "Tô màu từng tỉnh/thành theo giá trị, dùng thang sequential một hue. Chưa dựng demo vì cần file GeoJSON ranh giới tỉnh — xem phần code bên dưới để biết cách gắn vào.",
+      "useWhen": [
+        "Đơn vị dữ liệu chính là VÙNG (tỉnh, quận, vùng bán hàng), không phải điểm.",
+        "Giá trị đã được CHUẨN HOÁ theo dân số / diện tích / số cửa hàng.",
+        "Vị trí địa lý thật sự là một phần câu chuyện."
+      ],
+      "avoidWhen": [
+        "Dùng số TUYỆT ĐỐI — lỗi phổ biến nhất: tỉnh to tự nhiên trông “nhiều” hơn chỉ vì nó rộng. Luôn chuẩn hoá, hoặc dùng bubble map.",
+        "Chỉ cần xếp hạng → thanh ngang chính xác hơn nhiều; bản đồ chỉ thắng khi cần thấy quan hệ không gian.",
+        "Nhiều vùng không có dữ liệu → mảng trắng loang lổ đọc như lỗi.",
+        "Thang cầu vồng — cấm tuyệt đối, như mọi thang sequential khác."
+      ],
+      "dataShape": "Mã tỉnh/thành + giá trị, khớp đúng thuộc tính `name` trong GeoJSON.",
+      "variants": [
+        "Tile grid map (mỗi tỉnh một ô vuông bằng nhau) — bỏ hình dạng thật để mọi vùng có trọng số thị giác như nhau.",
+        "Cartogram: biến dạng vùng theo giá trị."
+      ],
+      "seriesCap": null
+    },
+    {
+      "id": "crossfilter-chart-chart",
+      "nameVi": "Lọc chéo 2 khối · biểu đồ ↔ biểu đồ",
+      "nameEn": "Cross-filter, two charts",
+      "aliases": [
+        "cross filter",
+        "lọc chéo",
+        "linked chart",
+        "drill",
+        "liên kết biểu đồ"
+      ],
+      "job": "cross-filter",
+      "status": "ready",
+      "description": "Cặp nhỏ nhất của lọc chéo: một biểu đồ làm NGUỒN chọn, một biểu đồ làm ĐÍCH. Click một thanh chi nhánh thì đường doanh thu bên cạnh vẽ lại cho riêng chi nhánh đó. Điểm mấu chốt: nguồn không tự lọc chính nó — vẫn đủ 5 thanh, 4 thanh còn lại chỉ lùi về xám.",
+      "useWhen": [
+        "Người xem cần đi từ “ai” sang “khi nào” mà không phải rời trang.",
+        "Hai câu hỏi luôn đi liền nhau: xếp hạng rồi tới diễn biến."
+      ],
+      "avoidWhen": [
+        "Chỉ có một biểu đồ → không có gì để lọc chéo, đừng bịa thêm khối cho có tương tác.",
+        "Đừng xoá hẳn các mark không được chọn ở khối nguồn: mất ngữ cảnh, và người xem không còn chỗ bấm để quay lại.",
+        "Đừng để bộ lọc chỉ tồn tại “trong đầu biểu đồ” — không có chip hiển thị thì 30 giây sau không ai nhớ đang xem lát cắt nào."
+      ],
+      "dataShape": "Một bảng fact chung cho cả hai khối (ngày × chi nhánh × danh mục × giá trị). Hai khối phải đọc CÙNG một nguồn, nếu không số sẽ lệch nhau.",
+      "variants": [
+        "Hai chiều: click đường → lọc ngược lại biểu đồ chi nhánh.",
+        "Hover-highlight thay vì click-filter khi chỉ cần liên hệ nhanh, không cần giữ trạng thái.",
+        "Ctrl/Cmd-click để chọn nhiều giá trị cùng một chiều."
+      ],
+      "seriesCap": "2 khối. Từ 3 khối trở lên bắt buộc có thanh chip bộ lọc."
+    },
+    {
+      "id": "crossfilter-chart-table",
+      "nameVi": "Lọc chéo 2 khối · biểu đồ ↔ bảng",
+      "nameEn": "Cross-filter, chart and table",
+      "aliases": [
+        "chart table link",
+        "biểu đồ và bảng",
+        "lọc hai chiều",
+        "bidirectional"
+      ],
+      "job": "cross-filter",
+      "status": "ready",
+      "description": "Biểu đồ trả lời “hình dạng”, bảng trả lời “con số chính xác” — nối hai chiều thì được cả hai. Click cột danh mục, bảng tính lại theo danh mục đó; click một dòng bảng, cột danh mục tính lại cho riêng chi nhánh đó. Mỗi khối là nguồn của một chiều khác nhau, nên không có vòng lặp.",
+      "useWhen": [
+        "Người xem vừa cần thấy tổng quan vừa cần trích đúng con số để dán vào báo cáo.",
+        "Bảng đã có sẵn và không muốn thêm bộ lọc dropdown ở trên đầu."
+      ],
+      "avoidWhen": [
+        "Hai khối cùng lọc CÙNG một chiều → vòng lặp, bấm đâu cũng thấy trang nhấp nháy mà không rõ tại sao.",
+        "Bảng dài hàng trăm dòng mà lọc làm dòng biến mất không báo gì → luôn hiện “x / y dòng khớp”.",
+        "Đừng để dòng bảng vừa là link mở trang chi tiết vừa là nút lọc — một hành vi cho một cú click."
+      ],
+      "dataShape": "Cùng một fact table. Bảng hiển thị số liệu đã tổng hợp theo chiều mà biểu đồ KHÔNG dùng làm nguồn.",
+      "variants": [
+        "Dòng bảng được chọn giữ nền nhạt + đậm chữ, không phải chỉ đổi màu chữ.",
+        "Nút “Xuất Excel” xuất đúng lát cắt đang lọc, không xuất toàn bộ."
+      ],
+      "seriesCap": "Bảng đích nên ≤ 12 dòng để thấy được thay đổi ngay, dài hơn thì cho cuộn trong khung."
+    },
+    {
+      "id": "crossfilter-table-table",
+      "nameVi": "Lọc chéo 2 khối · bảng ↔ bảng (chính–phụ)",
+      "nameEn": "Master–detail tables",
+      "aliases": [
+        "master detail",
+        "bảng chính phụ",
+        "drill down",
+        "bảng liên kết"
+      ],
+      "job": "cross-filter",
+      "status": "ready",
+      "description": "Bảng chính chọn một dòng, bảng phụ mở chi tiết của đúng dòng đó. Khác với bảng lồng nhau ở chỗ: chi tiết có CẤU TRÚC CỘT KHÁC hẳn bảng chính, nên không nhét vào cùng một bảng được. Khi chưa chọn gì, bảng phụ hiện chi tiết của toàn bộ — không bao giờ để trống trơn.",
+      "useWhen": [
+        "Chi tiết có tập cột riêng (chi nhánh → danh mục, đơn hàng → dòng hàng).",
+        "Cần so nhanh nhiều dòng chính trong khi vẫn giữ một chi tiết đang mở."
+      ],
+      "avoidWhen": [
+        "Chi tiết cùng bộ cột với bảng chính → dùng bảng phân cấp có tổng phụ, gọn hơn hẳn.",
+        "Đừng để bảng phụ trống khi chưa chọn dòng nào: mặc định phải là “toàn bộ”, kèm chữ nói rõ phạm vi.",
+        "Đừng bắt cuộn xa mới thấy bảng phụ — hai bảng phải nằm trong cùng một tầm mắt, nếu không thì dùng trang chi tiết riêng."
+      ],
+      "dataShape": "Quan hệ cha–con: mỗi dòng bảng chính có khoá để lọc ra tập dòng của bảng phụ.",
+      "variants": [
+        "Bảng phụ đặt dưới bảng chính khi màn hình hẹp — giữ nguyên thứ tự đọc chính trước phụ.",
+        "Tiêu đề bảng phụ luôn nhắc lại phạm vi: “Danh mục của CN-01”.",
+        "Bảng phụ cũng lọc ngược được (chọn danh mục) khi cần lát cắt hai chiều."
+      ],
+      "seriesCap": "2 bảng. Ba cấp trở lên → chuyển sang cây có tổng phụ hoặc trang chi tiết riêng."
+    },
+    {
+      "id": "crossfilter-3-panels",
+      "nameVi": "Lọc chéo 3 khối · 2 biểu đồ + bảng",
+      "nameEn": "Cross-filter, three panels",
+      "aliases": [
+        "3 panel",
+        "ba khối",
+        "dashboard lọc chéo"
+      ],
+      "job": "cross-filter",
+      "status": "ready",
+      "description": "Hai biểu đồ là hai NGUỒN lọc theo hai chiều khác nhau, một bảng là ĐÍCH nhận cả hai. Điều kiện cộng dồn bằng VÀ: chọn CN-01 rồi chọn Thiết bị thì bảng còn đúng một dòng. Từ ba khối trở lên, thanh chip bộ lọc không còn là tuỳ chọn.",
+      "useWhen": [
+        "Có 2–3 chiều phân tích mà người xem hay kết hợp với nhau.",
+        "Muốn thay bộ dropdown khô khan bằng chính các biểu đồ — chọn ngay trên hình."
+      ],
+      "avoidWhen": [
+        "Người xem chỉ cần lọc theo một chiều duy nhất → một dropdown là đủ, đừng bắt học cách tương tác mới.",
+        "Đừng để hai biểu đồ cùng lọc một chiều: bấm cái này thì cái kia mất trạng thái, không ai hiểu vì sao.",
+        "Đừng lọc chéo khi số dòng đích quá nhỏ (dưới ~5) — lọc xong còn 1 dòng thì thà cho bảng luôn."
+      ],
+      "dataShape": "Fact table nhiều chiều; mỗi khối nguồn phụ trách đúng MỘT chiều.",
+      "variants": [
+        "Thêm nút “Xoá tất cả” cạnh dãy chip khi có từ 2 điều kiện trở lên.",
+        "Ghi lát cắt vào URL (?branch=CN-01&cat=…) để gửi link giữ nguyên trạng thái.",
+        "Lưu lát cắt vào localStorage cho lần mở sau."
+      ],
+      "seriesCap": "3 khối; tối đa 3 chiều lọc cùng lúc trước khi nên chuyển sang panel bộ lọc riêng."
+    },
+    {
+      "id": "crossfilter-4-panels",
+      "nameVi": "Lọc chéo 4 khối · KPI + 2 biểu đồ + bảng",
+      "nameEn": "Cross-filter, four panels",
+      "aliases": [
+        "4 panel",
+        "bốn khối",
+        "kpi lọc theo"
+      ],
+      "job": "cross-filter",
+      "status": "ready",
+      "description": "Thêm hàng KPI vào bố cục 3 khối. Quy tắc sống còn: KPI phải đổi theo bộ lọc như mọi khối khác. Một hàng KPI đứng yên trong khi biểu đồ bên dưới đã lọc là cách nhanh nhất để mất niềm tin vào cả trang — người xem sẽ nghĩ số nào cũng sai.",
+      "useWhen": [
+        "Trang có cả người xem tổng quan (dừng ở KPI) lẫn người soi chi tiết (xuống bảng).",
+        "Cần thấy ngay lát cắt đang chọn chiếm bao nhiêu phần của tổng."
+      ],
+      "avoidWhen": [
+        "KPI lấy từ nguồn khác không lọc được → thà bỏ KPI, hoặc ghi rõ “toàn chuỗi, không theo bộ lọc”.",
+        "Đừng nhồi 6–8 ô KPI: lọc xong người xem phải quét lại cả bức tường số.",
+        "Đừng để trang nhảy giật khi lọc — khối phải giữ nguyên chiều cao, chỉ đổi nội dung."
+      ],
+      "dataShape": "Fact table nhiều chiều. KPI = tổng hợp trên đúng tập dòng đã lọc, tính cùng chỗ với bảng.",
+      "variants": [
+        "Mỗi KPI kèm “x% tổng toàn chuỗi” để lát cắt luôn có mốc so.",
+        "Hiện đồng thời giá trị lát cắt và giá trị toàn chuỗi bị làm mờ phía sau.",
+        "Nút quay lại lát cắt trước (undo) khi chuỗi lọc dài."
+      ],
+      "seriesCap": "3–4 ô KPI, 2 biểu đồ, 1 bảng."
+    },
+    {
+      "id": "crossfilter-5-panels",
+      "nameVi": "Lọc chéo 5 khối · thêm chọn khoảng thời gian",
+      "nameEn": "Cross-filter, five panels",
+      "aliases": [
+        "5 panel",
+        "năm khối",
+        "brush",
+        "chọn khoảng",
+        "time range"
+      ],
+      "job": "cross-filter",
+      "status": "ready",
+      "description": "Bố cục lớn nhất còn đọc được: một khối chọn kỳ + ba khối phân tích + một bảng. Ba chiều lọc độc lập cộng dồn thành một lát cắt. Đường xu hướng cố tình KHÔNG bị cắt theo kỳ đang chọn — kỳ đó chỉ được tô nền, để phần trước và sau vẫn còn đó mà so.",
+      "useWhen": [
+        "Dashboard vận hành mà người dùng thật sự khoanh vùng thời gian rồi mới soi tiếp.",
+        "Đã có đủ 3 chiều lọc quen thuộc và người xem dùng chúng hằng ngày."
+      ],
+      "avoidWhen": [
+        "Người xem lần đầu / xem một lần rồi thôi — 5 khối tương tác là quá nhiều để học.",
+        "Đừng vượt quá 3 chiều lọc trên một trang: sau đó không ai đoán nổi vì sao bảng rỗng.",
+        "Đừng để lọc xong ra rỗng mà không có lối thoát — luôn kèm “Xoá tất cả”.",
+        "Đừng cắt cụt đường xu hướng theo kỳ đã chọn: mất hẳn phần so sánh trước/sau."
+      ],
+      "dataShape": "Fact table có cột thời gian; kỳ được gom sẵn thành các khối đều nhau (ở đây 5 kỳ × 6 ngày).",
+      "variants": [
+        "Thay dãy cột chọn kỳ bằng brush kéo thả trên chính đường xu hướng (ECharts `brush` / `dataZoom`).",
+        "Thanh chip bộ lọc dính (sticky) ở đầu trang khi cuộn dài.",
+        "Nút “So với kỳ trước” tự đặt lát cắt đối chiếu."
+      ],
+      "seriesCap": "5 khối, 3 chiều lọc. Quá mức này → tách thành nhiều trang."
+    },
+    {
+      "id": "funnel-band-dashboard",
+      "nameVi": "Dashboard theo phễu · băng màu theo nhóm chỉ số",
+      "nameEn": "Funnel-band dashboard",
+      "aliases": [
+        "phễu",
+        "funnel dashboard",
+        "marketing",
+        "băng màu",
+        "nhóm chỉ số",
+        "combo"
+      ],
+      "job": "composite",
+      "status": "ready",
+      "description": "Chia dashboard thành các băng theo GIAI ĐOẠN của phễu, mỗi băng một hue. Trong băng có KPI, biểu đồ và các cột tương ứng dưới bảng — tất cả cùng màu, nên mắt gom nhóm được ngay mà không cần đọc tiêu đề. Đây là trường hợp hiếm mà màu mã hoá nhóm chứ không mã hoá series.",
+      "useWhen": [
+        "Quy trình có thứ tự rõ ràng và mỗi bước có bộ chỉ số riêng: hiển thị → click → đơn → chi phí.",
+        "Người xem cần biết “tắc ở khâu nào”, chứ không chỉ “tổng bao nhiêu”.",
+        "Có bảng chi tiết dài, cần một cách gom cột thành nhóm mà không kẻ thêm khung."
+      ],
+      "avoidWhen": [
+        "Các nhóm chỉ số không có thứ tự trước–sau → băng màu gợi ý một luồng không tồn tại.",
+        "Quá 4–5 băng: hết slot màu phân biệt được, và hàng ngang thành quá chật.",
+        "Đừng dùng combo cột + đường trên HAI trục Y như bản gốc của mẫu này — hai thang đo cho phép “tạo ra” bất kỳ tương quan nào. Ở đây tách thành hai dải chung trục thời gian."
+      ],
+      "dataShape": "Mỗi giai đoạn cần một chuỗi “lượng” theo thời gian + một “tỷ lệ” dẫn xuất. Bảng chi tiết: một dòng một đối tượng, các cột nhóm theo đúng giai đoạn.",
+      "variants": [
+        "Mũi tên giữa các băng để nhấn thứ tự đọc trái → phải.",
+        "Băng cuối là “chi phí/hiệu quả” — nơi tăng là xấu, nên mũi tên delta đổi chiều nghĩa.",
+        "Trên màn hẹp: băng và bảng cuộn ngang CÙNG NHAU để không mất thế thẳng cột; nếu buộc phải xếp dọc thì giữ nguyên thứ tự."
+      ],
+      "seriesCap": "4 băng; mỗi băng 2–3 KPI và tối đa 2 dải biểu đồ."
+    },
+    {
+      "id": "repeated-panels",
+      "nameVi": "Panel lặp · so sánh nhiều vùng cùng bố cục",
+      "nameEn": "Repeated panels / dashboard small multiples",
+      "aliases": [
+        "small multiples",
+        "panel lặp",
+        "so sánh vùng",
+        "regional comparison",
+        "trellis"
+      ],
+      "job": "composite",
+      "status": "ready",
+      "description": "Small multiples ở cấp DASHBOARD chứ không phải cấp biểu đồ: cùng một bố cục (KPI → danh mục → xu hướng → xếp hạng) lặp lại cho từng vùng, đặt cạnh nhau. Mắt học bố cục đúng một lần rồi quét ngang so sánh — cách so nhiều đối tượng nhiều chiều rẻ nhất về mặt nhận thức.",
+      "useWhen": [
+        "So 3–5 đối tượng cùng loại (vùng, chi nhánh, dòng sản phẩm) trên nhiều chiều cùng lúc.",
+        "Mỗi đối tượng có người phụ trách riêng — ai cũng tìm thấy cột của mình ở đúng chỗ."
+      ],
+      "avoidWhen": [
+        "Mỗi panel tự co giãn thang đo → mọi panel trông giống hệt nhau và so sánh sai hoàn toàn. Đây là lỗi số một của mẫu này.",
+        "Quá 5 panel trên một hàng: chữ co lại tới mức không đọc được.",
+        "Các đối tượng khác loại nhau (một vùng vs một dòng sản phẩm) — lặp bố cục sẽ gợi ý một phép so sánh không có nghĩa."
+      ],
+      "dataShape": "Cùng một tập chỉ số cho mọi đối tượng. Thiếu chỉ số ở một panel thì để ô trống có chú thích, không bỏ hẳn dòng đó khỏi panel.",
+      "variants": [
+        "Panel “tổng” đặt đầu tiên làm mốc so.",
+        "Sắp panel theo độ lớn giảm dần, hoặc theo thứ tự địa lý — chọn một và giữ nguyên.",
+        "Trên màn hẹp: cuộn ngang trong khung, không xuống dòng làm vỡ hàng so sánh."
+      ],
+      "seriesCap": "3–5 panel; mỗi panel tối đa 4 khối con."
+    },
+    {
+      "id": "multiselect-filter-table",
+      "nameVi": "Bảng + panel lọc nhiều lựa chọn",
+      "nameEn": "Multi-select filter panel with table",
+      "aliases": [
+        "multi select",
+        "checkbox filter",
+        "lọc nhiều",
+        "dropdown lọc",
+        "panel lọc"
+      ],
+      "job": "composite",
+      "status": "ready",
+      "description": "Bộ lọc kiểu danh sách tick chọn: ô tìm trong danh sách, chọn tất cả / bỏ hết, và số đếm “đang chọn mấy trên mấy”. Cặp đôi kinh điển của mọi màn hình danh sách — và cũng là chỗ hay làm ẩu nhất, vì bảng lọc xong không nói cho người dùng biết đã mất bao nhiêu dòng.",
+      "useWhen": [
+        "Danh sách lựa chọn dài quá 7–8 mục, không nhét vừa dãy chip.",
+        "Người dùng thường chọn NHIỀU giá trị một lúc, không phải một."
+      ],
+      "avoidWhen": [
+        "Chỉ có 2–5 lựa chọn → dùng dãy chip bật/tắt, thấy ngay không cần mở panel.",
+        "Đừng để bảng rỗng mà không giải thích: rỗng vì bộ lọc khác hẳn rỗng vì không có dữ liệu.",
+        "Đừng ẩn số đếm: “Mặt hàng ▾” không nói được là đang lọc 9 trên 14 hay đang xem tất cả.",
+        "Đừng để tổng ở chân bảng tính trên TOÀN BỘ dữ liệu trong khi bảng đã lọc — tổng phải theo lát cắt."
+      ],
+      "dataShape": "Một danh sách giá trị rời rạc để chọn + bảng dữ liệu lọc theo tập đã chọn.",
+      "variants": [
+        "Chip tóm tắt bên ngoài: “Mặt hàng: 9/14” — bấm vào mở lại panel.",
+        "Nhóm lựa chọn theo cấp (vùng → chi nhánh), tick cấp cha là tick hết cấp con.",
+        "Giữ nguyên lựa chọn khi đổi trang, và ghi vào URL để gửi link."
+      ],
+      "seriesCap": "Danh sách vài trăm mục vẫn ổn nếu có ô tìm; quá vài nghìn thì chuyển sang tìm-kiếm-rồi-chọn."
+    },
+    {
+      "id": "variance-bar-table",
+      "nameVi": "Bảng chênh lệch có thanh hai chiều",
+      "nameEn": "Variance table with diverging bars",
+      "aliases": [
+        "variance",
+        "chênh lệch",
+        "diverging bar",
+        "so kỳ",
+        "baseline comparison",
+        "p&l"
+      ],
+      "job": "composite",
+      "status": "ready",
+      "description": "Bảng so hai kỳ, thay cột Δ khô khan bằng một thanh mọc hai chiều quanh trục 0 dùng chung. Dấu và độ lớn đọc được trong một cái liếc, mà vẫn giữ nguyên con số chính xác bên cạnh. Có phân cấp gập/mở để đi từ tổng xuống chi tiết.",
+      "useWhen": [
+        "Báo cáo so kỳ / so kế hoạch, nơi câu hỏi đầu tiên luôn là “chỗ nào lệch nhiều nhất”.",
+        "Dữ liệu có cả tăng lẫn giảm — nếu toàn dương thì thanh một chiều là đủ.",
+        "Cần cả tổng cấp cao lẫn chi tiết bên dưới trong cùng một bảng."
+      ],
+      "avoidWhen": [
+        "Mỗi dòng một thang đo riêng → thanh dài ngắn không so được với nhau, chỉ còn là trang trí.",
+        "Chỉ dùng màu để phân biệt tăng/giảm: phải kèm dấu +/− hoặc ngoặc đơn.",
+        "Trộn chung đơn vị khác nhau (tiền và %) vào cùng một cột thanh."
+      ],
+      "dataShape": "Mỗi dòng: giá trị kỳ này, giá trị kỳ đối chiếu. Δ và Δ% tính ra; thang thanh = |Δ| lớn nhất toàn bảng.",
+      "variants": [
+        "Ba cột mốc: kế hoạch, cùng kỳ năm trước, trung bình ngành.",
+        "Thêm cột “đóng góp vào chênh lệch tổng” khi cần biết ai kéo tổng đi.",
+        "Tô nền dòng có |Δ%| vượt ngưỡng thay vì bắt người xem tự dò."
+      ],
+      "seriesCap": "2 cột giá trị + 1 cột thanh + 1 cột %. Thêm nữa thì tách bảng."
+    },
+    {
+      "id": "period-statement-table",
+      "nameVi": "Bảng nhiều kỳ có micro-chart trong cột",
+      "nameEn": "Multi-period statement with in-table micro charts",
+      "aliases": [
+        "income statement",
+        "báo cáo kết quả",
+        "sparkline table",
+        "micro chart",
+        "p&l"
+      ],
+      "job": "composite",
+      "status": "ready",
+      "description": "Dạng bảng dày nhất trong catalog: mỗi dòng một chỉ tiêu, mỗi cột một kỳ, cộng thêm một cột sparkline và một cột micro-bar cho mức thay đổi từng kỳ. Dòng tổng in đậm có nét kẻ, dòng trừ đi để trong ngoặc, dòng phụ “% doanh thu” nằm ngay dưới con số.",
+      "useWhen": [
+        "Báo cáo tài chính / vận hành nhiều kỳ, nơi người đọc cần con số chính xác chứ không phải hình dạng.",
+        "Số dòng cố định và ai cũng thuộc thứ tự các dòng — khi đó bảng nhanh hơn biểu đồ."
+      ],
+      "avoidWhen": [
+        "Người xem chỉ cần xu hướng → một biểu đồ đường đọc nhanh hơn hẳn.",
+        "Quá 8–10 kỳ trong một bảng: chuyển sang cuộn ngang có cột chỉ tiêu ghim lại, hoặc gộp kỳ.",
+        "Đừng thêm tầng thứ tư (nền tô màu + sparkline + micro-bar + icon) — mỗi ô chỉ nên gánh một tín hiệu phụ.",
+        "Micro-bar mỗi dòng một thang riêng: mất luôn khả năng so giữa các dòng."
+      ],
+      "dataShape": "Ma trận chỉ tiêu × kỳ, kèm phân loại dòng (tổng / thành phần / khoản trừ) để quyết định cách trình bày.",
+      "variants": [
+        "Cột “luỹ kế từ đầu năm” đặt cạnh cột kỳ hiện tại.",
+        "Ghim cột chỉ tiêu khi cuộn ngang (`position: sticky` trên ô đầu dòng).",
+        "Nhấn vào một dòng để mở biểu đồ lớn của riêng chỉ tiêu đó."
+      ],
+      "seriesCap": "5–8 cột kỳ; 10–15 dòng chỉ tiêu."
+    },
+    {
+      "id": "scorecard-multi",
+      "nameVi": "Scorecard nhiều mốc",
+      "nameEn": "Scorecard with multiple benchmarks",
+      "aliases": [
+        "benchmark card",
+        "nhiều mốc so sánh",
+        "KPI nâng cao"
+      ],
+      "job": "foundation",
+      "status": "ready",
+      "description": "Một chỉ số đặt cạnh NHIỀU mốc tham chiếu cùng lúc: kế hoạch, cùng kỳ, trung bình nhóm. Trả lời được “tốt hay không” — điều mà một con số trần trụi không bao giờ nói được.",
+      "useWhen": [
+        "Con số chỉ có nghĩa khi có mốc so: 5,9 tỷ là tốt hay tệ?",
+        "Có nhiều hơn một mốc đáng quan tâm và chúng không mâu thuẫn nhau.",
+        "Muốn thay cả một hàng KPI rời rạc bằng một khối duy nhất có chiều sâu."
+      ],
+      "avoidWhen": [
+        "Quá 3 mốc → các vạch dính nhau, đọc không ra. Chọn 2–3 mốc thật sự dẫn dắt quyết định.",
+        "Các mốc mâu thuẫn (kế hoạch thấp hơn cùng kỳ) mà không giải thích → người xem hoang mang.",
+        "Chỉ có một mốc → dùng stat tile có delta cho gọn."
+      ],
+      "dataShape": "Một giá trị hiện tại + danh sách mốc `{ nhãn, giá trị }`.",
+      "variants": [
+        "Thanh ngang có vạch mốc (như demo) hoặc bullet chart chuẩn.",
+        "Thêm sparkline để có cả chiều thời gian.",
+        "Ghi % chênh so từng mốc, kèm ▲▼ chứ không chỉ màu."
+      ],
+      "seriesCap": "2–3 mốc."
+    },
+    {
+      "id": "chart-states",
+      "nameVi": "Trạng thái rỗng / đang tải / lỗi",
+      "nameEn": "Empty, loading & error states",
+      "aliases": [
+        "empty state",
+        "skeleton",
+        "loading",
+        "lỗi",
+        "no data"
+      ],
+      "job": "foundation",
+      "status": "ready",
+      "description": "Ba trạng thái mà biểu đồ nào cũng gặp nhưng gần như luôn bị quên tới lúc lên production. Mỗi trạng thái phải nói rõ CHUYỆN GÌ đang xảy ra và LÀM GÌ tiếp theo.",
+      "useWhen": [
+        "Mọi biểu đồ lấy dữ liệu từ API — tức là gần như tất cả.",
+        "Có bộ lọc: người dùng chắc chắn sẽ lọc ra tập rỗng."
+      ],
+      "avoidWhen": [
+        "Vòng xoay giữa màn hình trống — không cho biết sắp có gì, và trang sẽ nhảy khi dữ liệu về. Dùng khung xương ĐÚNG chiều cao của biểu đồ thật.",
+        "Rỗng và lỗi hiển thị giống nhau → người xem tưởng “không có dữ liệu” trong khi thực ra hệ thống hỏng.",
+        "Thông báo lỗi kỹ thuật thô (`TypeError: undefined`) → vô nghĩa với người dùng. Nói bằng ngôn ngữ nghiệp vụ, kèm mã lỗi để tra khi cần.",
+        "Trạng thái rỗng mà không có lối thoát → luôn kèm một nút hành động (đặt lại bộ lọc, nới khoảng thời gian)."
+      ],
+      "dataShape": "Một biến trạng thái: `ok | loading | empty | error`.",
+      "variants": [
+        "Khung xương có hiệu ứng quét nhẹ (như demo).",
+        "Lỗi một phần: vẫn vẽ dữ liệu cũ nhưng gắn nhãn “có thể đã cũ”.",
+        "Rỗng lần đầu (chưa từng có dữ liệu) khác rỗng do lọc — lời nhắn nên khác nhau."
+      ],
+      "seriesCap": null
+    },
+    {
+      "id": "data-freshness",
+      "nameVi": "Ghi chú nguồn & độ tươi dữ liệu",
+      "nameEn": "Data source & freshness note",
+      "aliases": [
+        "data freshness",
+        "nguồn dữ liệu",
+        "cập nhật lúc",
+        "footnote",
+        "metadata"
+      ],
+      "job": "foundation",
+      "status": "ready",
+      "description": "Một dòng nhỏ dưới biểu đồ: số liệu lấy từ đâu, tính đến lúc nào, còn thiếu gì. Rẻ tiền nhất trong cả dashboard nhưng quyết định việc người xem có TIN vào con số hay không.",
+      "useWhen": [
+        "Luôn luôn. Không có ngoại lệ đáng kể.",
+        "Đặc biệt quan trọng khi các khối trên trang có độ tươi khác nhau.",
+        "Khi có định nghĩa dễ gây tranh cãi (doanh thu đã trừ huỷ chưa?) — nói rõ ngay tại chỗ."
+      ],
+      "avoidWhen": [
+        "Ghi “cập nhật realtime” khi thực ra chạy theo lô 4 tiếng — sai một lần là mất niềm tin lâu dài.",
+        "Nhét vào tooltip hoặc trang “Giới thiệu” — không ai tìm tới đó. Phải nằm ngay cạnh số.",
+        "Chỉ hiện thời điểm mà không cảnh báo khi dữ liệu đã cũ bất thường — hãy đổi nhãn trạng thái."
+      ],
+      "dataShape": "Metadata đi kèm mỗi khối: nguồn, thời điểm chốt số, nhịp cập nhật, cảnh báo.",
+      "variants": [
+        "Nhãn trạng thái: mới cập nhật / đang đồng bộ / dữ liệu cũ (như demo).",
+        "Hiện thời gian tương đối (“2 ngày trước”) kèm thời điểm tuyệt đối trong tooltip.",
+        "Ghi rõ múi giờ khi có người xem ở nhiều nơi."
+      ],
+      "seriesCap": null
+    },
+    {
+      "id": "annotations",
+      "nameVi": "Chú thích sự kiện",
+      "nameEn": "Event annotations",
+      "aliases": [
+        "annotation",
+        "mốc sự kiện",
+        "event marker",
+        "ghi chú trên chart"
+      ],
+      "job": "foundation",
+      "status": "ready",
+      "description": "Vạch mốc kèm nhãn ngay trên biểu đồ, đánh dấu chuyện đã xảy ra: đổi giá, chiến dịch, sự cố. Biến một cái đỉnh bí ẩn thành một câu chuyện có nguyên nhân.",
+      "useWhen": [
+        "Có sự kiện bên ngoài giải thích được biến động trong dữ liệu.",
+        "Biểu đồ sẽ được xem lại sau nhiều tháng, khi không ai còn nhớ hôm đó có gì.",
+        "1–4 mốc. Nhiều hơn thì biểu đồ thành cái bảng thông báo."
+      ],
+      "avoidWhen": [
+        "Chú thích chen vào vùng có dữ liệu, che mất chính đường cần đọc.",
+        "Vẽ mốc bằng màu series → người xem tưởng đó là một series thứ hai. Luôn dùng mực và nét đứt.",
+        "Ghi chú suy diễn nhân quả chưa kiểm chứng (“nhờ chiến dịch nên tăng 20%”) — ghi sự kiện, đừng ghi kết luận."
+      ],
+      "dataShape": "Danh sách `{ ngày, nhãn }` khớp với trục thời gian của biểu đồ.",
+      "variants": [
+        "Vạch dọc (như demo) cho sự kiện một thời điểm.",
+        "Dải nền cho sự kiện kéo dài (mùa cao điểm, đợt giãn cách).",
+        "Chấm nhỏ trên đường + tooltip khi có nhiều mốc dày."
+      ],
+      "seriesCap": "1–4 mốc."
+    },
+    {
+      "id": "threshold-band",
+      "nameVi": "Vùng ngưỡng mục tiêu",
+      "nameEn": "Threshold / target band",
+      "aliases": [
+        "target band",
+        "reference band",
+        "ngưỡng",
+        "vùng an toàn",
+        "SLA"
+      ],
+      "job": "foundation",
+      "status": "ready",
+      "description": "Một dải nền mờ đánh dấu khoảng giá trị chấp nhận được, thay cho một đường mục tiêu trơ trọi. Dải phản ánh đúng thực tế: mục tiêu thường là một khoảng, không phải một con số duy nhất.",
+      "useWhen": [
+        "Có ngưỡng nghiệp vụ thật: mục tiêu doanh thu, SLA thời gian phản hồi, khoảng tồn kho an toàn.",
+        "Người xem cần biết “hôm nay có nằm trong vùng ổn không”.",
+        "Ngưỡng vốn là một khoảng chứ không phải một điểm."
+      ],
+      "avoidWhen": [
+        "Tô dải quá đậm → nó át mất chính đường dữ liệu. Đây là nền, phải rất nhạt.",
+        "Ngưỡng đặt tuỳ tiện, không ai cam kết → vẽ ra chỉ tạo áp lực giả.",
+        "Nhiều dải chồng nhau → chọn tối đa một vùng “ổn” và một vùng “báo động”."
+      ],
+      "dataShape": "Cận dưới + cận trên + nhãn.",
+      "variants": [
+        "Ba vùng kém / đạt / tốt — chỉ khi các ngưỡng thật sự có nghĩa.",
+        "Ngưỡng thay đổi theo thời gian → dải có hình bậc thang.",
+        "Đổi màu chính đường khi ra ngoài vùng, kèm nhãn chữ."
+      ],
+      "seriesCap": null
+    },
+    {
+      "id": "forecast",
+      "nameVi": "Dự báo & khoảng tin cậy",
+      "nameEn": "Forecast with confidence band",
+      "aliases": [
+        "forecast",
+        "dự báo",
+        "projection",
+        "confidence interval",
+        "khoảng tin cậy"
+      ],
+      "job": "foundation",
+      "status": "ready",
+      "description": "Phần tương lai vẽ bằng nét đứt, kèm dải loe rộng dần thể hiện độ không chắc chắn. Hai tín hiệu này là bắt buộc: thiếu chúng, người xem sẽ đọc dự báo như số thật.",
+      "useWhen": [
+        "Có mô hình dự báo thật và bạn nêu được sai số của nó.",
+        "Quyết định phụ thuộc vào chuyện sắp tới, không chỉ chuyện đã qua."
+      ],
+      "avoidWhen": [
+        "Vẽ dự báo liền mạch cùng nét với số thật — đây là lỗi nghiêm trọng nhất: người xem không phân biệt được đâu là đã xảy ra, đâu là phỏng đoán.",
+        "Không có dải tin cậy → ngụ ý dự báo chắc chắn, điều không bao giờ đúng.",
+        "Dải giữ nguyên độ rộng theo thời gian → sai về bản chất; càng xa càng phải loe.",
+        "Kéo dài dự báo quá xa so với dữ liệu lịch sử có được."
+      ],
+      "dataShape": "Chuỗi lịch sử + chuỗi dự báo `{ giá trị, cận dưới, cận trên }`, nối liền tại điểm cuối cùng của lịch sử.",
+      "variants": [
+        "Nhiều mức tin cậy (50% / 80% / 95%) — các dải lồng nhau, càng ngoài càng nhạt.",
+        "Vài kịch bản (thận trọng / cơ sở / lạc quan) thay cho dải liên tục.",
+        "Vạch dọc đánh dấu “hôm nay” tại điểm giao giữa thật và dự báo."
+      ],
+      "seriesCap": "1 chuỗi dự báo mỗi khung."
+    }
+  ]
+}
