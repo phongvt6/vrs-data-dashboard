@@ -10,6 +10,7 @@
 // Xem /bang/doanh-thu-tu-doanh cho bản đọc thẳng BigQuery.
 
 import { Suspense } from "react";
+import { connection } from "next/server";
 import ChartTile from "@/chart/ChartTile";
 import { MART, duLieu } from "@/lib/nguon";
 import { moiNhat, toRows } from "@/lib/mart";
@@ -47,11 +48,13 @@ export default function DoanhThuPage() {
 }
 
 async function MocDuLieu() {
+  await connection(); // Đọc DB tại request-time — không nạp cache lúc build (build khỏi cần DATABASE_URL).
   const moc = await moiNhat(DATASETS);
   return moc ? <>Số liệu tính đến {moc}</> : null;
 }
 
 async function HangDau() {
+  await connection(); // Bail khỏi prerender: query chạy tại request-time, cache của duLieu nạp lúc đó.
   const [tong, theoNganh] = await Promise.all([
     duLieu<{ thang: string; ngay_cuoi: string; ngay_thu: string; dt: string; dt_truoc: string; so_diem: string }>(
       MART,
@@ -112,6 +115,7 @@ async function HangDau() {
 }
 
 async function HangGiua() {
+  await connection();
   const [theoThang, topDiem] = await Promise.all([
     duLieu(
       MART,
@@ -140,6 +144,7 @@ async function HangGiua() {
 }
 
 async function HangCuoi() {
+  await connection();
   const rows = await duLieu(
     MART,
     `SELECT to_char(date_trunc('month', d.ngay), 'MM/YYYY') AS thang, k.nganh, sum(d.doanh_thu) AS dt
