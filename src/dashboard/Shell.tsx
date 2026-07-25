@@ -12,6 +12,10 @@ export type NavItem = {
   /** Emoji hoặc icon node. */
   icon: ReactNode;
   ten: string;
+  /** Số hiển thị trong pill bên phải (ví dụ số cảnh báo). Bỏ qua nếu 0/undefined. */
+  badge?: number;
+  /** Nếu có: mục là LINK ngoài (mở tab mới) thay vì nút chuyển view. */
+  href?: string;
 };
 
 export function DashboardShell({
@@ -86,42 +90,70 @@ export function DashboardShell({
 
         <nav style={{ display: "grid", gap: 3, flex: 1, alignContent: "start" }}>
           {nav.map((n) => {
-            const on = n.id === active;
-            return (
+            const on = !n.href && n.id === active;
+            const rowStyle = {
+              display: "flex",
+              alignItems: "center",
+              gap: 11,
+              padding: "9px 11px",
+              borderRadius: RADIUS.control,
+              border: "none",
+              cursor: "pointer",
+              textAlign: "left" as const,
+              textDecoration: "none",
+              fontSize: 13.5,
+              lineHeight: 1.2,
+              whiteSpace: "nowrap" as const,
+              fontWeight: on ? 700 : 500,
+              background: on ? "var(--ds-accent)" : "transparent",
+              color: on ? "var(--ds-accent-ink)" : "var(--ds-ink-2)",
+              justifyContent: thuGon ? "center" : "flex-start",
+              transition: "background .1s",
+            };
+            const inner = (
+              <>
+                <span style={{ fontSize: 16, width: 18, textAlign: "center", flexShrink: 0 }} aria-hidden>
+                  {n.icon}
+                </span>
+                {!thuGon && <span style={{ flex: 1 }}>{n.ten}{n.href ? " ↗" : ""}</span>}
+                {!thuGon && n.badge ? (
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      background: on ? "rgba(255,255,255,.28)" : "var(--ds-bad)",
+                      color: "#fff",
+                      borderRadius: RADIUS.pill,
+                      padding: "1px 7px",
+                    }}
+                  >
+                    {n.badge}
+                  </span>
+                ) : null}
+              </>
+            );
+            const hover = {
+              onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
+                if (!on) e.currentTarget.style.background = "var(--ds-grid)";
+              },
+              onMouseLeave: (e: React.MouseEvent<HTMLElement>) => {
+                if (!on) e.currentTarget.style.background = "transparent";
+              },
+            };
+            return n.href ? (
+              <a key={n.id} href={n.href} target="_blank" rel="noopener" title={n.ten} style={rowStyle} {...hover}>
+                {inner}
+              </a>
+            ) : (
               <button
                 key={n.id}
                 onClick={() => onNavigate(n.id)}
                 title={n.ten}
                 aria-current={on ? "page" : undefined}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 11,
-                  padding: "9px 11px",
-                  borderRadius: RADIUS.control,
-                  border: "none",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  fontSize: 13.5,
-                  lineHeight: 1.2,
-                  whiteSpace: "nowrap",
-                  fontWeight: on ? 700 : 500,
-                  background: on ? "var(--ds-accent)" : "transparent",
-                  color: on ? "var(--ds-accent-ink)" : "var(--ds-ink-2)",
-                  justifyContent: thuGon ? "center" : "flex-start",
-                  transition: "background .1s",
-                }}
-                onMouseEnter={(e) => {
-                  if (!on) e.currentTarget.style.background = "var(--ds-grid)";
-                }}
-                onMouseLeave={(e) => {
-                  if (!on) e.currentTarget.style.background = "transparent";
-                }}
+                style={rowStyle}
+                {...hover}
               >
-                <span style={{ fontSize: 16, width: 18, textAlign: "center", flexShrink: 0 }} aria-hidden>
-                  {n.icon}
-                </span>
-                {!thuGon && <span style={{ flex: 1 }}>{n.ten}</span>}
+                {inner}
               </button>
             );
           })}
@@ -154,7 +186,7 @@ export function DashboardShell({
             justifyContent: "space-between",
             gap: 12,
             flexWrap: "wrap",
-            marginBottom: 4,
+            marginBottom: 14,
           }}
         >
           <div>

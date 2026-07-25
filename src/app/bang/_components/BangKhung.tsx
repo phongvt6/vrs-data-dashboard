@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MauBadge } from "@/dashboard/layout";
 
 /**
  * Khung chung của một trang dashboard: thanh đầu mỏng có nút quay về app chính,
@@ -76,11 +77,14 @@ export function O({
   tieu_de,
   ghi_chu,
   w = 6,
+  mau,
   children,
 }: {
   tieu_de?: string;
   ghi_chu?: string;
   w?: number;
+  /** id loại chart trong thư viện (CHART_TYPES) → hiện badge ⓘ truy xuất mẫu. */
+  mau?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -92,11 +96,14 @@ export function O({
       }}
     >
       {tieu_de && (
-        <div style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 14.5, fontWeight: 700 }}>{tieu_de}</div>
-          {ghi_chu && (
-            <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 2 }}>{ghi_chu}</div>
-          )}
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 12 }}>
+          <div>
+            <div style={{ fontSize: 14.5, fontWeight: 700 }}>{tieu_de}</div>
+            {ghi_chu && (
+              <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 2 }}>{ghi_chu}</div>
+            )}
+          </div>
+          {mau && <MauBadge mau={mau} />}
         </div>
       )}
       {children}

@@ -13,44 +13,23 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { docKhoanRaw, DATASETS_KHOAN } from "@/lib/khoan-data";
 import { moiNhat } from "@/lib/mart";
-import BangKhung, { Luoi, OTrong } from "../_components/BangKhung";
+import { Loading } from "@/dashboard/layout";
 import KhoanApp from "./KhoanApp";
 
 export const metadata = { title: "Thưởng khoán — VRS" };
 
+// Chrome giờ nằm trong KhoanApp (DashboardShell — sidebar trái, thống nhất với
+// các dashboard nhiều view khác). Trang chỉ lo lấy dữ liệu server rồi truyền vào.
 export default function KhoanNativePage() {
   return (
-    <BangKhung
-      ten="Thưởng khoán"
-      mo_ta="Quỹ thưởng sinh từ doanh thu theo mốc KPI của từng quầy, chia cho nhân viên theo giờ làm × hệ số"
-      mocDuLieu={
-        <Suspense fallback={null}>
-          <MocDuLieu />
-        </Suspense>
-      }
-    >
-      <Suspense
-        fallback={
-          <>
-            <Luoi><OTrong w={2} cao={120} /><OTrong w={2} cao={120} /><OTrong w={3} cao={120} /><OTrong w={3} cao={120} /><OTrong w={2} cao={120} /></Luoi>
-            <Luoi><OTrong w={6} cao={260} /><OTrong w={6} cao={260} /></Luoi>
-          </>
-        }
-      >
-        <NoiDung />
-      </Suspense>
-    </BangKhung>
+    <Suspense fallback={<div style={{ padding: 40 }}><Loading cao={480} /></div>}>
+      <NoiDung />
+    </Suspense>
   );
-}
-
-async function MocDuLieu() {
-  await connection(); // Đọc DB tại request-time — build khỏi cần DATABASE_URL.
-  const moc = await moiNhat(DATASETS_KHOAN);
-  return moc ? <>Số liệu tính đến {moc}</> : null;
 }
 
 async function NoiDung() {
   await connection(); // Bail khỏi prerender: engine khoán chạy tại request-time.
-  const raw = await docKhoanRaw();
-  return <KhoanApp raw={raw} />;
+  const [raw, moc] = await Promise.all([docKhoanRaw(), moiNhat(DATASETS_KHOAN)]);
+  return <KhoanApp raw={raw} moc={moc ?? null} />;
 }

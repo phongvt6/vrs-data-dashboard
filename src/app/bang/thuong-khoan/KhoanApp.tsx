@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import ChartTile from "@/chart/ChartTile";
 import { tinhThuong, type DuLieuTho, type KetQua, type NgayQuay, type NgayNguoi } from "@/lib/khoan";
 import { Luoi, O } from "../_components/BangKhung";
+import { DashboardShell, type NavItem } from "@/dashboard/Shell";
 
 // App khoán native. Nhận DỮ LIỆU THÔ từ server, tự chạy engine (một lần, client),
 // lọc theo kỳ + chiều rồi vẽ bằng thư viện chart của app. Mỗi "trang" là một
@@ -56,72 +57,40 @@ function theoNv(R: NgayNguoi[]) {
     .sort((a, b) => b.thuc_nhan - a.thuc_nhan);
 }
 
-export default function KhoanApp({ raw }: { raw: DuLieuTho }) {
+export default function KhoanApp({ raw, moc }: { raw: DuLieuTho; moc?: string | null }) {
   const data: KetQua = useMemo(() => tinhThuong(raw), [raw]);
   const kyCo = useMemo(() => [...new Set(data.dt.map((r) => r.nam_thang))].sort(), [data]);
   const [trang, setTrang] = useState<Trang>("dash");
   const [ky, setKy] = useState<string>(kyCo[kyCo.length - 1] ?? "");
-  const [thuGon, setThuGon] = useState(false);
 
   const soCanhBao = data.canhBao.filter((c) => !c.ngay || c.ngay.slice(0, 7).replace("-", "/") === ky).length;
 
+  // Nav dùng chung: các trang phân tích + một LINK ngoài "Bảng thi đua" (trang cổ
+  // vũ, giữ ở bản gốc /bang/thuong-khoan-cu của team kinh doanh).
+  const navItems: NavItem[] = [
+    ...NAV.map((n) => ({ id: n.id, icon: n.ic, ten: n.lb, badge: n.id === "check" ? soCanhBao : undefined })),
+    { id: "thidua", icon: "🏆", ten: "Bảng thi đua", href: "/bang/thuong-khoan-cu" },
+  ];
+
   return (
-    <div style={{ display: "grid", gridTemplateColumns: `${thuGon ? 52 : 212}px 1fr`, gap: 16, alignItems: "start", transition: "grid-template-columns .18s" }}>
-      <nav style={{
-        position: "sticky", top: 84, display: "flex", flexDirection: "column", gap: 2,
-        background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 12, padding: 8,
-      }}>
-        <button onClick={() => setThuGon((v) => !v)} title={thuGon ? "Mở rộng" : "Thu gọn"} style={{
-          display: "flex", alignItems: "center", justifyContent: thuGon ? "center" : "flex-end", gap: 6,
-          padding: "6px 9px", marginBottom: 4, borderRadius: 8, border: "none", cursor: "pointer",
-          background: "transparent", color: "var(--ink-soft)", fontSize: 13,
-        }}>{thuGon ? "»" : "« Thu gọn"}</button>
-
-        {NAV.map((n) => {
-          const on = n.id === trang;
-          return (
-            <button key={n.id} onClick={() => setTrang(n.id)} title={thuGon ? n.lb : undefined} style={{
-              display: "flex", alignItems: "center", gap: 9, padding: "8px 11px", borderRadius: 8,
-              border: "none", cursor: "pointer", textAlign: "left", fontSize: 13.5, whiteSpace: "nowrap",
-              justifyContent: thuGon ? "center" : "flex-start",
-              fontWeight: on ? 600 : 400,
-              background: on ? "var(--accent)" : "transparent",
-              color: on ? "#fff" : "var(--ink-soft)",
-            }}>
-              <span style={{ fontSize: 15 }}>{n.ic}</span>
-              {!thuGon && <span style={{ flex: 1 }}>{n.lb}</span>}
-              {!thuGon && n.id === "check" && soCanhBao > 0 && (
-                <span style={{ fontSize: 11, fontWeight: 700, background: on ? "rgba(255,255,255,.25)" : "#d03b3b", color: "#fff", borderRadius: 99, padding: "1px 7px" }}>{soCanhBao}</span>
-              )}
-            </button>
-          );
-        })}
-
-        {/* Bảng thi đua là trang cổ vũ, không phải phân tích — link ra bản gốc
-            (port của team kinh doanh) ở /bang/thuong-khoan-cu. */}
-        <a href="/bang/thuong-khoan-cu" target="_blank" rel="noopener" title="Bảng thi đua (bản gốc)" style={{
-          display: "flex", alignItems: "center", gap: 9, padding: "8px 11px", borderRadius: 8,
-          textDecoration: "none", fontSize: 13.5, whiteSpace: "nowrap", color: "var(--ink-soft)",
-          justifyContent: thuGon ? "center" : "flex-start",
-        }}>
-          <span style={{ fontSize: 15 }}>🏆</span>
-          {!thuGon && <span style={{ flex: 1 }}>Bảng thi đua ↗</span>}
-        </a>
-      </nav>
-
-      <div style={{ minWidth: 0 }}>
-        {trang !== "guide" && <ChonKy kyCo={kyCo} ky={ky} onChon={setKy} />}
-        {trang === "dash" && <Dashboard data={data} ky={ky} />}
-        {trang === "report" && <BaoCao data={data} ky={ky} kyCo={kyCo} />}
-        {trang === "bang" && <BangTinh data={data} ky={ky} />}
-        {trang === "kiosk" && <TheoBoPhan data={data} ky={ky} boPhan="Kiosk" />}
-        {trang === "st" && <TheoBoPhan data={data} ky={ky} boPhan="Siêu thị" />}
-        {trang === "gio" && <GioLam data={data} ky={ky} />}
-        {trang === "check" && <KiemTra data={data} ky={ky} />}
-        {trang === "data" && <DanhSachData raw={raw} />}
-        {trang === "guide" && <HuongDan />}
-      </div>
-    </div>
+    <DashboardShell
+      nav={navItems}
+      active={trang}
+      onNavigate={(id) => setTrang(id as Trang)}
+      title={NAV.find((n) => n.id === trang)?.lb ?? ""}
+      subtitle={moc ? `Thưởng khoán · số liệu đến ${moc}` : "Thưởng khoán"}
+    >
+      {trang !== "guide" && <ChonKy kyCo={kyCo} ky={ky} onChon={setKy} />}
+      {trang === "dash" && <Dashboard data={data} ky={ky} />}
+      {trang === "report" && <BaoCao data={data} ky={ky} kyCo={kyCo} />}
+      {trang === "bang" && <BangTinh data={data} ky={ky} />}
+      {trang === "kiosk" && <TheoBoPhan data={data} ky={ky} boPhan="Kiosk" />}
+      {trang === "st" && <TheoBoPhan data={data} ky={ky} boPhan="Siêu thị" />}
+      {trang === "gio" && <GioLam data={data} ky={ky} />}
+      {trang === "check" && <KiemTra data={data} ky={ky} />}
+      {trang === "data" && <DanhSachData raw={raw} />}
+      {trang === "guide" && <HuongDan />}
+    </DashboardShell>
   );
 }
 
@@ -178,8 +147,8 @@ function Dashboard({ data, ky }: { data: KetQua; ky: string }) {
         <O w={2}><ChartTile loai="stat-tile" config={TIEN} rows={[{ label: "Bình quân / người", value: soNv ? thucNhan / soNv : 0 }]} /></O>
       </Luoi>
       <Luoi>
-        <O w={6} tieu_de="Doanh thu theo ngày"><ChartTile loai="area" config={TIEN} height={230} rows={theoNgay.map((r) => ({ label: dmy(r.ngay), value: r.dt }))} /></O>
-        <O w={6} tieu_de="Quỹ thưởng theo ngày" ghi_chu="Cùng trục thời gian với chart bên trái. Quỹ nhảy bậc vào ngày quầy vượt mốc KPI — từ đó phần vượt trích 15% thay vì 2,5%."><ChartTile loai="area" config={TIEN} height={230} rows={theoNgay.map((r) => ({ label: dmy(r.ngay), value: r.quy }))} /></O>
+        <O w={6} tieu_de="Doanh thu theo ngày" mau="area"><ChartTile loai="area" config={TIEN} height={230} rows={theoNgay.map((r) => ({ label: dmy(r.ngay), value: r.dt }))} /></O>
+        <O w={6} tieu_de="Quỹ thưởng theo ngày" mau="area" ghi_chu="Cùng trục thời gian với chart bên trái. Quỹ nhảy bậc vào ngày quầy vượt mốc KPI — từ đó phần vượt trích 15% thay vì 2,5%."><ChartTile loai="area" config={TIEN} height={230} rows={theoNgay.map((r) => ({ label: dmy(r.ngay), value: r.quy }))} /></O>
       </Luoi>
       <Luoi>
         <O w={7} tieu_de="Tiến độ hoàn thành KPI" ghi_chu={`${tienDoKpi.length} quầy có doanh thu trong kỳ`}>
@@ -192,14 +161,14 @@ function Dashboard({ data, ky }: { data: KetQua; ky: string }) {
               vnd(quyCuaQuay.get(r.ma_cua_hang) ?? 0),
             ])} />
         </O>
-        <O w={5} tieu_de="Quỹ thưởng theo quầy" ghi_chu="14 quầy sinh quỹ lớn nhất trong kỳ"><ChartTile loai="bar" config={TIEN} height={420} rows={theoQuay.slice(0, 14).map((q) => ({ label: q.ma, value: q.quy }))} /></O>
+        <O w={5} tieu_de="Quỹ thưởng theo quầy" mau="bar" ghi_chu="14 quầy sinh quỹ lớn nhất trong kỳ"><ChartTile loai="bar" config={TIEN} height={420} rows={theoQuay.slice(0, 14).map((q) => ({ label: q.ma, value: q.quy }))} /></O>
       </Luoi>
       <Luoi>
         <O w={7} tieu_de="Top 15 nhân viên theo thực nhận">
           <Bang cot={["Mã NV", "Họ tên", "Chức danh", "Quầy", "Giờ", "Thực nhận"]} phai={[4, 5]}
             dong={top.map((r) => [<span key="m" style={mono}>{r.ma}</span>, r.ho_ten || "—", r.chuc_vu || "—", <span key="q" style={mono}>{r.ma_cua_hang}</span>, gioF(r.gio), <b key="t">{vnd(r.thuc_nhan)}</b>])} />
         </O>
-        <O w={5} tieu_de="Phân bổ theo chức danh" ghi_chu="Tổng thực nhận, đã loại Partime (không nhận thưởng)"><ChartTile loai="donut" config={TIEN} rows={theoChucDanh} height={300} /></O>
+        <O w={5} tieu_de="Phân bổ theo chức danh" mau="donut" ghi_chu="Tổng thực nhận, đã loại Partime (không nhận thưởng)"><ChartTile loai="donut" config={TIEN} rows={theoChucDanh} height={300} /></O>
       </Luoi>
     </>
   );
@@ -240,7 +209,7 @@ function BaoCao({ data, ky, kyCo }: { data: KetQua; ky: string; kyCo: string[] }
         <O w={4} ghi_chu="so kỳ trước"><ChartTile loai="stat-tile" config={TIEN} rows={[{ label: "Thực nhận", ...cmp(a.thuc_nhan, b.thuc_nhan) }]} /></O>
       </Luoi>
       <Luoi>
-        <O w={12} tieu_de="Quỹ thưởng theo ngày"><ChartTile loai="area" config={TIEN} height={260} rows={theoNgay} /></O>
+        <O w={12} tieu_de="Quỹ thưởng theo ngày" mau="area"><ChartTile loai="area" config={TIEN} height={260} rows={theoNgay} /></O>
       </Luoi>
       <Luoi>
         <O w={12} tieu_de="So sánh quỹ theo quầy" ghi_chu={kyTruoc ? "Chênh so kỳ trước" : "Kỳ này"}>
@@ -301,7 +270,7 @@ function TheoBoPhan({ data, ky, boPhan }: { data: KetQua; ky: string; boPhan: st
         <O w={4}><ChartTile loai="stat-tile" config={{ dinh_dang: "so", don_vi: "quầy" }} rows={[{ label: "Số quầy", value: theoQuay.length }]} /></O>
       </Luoi>
       <Luoi>
-        <O w={5} tieu_de={`Quỹ thưởng theo quầy ${boPhan}`}><ChartTile loai="bar" config={TIEN} height={360} rows={theoQuay.slice(0, 16).map((q) => ({ label: q.ma, value: q.quy }))} /></O>
+        <O w={5} tieu_de={`Quỹ thưởng theo quầy ${boPhan}`} mau="bar"><ChartTile loai="bar" config={TIEN} height={360} rows={theoQuay.slice(0, 16).map((q) => ({ label: q.ma, value: q.quy }))} /></O>
         <O w={7} tieu_de="Nhân viên & thực nhận">
           <Bang cot={["Mã NV", "Họ tên", "Chức danh", "Quầy", "Giờ", "Thực nhận"]} phai={[4, 5]} cao={360}
             dong={nv.map((r) => [<span key="m" style={mono}>{r.ma}</span>, r.ho_ten || "—", r.chuc_vu || "—", <span key="q" style={mono}>{r.ma_cua_hang}</span>, gioF(r.gio), <b key="t">{vnd(r.thuc_nhan)}</b>])} />
@@ -447,7 +416,7 @@ function Bang({ cot, dong, phai = [], cao }: { cot: string[]; dong: React.ReactN
     <div style={{ overflow: "auto", maxHeight: cao }}>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
         <thead><tr>{cot.map((c, i) => (
-          <th key={c} style={{ position: "sticky", top: 0, background: "var(--panel)", textAlign: p.has(i) ? "right" : "left", padding: "7px 8px", borderBottom: "1px solid var(--line-strong)", fontSize: 11.5, fontWeight: 600, color: "var(--ink-soft)", whiteSpace: "nowrap" }}>{c}</th>
+          <th key={c} style={{ position: "sticky", top: 0, background: "var(--panel)", textAlign: p.has(i) ? "right" : "left", padding: "7px 8px", borderBottom: "1px solid var(--line-strong)", fontSize: 12, fontWeight: 600, color: "var(--ink-soft)", whiteSpace: "nowrap" }}>{c}</th>
         ))}</tr></thead>
         <tbody>{dong.map((r, i) => (
           <tr key={i}>{r.map((o, j) => (
