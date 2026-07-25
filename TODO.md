@@ -26,9 +26,12 @@ chuyển route + gỡ.
   tra, Danh sách data, Hướng dẫn) + sidebar thu gọn kiểu Looker + Bảng thi đua
   để **link ↗** ra bản gốc (không dựng native). Engine `src/lib/khoan.ts`, data
   `src/lib/khoan-data.ts` (`docKhoanRaw` → client tính). Verify khớp số.
-- [ ] **Chuyển route khoán sang native**: đổi `/bang/khoan-native` → thành
-  `/bang/thuong-khoan`; gỡ rewrite trong `next.config.ts`, gỡ `public/khoan/`,
-  gỡ `src/app/api/khoan/data/`. (Chưa làm — đợi xem native ổn hẳn.)
+- [x] **Chuyển route khoán sang native (2026-07-25)**: `/bang/khoan-native` →
+  `/bang/thuong-khoan` (trang React filesystem thắng rewrite). **QUYẾT ĐỊNH MỚI
+  của chủ dự án: KHÔNG gỡ bản gốc.** Giữ port song song ở `/bang/thuong-khoan-cu`
+  (rewrite → `public/khoan/`), `src/app/api/khoan/data/` vẫn cần. Danh mục có 2
+  entry: `db_thuong_khoan` (native) + `db_thuong_khoan_cu` (bản gốc). Đừng gỡ
+  `public/khoan/` nữa. Commit 4fb81e9.
 - [ ] **Tự doanh native (5 trang)**: Tổng quan, So sánh thời gian, Nhóm hàng,
   Danh sách hàng hóa, Hướng dẫn. Khác khoán: đọc BigQuery LIVE qua
   `src/lib/tu-doanh/core.ts` (không có engine tính). Dựng client app tương tự
