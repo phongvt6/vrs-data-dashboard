@@ -7,11 +7,11 @@
 
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/chart/EChart";
-import { CHROME, MARK, FONT_STACK } from "@/chart/lib/theme";
+import { CHROME, MARK, FONT, FONT_STACK } from "@/chart/lib/theme";
 import { vnCompact, vnNumber } from "@/chart/lib/theme";
 
 const C = CHROME.light;
-const AXIS_TEXT = { color: C.inkSecondary, fontFamily: FONT_STACK, fontSize: 11 };
+const AXIS_TEXT = { color: C.inkSecondary, fontFamily: FONT_STACK, fontSize: FONT.axis };
 const money = (v: number) => `${vnCompact(v)} ₫`;
 
 const baseGrid = { left: 8, right: 12, top: 24, bottom: 8, containLabel: true };
@@ -21,7 +21,7 @@ function tip(extra: Record<string, unknown> = {}) {
     backgroundColor: C.surface,
     borderColor: C.border,
     borderWidth: 1,
-    textStyle: { color: C.ink, fontFamily: FONT_STACK, fontSize: 12 },
+    textStyle: { color: C.ink, fontFamily: FONT_STACK, fontSize: FONT.tooltip },
     ...extra,
   };
 }
@@ -46,7 +46,7 @@ export function DonutTotal({
       backgroundColor: C.surface,
       borderColor: C.border,
       borderWidth: 1,
-      textStyle: { color: C.ink, fontFamily: FONT_STACK, fontSize: 12 },
+      textStyle: { color: C.ink, fontFamily: FONT_STACK, fontSize: FONT.tooltip },
       formatter: (p: { name: string; value: number; percent: number }) =>
         `${p.name}<br/><b>${unit === "₫" ? money(p.value) : vnNumber(p.value)}</b> · ${p.percent}%`,
     } as EChartsOption["tooltip"],
@@ -57,7 +57,7 @@ export function DonutTotal({
       top: "middle",
       itemWidth: 10,
       itemHeight: 10,
-      textStyle: { color: C.inkSecondary, fontFamily: FONT_STACK, fontSize: 11 },
+      textStyle: { color: C.inkSecondary, fontFamily: FONT_STACK, fontSize: FONT.legend },
     },
     graphic: {
       type: "text",
@@ -68,7 +68,7 @@ export function DonutTotal({
         textAlign: "center",
         fill: C.ink,
         fontFamily: FONT_STACK,
-        fontSize: 15,
+        fontSize: 16,
         fontWeight: 700,
       },
     } as EChartsOption["graphic"],
@@ -209,7 +209,7 @@ export function RankH({
       backgroundColor: C.surface,
       borderColor: C.border,
       borderWidth: 1,
-      textStyle: { color: C.ink, fontFamily: FONT_STACK, fontSize: 12 },
+      textStyle: { color: C.ink, fontFamily: FONT_STACK, fontSize: FONT.tooltip },
       formatter: (p: { name: string; value: number }) =>
         `${p.name}<br/><b>${unit === "₫" ? money(p.value) : vnNumber(p.value)}</b>`,
     } as EChartsOption["tooltip"],
@@ -232,7 +232,7 @@ export function RankH({
           formatter: (p: { value: number }) => (unit === "₫" ? vnCompact(p.value) : vnNumber(p.value)),
           color: C.inkSecondary,
           fontFamily: FONT_STACK,
-          fontSize: 10.5,
+          fontSize: FONT.dataLabel,
         },
       },
     ] as EChartsOption["series"],
@@ -265,7 +265,7 @@ export function ComboUnits({
       backgroundColor: C.surface,
       borderColor: C.border,
       borderWidth: 1,
-      textStyle: { color: C.ink, fontFamily: FONT_STACK, fontSize: 12 },
+      textStyle: { color: C.ink, fontFamily: FONT_STACK, fontSize: FONT.tooltip },
     },
     legend: { top: 0, right: 0, textStyle: AXIS_TEXT, itemWidth: 14, itemHeight: 8 },
     xAxis: {

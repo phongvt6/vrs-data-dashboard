@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ChartTile from "@/chart/ChartTile";
 import { sampleRows } from "@/chart/sample";
 import { CHART_TYPES, JOBS, chartTypesByJob } from "@/chart/types";
@@ -15,6 +15,15 @@ const TAT_CA = "Tất cả";
 export default function ChartLibrary() {
   const [job, setJob] = useState<string>(TAT_CA);
   const nhom = chartTypesByJob().filter((g) => job === TAT_CA || g.job.id === job);
+
+  // Gallery render phía client → hash trong URL (đến từ badge ⓘ, ví dụ /charts#donut)
+  // không tự cuộn được. Tự cuộn tới thẻ tương ứng sau khi mount.
+  useEffect(() => {
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ block: "start" });
+  }, []);
 
   return (
     <div>
@@ -58,9 +67,13 @@ export default function ChartLibrary() {
             {types.map((t) => (
               <div
                 key={t.id}
+                id={t.id}
+                className="chart-card"
                 style={{
                   background: "var(--panel)", border: "1px solid var(--line)",
                   borderRadius: 12, padding: "16px 18px",
+                  // Chừa chỗ để khi nhảy từ badge ⓘ (/charts#id) thẻ không dính mép trên.
+                  scrollMarginTop: 20,
                 }}
               >
                 <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 4, flexWrap: "wrap" }}>

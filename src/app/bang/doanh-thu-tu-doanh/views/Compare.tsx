@@ -161,6 +161,7 @@ export default function CompareView({ filter, periodType }: { filter: Filter; pe
       <Cell
         w={12}
         title="So sánh doanh thu theo đơn vị"
+        mau="grouped-bar"
         note={`Kỳ này ${ngayDay(ov.spans.cur.from)} – ${ngayDay(ov.spans.cur.to)} · theo ${DIM_NOUN[comboDim]} · so ${labelLo}`}
         right={dimToggle}
       >

@@ -79,7 +79,7 @@ export default function OverviewView({ filter, periodType }: { filter: Filter; p
       <Deep blocks={deepUnits(d.byStore.map((s) => ({ name: s.name, cur: s.cur, prev: periodType === "year" ? s.prevY : s.prevM })), "cửa hàng", t.cur, periodType === "year" ? t.prevY : t.prevM)} />
 
       {/* Bar+line theo tháng */}
-      <Cell w={12} title="Doanh thu theo tháng" note={`Cột: ${d.monthly.year} · đường đứt: ${d.monthly.year - 1}`}>
+      <Cell w={12} title="Doanh thu theo tháng" mau="column" note={`Cột: ${d.monthly.year} · đường đứt: ${d.monthly.year - 1}`}>
         <BarLineMonthly labels={d.monthly.labels} cur={d.monthly.cur} prev={d.monthly.prev}
           curName={String(d.monthly.year)} prevName={String(d.monthly.year - 1)}
           highlightIdx={Number(d.effTo.slice(5, 7)) - 1} height={300} />
@@ -87,14 +87,14 @@ export default function OverviewView({ filter, periodType }: { filter: Filter; p
 
       {/* 3 donut */}
       <Grid>
-        <Cell w={4} title="Cơ cấu theo trạm"><DonutTotal items={dTram} colorOf={cTram} /></Cell>
-        <Cell w={4} title="Cơ cấu theo điểm trạm"><DonutTotal items={dDiem} colorOf={cDiem} /></Cell>
-        <Cell w={4} title="Cơ cấu theo nhóm hàng"><DonutTotal items={dNhom} colorOf={cNhom} /></Cell>
+        <Cell w={4} title="Cơ cấu theo trạm" mau="donut"><DonutTotal items={dTram} colorOf={cTram} /></Cell>
+        <Cell w={4} title="Cơ cấu theo điểm trạm" mau="donut"><DonutTotal items={dDiem} colorOf={cDiem} /></Cell>
+        <Cell w={4} title="Cơ cấu theo nhóm hàng" mau="donut"><DonutTotal items={dNhom} colorOf={cNhom} /></Cell>
       </Grid>
 
       {/* Rank cửa hàng + bảng */}
       <Grid>
-        <Cell w={5} title="Doanh thu theo điểm bán" note="Top 20 · màu theo điểm trạm">
+        <Cell w={5} title="Doanh thu theo điểm bán" mau="bar" note="Top 20 · màu theo điểm trạm">
           <RankH rows={rankRows} height={Math.max(240, rankRows.length * 20)} />
         </Cell>
         <Cell w={7} title="Chi tiết theo cửa hàng">
@@ -117,10 +117,10 @@ export default function OverviewView({ filter, periodType }: { filter: Filter; p
 
       {/* Area theo ngày + tiến độ trạm */}
       <Grid>
-        <Cell w={8} title="Doanh thu theo ngày">
+        <Cell w={8} title="Doanh thu theo ngày" mau="area">
           <AreaDaily points={d.daily.map((x) => ({ label: x.d.slice(8, 10) + "/" + x.d.slice(5, 7), value: x.dt }))} />
         </Cell>
-        <Cell w={4} title="Cơ cấu theo bộ phận">
+        <Cell w={4} title="Cơ cấu theo bộ phận" mau="donut">
           <DonutTotal items={topNKhac(d.byBp.map((x) => ({ name: x.name, value: x.cur })))} colorOf={colorMap(topNKhac(d.byBp.map((x) => ({ name: x.name, value: x.cur }))).map((x) => x.name))} />
         </Cell>
       </Grid>

@@ -76,5 +76,12 @@ a { color: inherit; text-decoration: none; }
 .tool-Google\.Sheets { color: var(--sheets); border-color: var(--sheets); background: #ecf6f0; }
 .tool-Nội\.bộ { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
 
+/* Thẻ chart được trỏ tới từ badge ⓘ (/charts#id) — làm nổi để dễ nhận ra. */
+.chart-card:target {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px var(--accent-soft);
+}
+
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 6px; }

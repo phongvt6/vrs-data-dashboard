@@ -1,5 +1,5 @@
 import type { EChartsOption } from 'echarts'
-import { CHROME, FONT_STACK, MARK, type Mode } from './theme'
+import { CHROME, FONT, FONT_STACK, MARK, type Mode } from './theme'
 
 /**
  * Khung mặc định dùng chung cho mọi biểu đồ ECharts trong catalog.
@@ -33,7 +33,7 @@ export function base(mode: Mode, opts: { legend?: boolean; grid?: Partial<GridOp
           itemWidth: 9,
           itemHeight: 9,
           itemGap: 18,
-          textStyle: { color: c.inkSecondary, fontSize: 12, fontFamily: FONT_STACK },
+          textStyle: { color: c.inkSecondary, fontSize: FONT.legend, fontFamily: FONT_STACK },
         }
       : { show: false },
     tooltip: tooltip(mode),
@@ -50,7 +50,7 @@ export function tooltip(mode: Mode, trigger: 'item' | 'axis' = 'axis') {
     borderColor: c.axis,
     borderWidth: 1,
     padding: [8, 12] as [number, number],
-    textStyle: { color: c.ink, fontSize: 12, fontFamily: FONT_STACK },
+    textStyle: { color: c.ink, fontSize: FONT.tooltip, fontFamily: FONT_STACK },
     extraCssText: 'border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,.12);',
     axisPointer: {
       type: trigger === 'axis' ? ('line' as const) : ('none' as const),
@@ -69,7 +69,7 @@ export function catAxis(mode: Mode, data: string[], extra: Record<string, unknow
     data,
     axisLine: { lineStyle: { color: c.axis } },
     axisTick: { show: false },
-    axisLabel: { color: c.inkMuted, fontSize: 11, fontFamily: FONT_STACK, hideOverlap: true },
+    axisLabel: { color: c.inkMuted, fontSize: FONT.axis, fontFamily: FONT_STACK, hideOverlap: true },
     ...extra,
   }
 }
@@ -88,7 +88,7 @@ export function valAxis(
     splitLine: { lineStyle: { color: c.grid, width: 1, type: 'solid' as const } },
     axisLabel: {
       color: c.inkMuted,
-      fontSize: 11,
+      fontSize: FONT.axis,
       fontFamily: FONT_STACK,
       // Ô chart hẹp thì nhãn trục giá trị chen nhau — giấu bớt thay vì đè lên nhau.
       hideOverlap: true,

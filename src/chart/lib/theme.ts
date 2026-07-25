@@ -156,6 +156,36 @@ export const MARK = {
 export const FONT_STACK = 'system-ui, -apple-system, "Segoe UI", sans-serif'
 
 /**
+ * Thang cỡ chữ dùng chung cho MỌI dashboard — chrome lẫn biểu đồ.
+ *
+ * QUY ĐỊNH: không có chữ nào nhỏ hơn 12px trên dashboard. Trước đây trục biểu đồ
+ * để 11px và nhãn số 10.5px (chữ nhỏ khó đọc) — nay mọi cỡ đọc từ bảng này, sửa
+ * một chỗ là cả app đổi theo. Đơn vị: px.
+ */
+export const FONT = {
+  /** Tiêu đề trang (h1 trong header dashboard). */
+  pageTitle: 22,
+  /** Tiêu đề thẻ/section (h3 trên đầu một ô chart/bảng). */
+  cardTitle: 15,
+  /** Con số lớn trong thẻ KPI. */
+  kpi: 28,
+  /** Con số vừa trong thẻ thống kê nhỏ. */
+  stat: 18,
+  /** Chữ thân bài, ô bảng. */
+  body: 13,
+  /** Nhãn trục biểu đồ (trước 11 → nay 12.5). */
+  axis: 12.5,
+  /** Chữ trong chú giải (legend). */
+  legend: 12.5,
+  /** Chữ trong tooltip. */
+  tooltip: 13,
+  /** Nhãn số vẽ trực tiếp trên mark (đầu thanh, trên cột) — trước 10.5. */
+  dataLabel: 12,
+  /** Chú thích phụ, phụ đề — SÀN, không nhỏ hơn. */
+  caption: 12,
+} as const
+
+/**
  * Chọn một bậc trên ramp theo giá trị đã chuẩn hoá t ∈ [0, 1].
  * Dùng cho ô bảng tô nền theo giá trị — cùng cơ chế với heatmap, chỉ khác là
  * nền nằm trong ô `<td>` chứ không phải trong canvas biểu đồ.

@@ -178,10 +178,10 @@ export default function GroupsView({ filter, periodType }: { filter: Filter; per
 
       {/* Cơ cấu + Top 10 SKU */}
       <Grid>
-        <Cell w={5} title="Cơ cấu nhóm hàng" note={`Kỳ ${rangeLabel}`}>
+        <Cell w={5} title="Cơ cấu nhóm hàng" mau="donut" note={`Kỳ ${rangeLabel}`}>
           <DonutTotal items={donutItems} colorOf={colorOf} height={250} />
         </Cell>
-        <Cell w={7} title="Top 10 mặt hàng có doanh thu cao nhất" note={`Kỳ ${rangeLabel} · màu theo nhóm hàng`}>
+        <Cell w={7} title="Top 10 mặt hàng có doanh thu cao nhất" mau="bar" note={`Kỳ ${rangeLabel} · màu theo nhóm hàng`}>
           <Hbars
             rows={top10.map((s) => ({ name: s.ten, value: s.dt, color: colorOf(s.group) }))}
             height={Math.max(240, top10.length * 26)}
@@ -257,6 +257,7 @@ export default function GroupsView({ filter, periodType }: { filter: Filter; per
 
         <Cell
           w={6}
+          mau="bar"
           title={`Chi tiết SKU · ${groupSel ?? ""}`}
           right={
             skus && skus.rest.length ? (
@@ -296,7 +297,7 @@ export default function GroupsView({ filter, periodType }: { filter: Filter; per
       </Grid>
 
       {/* Cột chồng theo tháng */}
-      <Cell w={12} title="Doanh thu nhóm hàng theo tháng" note="Top 8 nhóm · phần còn lại gộp “Nhóm khác”">
+      <Cell w={12} title="Doanh thu nhóm hàng theo tháng" mau="stacked-bar" note="Top 8 nhóm · phần còn lại gộp “Nhóm khác”">
         <StackedSeries labels={d.trend.labels} series={stackSeries} height={290} />
       </Cell>
     </div>
