@@ -155,31 +155,31 @@ function MauPopover({
   return (
     <div
       role="dialog"
-      aria-label={`Thông tin mẫu ${t.ten}`}
+      aria-label={`Mẫu ${t.ten}`}
       style={{
         position: "absolute",
         top: "calc(100% + 6px)",
         right: 0,
         zIndex: 60,
-        width: 320,
-        maxWidth: "min(320px, 80vw)",
+        width: "max-content",
+        maxWidth: "min(260px, 80vw)",
         background: "var(--ds-panel)",
         border: "1px solid var(--ds-line-strong)",
         borderRadius: RADIUS.card,
         boxShadow: "0 10px 30px rgba(0,0,0,.16)",
-        padding: "12px 14px",
+        padding: "10px 12px",
         textAlign: "left",
         cursor: "default",
         whiteSpace: "normal",
       }}
     >
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8 }}>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
         <a
           href={`/charts#${t.id}`}
           target="_blank"
           rel="noopener"
           title="Mở trang Thư viện chart"
-          style={{ fontSize: 14, fontWeight: 700, color: "var(--ds-accent)", textDecoration: "none" }}
+          style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ds-accent)", textDecoration: "none" }}
         >
           {t.ten} ↗
         </a>
@@ -187,44 +187,12 @@ function MauPopover({
           type="button"
           onClick={onClose}
           aria-label="Đóng"
-          style={{ border: "none", background: "none", cursor: "pointer", color: "var(--ds-ink-muted)", fontSize: 15, lineHeight: 1, padding: 2 }}
+          style={{ border: "none", background: "none", cursor: "pointer", color: "var(--ds-ink-muted)", fontSize: 14, lineHeight: 1, padding: 0 }}
         >
           ✕
         </button>
       </div>
-      <div style={{ fontSize: 11, color: "var(--ds-ink-muted)", fontFamily: "var(--mono, ui-monospace, monospace)", marginTop: 1 }}>{t.id}</div>
-      <p style={{ margin: "8px 0 0", fontSize: 12.5, color: "var(--ds-ink-2)", lineHeight: 1.5 }}>{t.mo_ta}</p>
-
-      <PopMuc tieu_de="Nên dùng khi" mau="var(--ds-accent)" items={t.nen_dung} />
-      <PopMuc tieu_de="Tránh khi" mau="var(--ds-bad)" items={t.tranh} />
-
-      <p style={{ margin: "10px 0 0", fontSize: 11.5, color: "var(--ds-ink-muted)", lineHeight: 1.5 }}>
-        <b style={{ color: "var(--ds-ink-2)" }}>Dữ liệu cần:</b> {t.dang_du_lieu}
-      </p>
-      <a
-        href={`/charts#${t.id}`}
-        target="_blank"
-        rel="noopener"
-        style={{ display: "inline-block", marginTop: 10, fontSize: 12, fontWeight: 600, color: "var(--ds-accent)", textDecoration: "none" }}
-      >
-        Xem trong Thư viện chart →
-      </a>
-    </div>
-  );
-}
-
-function PopMuc({ tieu_de, mau, items }: { tieu_de: string; mau: string; items: string[] }) {
-  if (!items?.length) return null;
-  return (
-    <div style={{ marginTop: 10 }}>
-      <div style={{ fontSize: 10.5, fontWeight: 700, color: mau, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.04em" }}>
-        {tieu_de}
-      </div>
-      <ul style={{ margin: 0, paddingLeft: 15, display: "grid", gap: 3 }}>
-        {items.map((s) => (
-          <li key={s} style={{ fontSize: 11.5, color: "var(--ds-ink-2)", lineHeight: 1.4 }}>{s}</li>
-        ))}
-      </ul>
+      <div style={{ fontSize: 11.5, color: "var(--ds-ink-muted)", fontFamily: "var(--mono, ui-monospace, monospace)", marginTop: 2 }}>{t.id}</div>
     </div>
   );
 }
